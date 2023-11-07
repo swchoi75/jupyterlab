@@ -4,5 +4,5 @@
 .Ruserdata
 .Rproj
 .pbix
-.csv
-.xlsx
+*.csv
+*.xlsx
