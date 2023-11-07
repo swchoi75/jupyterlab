@@ -4,11 +4,11 @@ from pathlib import Path
 
 
 # Path
-path = Path(r"C:\Users\uid98421\Vitesco Technologies\Controlling VT Korea - Documents\120. Data automation\1000 VT Datalake")
+path = Path.cwd()
 
 # Input file
-input_file = path / "output/Investment_spending/" / "Monthly Spending FC10+2.csv"
-output_file = path / "report in Excel/Investment_spending" / "Charts.xlsx"
+input_file = path / "output" / "Monthly Spending FC10+2.csv"
+output_file = path / "report" / "Charts.xlsx"
 
 
 df = pd.read_csv(input_file)
@@ -48,6 +48,13 @@ with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
         column_settings = [{"header": column}
                            for column in category_df.columns]
 
+        # Add your formatting options, for example, bold headers
+        header_format = workbook.add_format(
+            {
+                "bold": True,
+            }
+        )
+
         # Write the header row explicitly with your formatting
         for col_num, value in enumerate(category_df.columns.values):
-            worksheet.write(0, col_num, value)
+            worksheet.write(0, col_num, value, header_format)

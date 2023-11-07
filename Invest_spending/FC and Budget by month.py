@@ -6,8 +6,6 @@ from janitor import clean_names
 
 # Path
 path = Path.cwd()
-data_path = path / "data"
-output_path = path / "output"
 
 
 # Functions

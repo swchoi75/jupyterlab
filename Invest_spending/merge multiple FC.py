@@ -3,9 +3,7 @@ from pathlib import Path
 
 
 # Path
-path = Path(r"C:\Users\uid98421\Vitesco Technologies\Controlling VT Korea - Documents\120. Data automation\1000 VT Datalake")
-data_path = path / "data/Investment_spending/"
-output_path = path / "output/Investment_spending/"
+path = Path.cwd()
 
 
 # Function
@@ -17,11 +15,11 @@ def read_csv_file(path, fc_version):
 
 
 # Input data
-fc10_path = output_path / "Monthly Spending FC10+2.csv"
-fc6_path = output_path / "Monthly Spending FC6+6.csv"
-fc4_path = output_path / "Monthly Spending FC4+8.csv"
-fc3_path = output_path / "Monthly Spending FC3+9.csv"
-fc2_path = output_path / "Monthly Spending FC2+10.csv"
+fc10_path = path / "output" / "Monthly Spending FC10+2.csv"
+fc6_path = path / "output" / "Monthly Spending FC6+6.csv"
+fc4_path = path / "output" / "Monthly Spending FC4+8.csv"
+fc3_path = path / "output" / "Monthly Spending FC3+9.csv"
+fc2_path = path / "output" / "Monthly Spending FC2+10.csv"
 
 
 # Process data
@@ -39,4 +37,4 @@ merged = pd.concat([fc10, fc6, fc4, fc3, fc2], axis="rows")
 
 
 # Output data
-merged.to_csv(output_path / "Monthly Spending merged.csv", index=False)
+merged.to_csv(path / "output" / "Monthly Spending merged.csv", index=False)

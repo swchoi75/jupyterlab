@@ -6,13 +6,13 @@ from pathlib import Path
 # Path
 # path = Path('./datasets/home-dataset/data/')
 path = Path(
-    r"C:\Users\uid98421\OneDrive - Vitesco Technologies\FY 2023\Jour fixe")
+    r"C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe")
 
 
 # Input file & Output file
-input_file = path / "output_jour_fixe.csv"
-meta_file = path / "email.csv"
-output_file = path / "report_jour_fixe.xlsx"
+input_file = path / "output" / "output_jour_fixe.csv"
+meta_file = path / "meta" / "email.csv"
+output_file = path / "output" / "report_jour_fixe.xlsx"
 
 
 # Read data
