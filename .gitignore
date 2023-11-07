@@ -1,8 +1,17 @@
+# R
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
 .Rproj
+
+# Power BI
 .pbix
+
+# Python
+.ipynb_checkpoints/
+*.jpg
 *.csv
 *.xlsx
+*.parquet
+__pycache__/
