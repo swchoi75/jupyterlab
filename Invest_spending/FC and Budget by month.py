@@ -5,9 +5,9 @@ from janitor import clean_names
 
 
 # Path
-path = Path(r"C:\Users\uid98421\Vitesco Technologies\Controlling VT Korea - Documents\120. Data automation\1000 VT Datalake")
-data_path = path / "data/Investment_spending/"
-output_path = path / "output/Investment_spending/"
+path = Path.cwd()
+data_path = path / "data"
+output_path = path / "output"
 
 
 # Functions
@@ -110,9 +110,9 @@ fc_fx = 1411.92300  # YTD October P&L rate (KRW / EUR)
 
 
 # Input data
-fc_path = data_path / "052P FC by month/GFW_ICH_V378 FC10+2_KRW.xlsx"
-bud_path = data_path / "552P Budget by month/GFW_ICH_V359 Budget 2023_KRW.xlsx"
-top = pd.read_csv(data_path / "top 15 projects.csv",
+fc_path = path / "data" / "GFW_ICH_V378 FC10+2_KRW.xlsx"
+bud_path = path / "data" / "GFW_ICH_V359 Budget 2023_KRW.xlsx"
+top = pd.read_csv(path / "data" / "top 15 projects.csv",
                   usecols=[0, 1]).clean_names()
 
 
@@ -125,4 +125,4 @@ fc_bud = pd.concat([fc, bud], axis="rows")
 df = main(fc_bud)
 
 # Output data
-df.to_csv(output_path / "Monthly Spending FC10+2.csv", index=False)
+df.to_csv(path / "output" / "Monthly Spending FC10+2.csv", index=False)

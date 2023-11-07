@@ -11,8 +11,8 @@ path = Path.cwd()
 
 
 # Input file & Output file
-input_file = path / "download_jour_fixe.csv"
-output_file = path / "output_jour_fixe.csv"
+input_file = path / "data" / "download_jour_fixe.csv"
+output_file = path / "output" / "output_jour_fixe.csv"
 
 
 # Functions
