@@ -5,13 +5,16 @@
 .Ruserdata
 .Rproj
 
+# Python
+.ipynb_checkpoints/
+__pycache__/
+
 # Power BI
 .pbix
 
-# Python
-.ipynb_checkpoints/
+# Data
 *.jpg
 *.csv
 *.xlsx
 *.parquet
-__pycache__/
+*.pptx

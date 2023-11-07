@@ -18,7 +18,7 @@ df = df[(df["category"] == "Top 15 projects") & (df["version"] != "Actual")]
 
 # Pivot table
 df = df.pivot_table(
-    values="k_eur", index=["master_id", "version"], columns="quarter", aggfunc="sum"
+    values="k_eur", index=["master_id", "master", "version"], columns="quarter", aggfunc="sum"
 ).reset_index()
 
 # Get the dimensions of the dataframe.
@@ -78,7 +78,7 @@ with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
             chart.add_series(
                 # [sheetname, first_row, first_col, last_row, last_col]
                 {
-                    "name": [category, row_num, 1],
+                    "name": [category, row_num, 3 - 1],
                     "categories": [category, 0, max_col - 4, 0, max_col - 1],
                     "values": [category, row_num, max_col - 4, row_num, max_col - 1],
                     "data_labels": {"value": True},
