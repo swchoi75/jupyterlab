@@ -1,12 +1,14 @@
 import pandas as pd
 from pathlib import Path
+
 # import xlsxwriter  # pip install XlsxWriter
 
 
 # Path
 # path = Path('./datasets/home-dataset/data/')
 path = Path(
-    r"C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe")
+    r"C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe"
+)
 
 
 # Input file & Output file
@@ -26,8 +28,7 @@ df = pd.merge(list, members, on="email")
 
 # Filter active members, open action items in 2023
 df = df[
-    (df["active"] == "yes") & (df["info_action"]
-                               == "Action") & (df["year"] == 2023)
+    (df["active"] == "yes") & (df["info_action"] == "Action") & (df["year"] == 2023)
 ]
 
 
@@ -72,10 +73,9 @@ with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
         (max_row, max_col) = category_df.shape
 
         # Create a list of column headers, to use in add_table().
-        column_settings = [{"header": column}
-                           for column in category_df.columns]
+        column_settings = [{"header": column} for column in category_df.columns]
 
-        # Add the Excel table structure. Pandas will add the data.
+        # Add the Excel table structure.
         worksheet.add_table(
             0,
             0,
