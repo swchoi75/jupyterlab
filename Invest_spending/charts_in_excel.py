@@ -1,6 +1,5 @@
 import pandas as pd
 from pathlib import Path
-from vincent.colors import brews
 
 
 # Path
@@ -8,21 +7,98 @@ path = Path.cwd()
 
 # Input file
 input_file = path / "output" / "Monthly Spending FC10+2.csv"
+meta_file = path / "data" / "top 15 projects.csv"
 output_file = path / "report" / "Charts.xlsx"
 
 # Read data
-df = pd.read_csv(input_file)
+df_1 = pd.read_csv(input_file)
+df_2 = pd.read_csv(meta_file, usecols=[0, 2])
+
+df = pd.merge(df_1, df_2, on="master_id")
+df.columns
+
+# Add column
+df["m_eur"] = df["k_eur"] / 1000
+
+# Rename columns
+df = df.rename(
+    columns={
+        "division_receiver": "division",
+        "bu_receiver": "bu",
+        "outlet_receiver": "outlet",
+    }
+)
 
 # Filter data
 df = df[(df["category"] == "Top 15 projects") & (df["version"] != "Actual")]
 
-# Pivot table
-df = df.pivot_table(
-    values="k_eur", index=["master_id", "master", "version"], columns="quarter", aggfunc="sum"
-).reset_index()
+pl = df[(df["assignment"] == "DIV E") | (df["assignment"] == "DIV P")]
+cf = df[df["assignment"] == "Central function"]
+npf = df[df["assignment"] == "NPF"]
 
-# Get the dimensions of the dataframe.
-(max_row, max_col) = df.shape
+df = pd.concat([pl, cf, npf])
+
+
+# select columns
+key_columns = [
+    "master_id",
+    "master",
+    # "division",
+    "assignment",
+    "bu",
+    "outlet",
+    "location",
+]
+
+df = df[
+    key_columns
+    + [
+        "quarter",
+        "version",
+        "m_eur",
+    ]
+]
+
+# Sort by values, but this sort does not show up in the excel report.
+df = df.sort_values(
+    ["assignment", "bu", "outlet", "version", "quarter"],
+    ascending=[True, True, True, True, False],
+)
+
+# Pivot table
+df = (
+    df.pivot_table(
+        values="m_eur",
+        index=key_columns + ["quarter"],
+        columns="version",
+        aggfunc="sum",
+    )
+    .fillna(0)  # Fill NA with zero for version: Budget & FC
+    .reset_index()
+)
+
+# Melt table
+df = df.melt(
+    id_vars=key_columns + ["quarter"],
+    value_vars=["Budget", "FC"],
+    value_name="m_eur",
+)
+
+# Pivot table
+df = (
+    df.pivot_table(
+        values="m_eur",
+        index=key_columns + ["version"],
+        columns="quarter",
+        aggfunc="sum",
+    )
+    .fillna(0)  # Fill NA with zero for quarter: Q1, Q2, Q3, Q4
+    .reset_index()
+)
+
+
+# # Get the dimensions of the dataframe.
+# (max_row, max_col) = df.shape
 
 # Unique values
 unique_categories = df["master_id"].unique()
@@ -50,19 +126,6 @@ with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
         # Create a list of column headers, to use in add_table().
         column_settings = [{"header": column} for column in category_df.columns]
 
-        # # Add the Excel table structure.
-        # worksheet.add_table(
-        #     0,
-        #     0,
-        #     max_row,
-        #     max_col - 1,
-        #     {
-        #         "columns": column_settings,
-        #         "style": "Table Style Medium 3",
-        #         "name": category,
-        #     },
-        # )
-
         # Add your formatting options, for example, bold headers
         header_format = workbook.add_format({"bold": True})
 
@@ -78,11 +141,10 @@ with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
             chart.add_series(
                 # [sheetname, first_row, first_col, last_row, last_col]
                 {
-                    "name": [category, row_num, 3 - 1],
+                    "name": [category, row_num, 6],
                     "categories": [category, 0, max_col - 4, 0, max_col - 1],
                     "values": [category, row_num, max_col - 4, row_num, max_col - 1],
                     "data_labels": {"value": True},
-                    "fill": {"color": brews["Spectral"][row_num - 1]},
                     "gap": 300,
                 }
             )
@@ -91,10 +153,14 @@ with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
         chart.set_y_axis({"major_gridlines": {"visible": False}})
 
         # Insert the chart into the worksheet.
-        worksheet.insert_chart("K2", chart)
+        worksheet.insert_chart("B10", chart)
 
-        # Define a numeric format, such as "0" for two decimal places
-        numeric_format = workbook.add_format({"num_format": "0"})
+        # Define a numeric format, such as "0.0" for two decimal places
+        numeric_format = workbook.add_format({"num_format": "0.0"})
 
         # Apply the numeric format to the numeric column (adjust the range as needed)
-        worksheet.set_column("C:F", None, numeric_format)
+        worksheet.set_column("A:Z", None, numeric_format)
+
+        # Specify column widths
+        worksheet.set_column("B:B", 30)  # Title
+        worksheet.set_column("C:C", 10)  # Title
