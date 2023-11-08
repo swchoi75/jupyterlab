@@ -46,7 +46,7 @@ def outlet():
     # POC
     col_poc = ["division", "bu", "new_outlet", "new_outlet_name"]
 
-    df = pd.read_excel(path / "New outlet.xlsx", usecols="A:F", dtype="str")
+    df = pd.read_excel(path / "meta" / "New outlet.xlsx", usecols="A:F", dtype="str")
     df = clean_names(df)
     df = df.drop(columns=["outlet_name"])
     df = df[["outlet"] + col_poc]
@@ -75,8 +75,8 @@ def balance_sheet(df):
 
 
 # Input data
-path_lc = path / "Analysis FS Item Hierarchy for CU 698_LC.xlsx"
-path_gc = path / "Analysis FS Item Hierarchy for CU 698_GC.xlsx"
+path_lc = path / "data" / "Analysis FS Item Hierarchy for CU 698_LC.xlsx"
+path_gc = path / "data" / "Analysis FS Item Hierarchy for CU 698_GC.xlsx"
 
 
 # Combine data
@@ -96,5 +96,5 @@ race_bs = balance_sheet(race)
 
 
 # Output data
-race_pnl.to_csv(path / "RACE Profit and Loss.csv", index=False, na_rep="0")
-race_bs.to_csv(path / "RACE Balance sheet.csv", index=False, na_rep="0")
+race_pnl.to_csv(path / "output" / "RACE Profit and Loss.csv", index=False, na_rep="0")
+race_bs.to_csv(path / "output" / "RACE Balance sheet.csv", index=False, na_rep="0")
