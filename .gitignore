@@ -18,3 +18,4 @@ __pycache__/
 *.xlsx
 *.parquet
 *.pptx
+*.html
