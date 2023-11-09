@@ -41,12 +41,12 @@ df = df.rename(
         "description": "Description",
         # "function": "Function",
         "status": "Status",
-        "duedate": "Due date",
+        "duedate": "Due_date",
     }
 )
 
 # Select columns
-df = df[["Year", "CW", "Title", "Description", "Status", "Due date", "responsible"]]
+df = df[["Year", "CW", "Title", "Description", "Status", "Due_date", "responsible"]]
 
 
 # Create a new Excel file and write separate sheets for each category
@@ -106,7 +106,7 @@ with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
         # Specify column widths
         worksheet.set_column("C:C", 50)  # Title
         worksheet.set_column("D:D", 100)  # Description
-        worksheet.set_column("E:F", 11)  # Status, Due date
+        worksheet.set_column("E:F", 11)  # Status, Due_date
 
         # Enable text wrapping for an entire column
         column_format = workbook.add_format()
