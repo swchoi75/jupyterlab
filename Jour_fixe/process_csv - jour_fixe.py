@@ -7,7 +7,9 @@ from janitor import clean_names  # pip install pyjanitor
 
 # Path
 # path = Path('./datasets/home-dataset/data/')
-path = Path.cwd()
+path = Path(
+    r"C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe"
+)
 
 
 # Input file & Output file
