@@ -27,9 +27,7 @@ df = pd.merge(list, members, on="email")
 
 
 # Filter active members, open action items in 2023
-df = df[
-    (df["active"] == "yes") & (df["info_action"] == "Action") & (df["year"] == 2023)
-]
+df = df[(df["active"] == "yes") & (df["status"] == "Action") & (df["year"] == 2023)]
 
 
 # Unique values
@@ -43,13 +41,14 @@ df = df.rename(
         "calendarweek": "CW",
         "title": "Title",
         "description": "Description",
-        "function": "Function",
-        "info_action": "Status",
+        # "function": "Function",
+        "status": "Status",
+        "duedate": "Due date",
     }
 )
 
 # Select columns
-df = df[["Year", "CW", "Title", "Description", "Status", "responsible"]]
+df = df[["Year", "CW", "Title", "Description", "Status", "Due date", "responsible"]]
 
 
 # Create a new Excel file and write separate sheets for each category
@@ -109,6 +108,7 @@ with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
         # Specify column widths
         worksheet.set_column("C:C", 50)  # Title
         worksheet.set_column("D:D", 100)  # Description
+        worksheet.set_column("E:F", 11)  # Status, Due date
 
         # Enable text wrapping for an entire column
         column_format = workbook.add_format()

@@ -62,6 +62,12 @@ def rename_column(df, old_column_name, new_column_name):
     return df
 
 
+def extract_email(df, column_name):
+    email_pattern = r"([\w\.-]+@[\w\.-]+)"
+    df[column_name] = df[column_name].str.extract(email_pattern)
+    return df
+
+
 def main(input_file):
     df = (
         load_and_clean_data(input_file)
@@ -76,6 +82,8 @@ def main(input_file):
                 "originator",
                 "information_x002f_action_x002f_d",
                 "responsible_x002f_report#claims",
+                "duedate",
+                "delegate",
             ],
         )
         .pipe(
@@ -106,7 +114,7 @@ def main(input_file):
         .pipe(
             normalize_and_create_column,
             column_name="information_x002f_action_x002f_d",
-            new_column_name="info_action",
+            new_column_name="status",
         )
         .pipe(
             replace_substring,
@@ -119,6 +127,10 @@ def main(input_file):
             old_column_name="responsible_x002f_report#claims",
             new_column_name="email",
         )
+        .pipe(
+            extract_email,
+            column_name="delegate",
+        )
         # Select the final set of columns
         .pipe(
             select_columns,
@@ -130,8 +142,10 @@ def main(input_file):
                 "description",
                 # after parsing JSON
                 "function",
-                "info_action",
+                "status",
                 "email",
+                "duedate",
+                # "delegate",
             ],
         )
     )
