@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 # Path
-path = Path.cwd()
+path = Path(__file__).parent
 
 # Input file
 input_file = path / "output" / "Monthly Spending FC10+2.csv"

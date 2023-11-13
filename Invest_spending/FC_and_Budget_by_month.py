@@ -5,7 +5,7 @@ from janitor import clean_names
 
 
 # Path
-path = Path.cwd()
+path = Path(__file__).parent
 
 
 # Functions
@@ -82,15 +82,13 @@ def process_numeric_columns(df):
 
 def join_top_15_projects(df):
     df = df.merge(top, on="master_id", how="left")
-    df["category"] = np.where(df["category"].isna(),
-                              "Other Projects", df["category"])
+    df["category"] = np.where(df["category"].isna(), "Other Projects", df["category"])
     return df
 
 
 def main(df):
     df = (
-        df
-        .pipe(rename_columns)
+        df.pipe(rename_columns)
         .pipe(add_version)
         .pipe(add_month)
         .pipe(add_quarter)
@@ -110,8 +108,7 @@ fc_fx = 1411.92300  # YTD October P&L rate (KRW / EUR)
 # Input data
 fc_path = path / "data" / "GFW_ICH_V378 FC10+2_KRW.xlsx"
 bud_path = path / "data" / "GFW_ICH_V359 Budget 2023_KRW.xlsx"
-top = pd.read_csv(path / "data" / "top 15 projects.csv",
-                  usecols=[0, 1]).clean_names()
+top = pd.read_csv(path / "data" / "top 15 projects.csv", usecols=[0, 1]).clean_names()
 
 
 # Process data
