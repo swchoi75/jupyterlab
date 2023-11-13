@@ -140,8 +140,8 @@ sp = SF(username, password, sharepoint_url)
 folder_url = "Documents/Github/jupyterlab/Jour_fixe/output/"
 
 file_list = sp.get_filelist_sharepoint(folder_url)
-for file in file_list:
-    print(file.properties["Name"])
+# for file in file_list:
+#     print(file.properties["Name"])
 
 
 # read file from local
