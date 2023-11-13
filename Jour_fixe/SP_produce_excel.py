@@ -149,7 +149,7 @@ file_data = sp.read_file_local(output_file)
 
 
 # write file to sharepoint
-file_url = "/personal/uid98421_vitesco_com/Documents/GitHub/jupyterlab/Jour_fixe/data/report_jour_fixe.xlsx"
+file_url = "/personal/uid98421_vitesco_com/Documents/GitHub/jupyterlab/Jour_fixe/output/report_jour_fixe.xlsx"
 sp.write_file_sharepoint(file_data, file_url)
 
 ########## Sharepoint connection ##########
