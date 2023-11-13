@@ -14,8 +14,14 @@ __pycache__/
 
 # Data
 *.jpg
-*.csv
-*.xlsx
+*.png
+
 *.parquet
+*.csv
+*.txt
+
+*.xlsx
+*.xlsm
+
 *.pptx
 *.html
