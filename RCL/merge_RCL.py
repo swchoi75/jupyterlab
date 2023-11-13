@@ -5,7 +5,7 @@ from janitor import clean_names
 
 
 # Path
-path = Path.cwd()
+path = Path(__file__).parent
 data_path = path / "data/"
 
 
@@ -47,14 +47,14 @@ def read_multiple_files(list_of_files):
 
 
 def wrangle_dataframe(df):
-    df = (df
-          .pipe(rename_columns)
-          .pipe(clean_names)
-          .pipe(convert_currency)
-          .pipe(extract_poc)
-          .pipe(join_with_poc)
-          .pipe(add_key_column)
-          )
+    df = (
+        df.pipe(rename_columns)
+        .pipe(clean_names)
+        .pipe(convert_currency)
+        .pipe(extract_poc)
+        .pipe(join_with_poc)
+        .pipe(add_key_column)
+    )
     return df
 
 
@@ -105,8 +105,7 @@ def join_with_poc(df):
     poc_df = poc()
     df = df.merge(poc_df, on=["outlet", "plant"], how="left")
     # Reorder columns
-    head_col = ["division", "bu", "outlet_name",
-                "plant_name", "outlet", "plant"]
+    head_col = ["division", "bu", "outlet_name", "plant_name", "outlet", "plant"]
     df = df[head_col + [col for col in df.columns if col not in head_col]]
     return df
 
@@ -119,8 +118,7 @@ def poc():
 
 def add_key_column(df):
     # Add key column for look up RCL comments
-    df["key"] = df["outlet"] + "_" + \
-        df["plant"] + "_" + df["rcl_item_structure"]
+    df["key"] = df["outlet"] + "_" + df["plant"] + "_" + df["rcl_item_structure"]
     return df
 
 

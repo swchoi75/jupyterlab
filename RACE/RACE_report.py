@@ -6,7 +6,7 @@ from janitor import clean_names
 
 # Path
 # path = Path('datasets/home-dataset/data/')
-path = Path.cwd()
+path = Path(__file__).parent
 
 
 # Functions
