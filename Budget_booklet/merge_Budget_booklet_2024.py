@@ -6,11 +6,12 @@ from janitor import clean_names
 # Path
 # path = Path('datasets/home-dataset/')
 path = Path.cwd()
+data_path = path / "data/"
 
 
 # List of multiple excel files
 xls_files = [
-    file for file in path.iterdir() if file.is_file() and file.suffix == ".xlsx"
+    file for file in data_path.iterdir() if file.is_file() and file.suffix == ".xlsx"
 ]
 
 
@@ -169,7 +170,7 @@ str = (
     )
 )
 
-fix.to_csv(path / "2024 Fix cost.csv", index=False)
-var.to_csv(path / "2024 Var cost.csv", index=False)
-hc.to_csv(path / "2024 Headcount.csv", index=False)
-str.to_csv(path / "2024 Structural changes.csv", index=False)
+fix.to_csv(path / "output" / "2024 Fix cost.csv", index=False)
+var.to_csv(path / "output" / "2024 Var cost.csv", index=False)
+hc.to_csv(path / "output" / "2024 Headcount.csv", index=False)
+str.to_csv(path / "output" / "2024 Structural changes.csv", index=False)

@@ -1,13 +1,12 @@
 import pandas as pd
 import os
+from pathlib import Path
 from janitor import clean_names
 
 
 # Path
-path = "../"
-data_path = path + "data/PnL/"
-output_path = path + "output/PnL/"
-expanded_path = os.path.expanduser(data_path + "RCL/")
+path = Path.cwd()
+data_path = path / "data/"
 
 
 # Budget FX rate
@@ -15,8 +14,9 @@ bud_fx = 1329  # Budget FX rate in 2023
 
 
 # Input data: List of multiple text files
-xls_files = [file for file in os.listdir(
-    expanded_path) if file.endswith(".xlsm")]
+xls_files = [
+    file for file in data_path.iterdir() if file.is_file() and file.suffix == ".xlsm"
+]
 
 
 def merge_rcl(list_of_files):
@@ -26,19 +26,23 @@ def merge_rcl(list_of_files):
 
 
 def read_multiple_files(list_of_files):
-    df = pd.concat(
-        [
-            pd.read_excel(
-                f"{expanded_path}/{file}",
-                sheet_name="RCL Input GC",
-                skiprows=4,
-                dtype={"Item Structure": str, "Outlet": str, "Plant": str},
-            ).assign(source=file)
-            for file in list_of_files
-        ],
-    )
-    # reorder columns
-    df = df[["source"] + [col for col in df.columns if col not in ["source"]]]
+    dataframes = [
+        pd.read_excel(
+            file,
+            sheet_name="RCL Input GC",
+            skiprows=4,
+            dtype={"Item Structure": str, "Outlet": str, "Plant": str},
+        )
+        for file in list_of_files
+    ]
+
+    # Add a new column with filename to each DataFrame
+    for i, df in enumerate(dataframes):
+        df["source"] = list_of_files[i].stem
+
+    # Merge the list of DataFrames into a single DataFrame
+    df = pd.concat(dataframes)
+
     return df
 
 
@@ -108,7 +112,7 @@ def join_with_poc(df):
 
 
 def poc():
-    df = pd.read_csv(path + "meta/POC.csv", dtype="str").clean_names()
+    df = pd.read_csv(path / "meta" / "POC.csv", dtype="str").clean_names()
     df = df.drop(columns=["cu", "profit_center"])
     return df
 
@@ -122,4 +126,4 @@ def add_key_column(df):
 
 # Output data
 df = merge_rcl(xls_files)
-df.to_csv(output_path + "RCL.csv", index=False)
+df.to_csv(path / "output" / "RCL.csv", index=False)
