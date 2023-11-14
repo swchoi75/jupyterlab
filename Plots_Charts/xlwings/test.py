@@ -38,7 +38,7 @@ print("The DataFrame df has {rows} rows.".format(rows=df.shape[0]))
 ws.range("O1").value = "Date"
 
 # Formula
-ws.range("O2").value = "=C2&D2&RIGHT(E2, 2)"
+ws.range("O2").value = '=C2&" "&D2&" "&RIGHT(E2, 2)'
 
 # API Autofill
 ws.range("O2").api.AutoFill(ws.range("O2:O{row}".format(row=last_row)).api, 0)
