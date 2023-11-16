@@ -8,7 +8,7 @@ path = Path(__file__).parent
 # Input file
 input_file = path / "output" / "Monthly Spending FC10+2.csv"
 meta_file = path / "data" / "top 15 projects.csv"
-output_file = path / "report" / "Charts.xlsx"
+output_file = path / "report" / "Quarterly Charts.xlsx"
 
 # Read data
 df_1 = pd.read_csv(input_file)
