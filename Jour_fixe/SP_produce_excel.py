@@ -3,8 +3,10 @@ from pathlib import Path
 
 
 # Path
-# path = Path('./datasets/home-dataset/data/')
-path = Path(__file__).parent
+absolute_path = (
+    r"C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe"
+)
+path = Path(absolute_path)
 
 
 # Input file & Output file
@@ -121,6 +123,9 @@ with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
 
 
 ########## Sharepoint connection ##########
+import sys
+
+sys.path.append(absolute_path)
 from SharepointFunctions import SharepointFunctions as SF
 
 
