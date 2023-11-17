@@ -1,0 +1,156 @@
+// 1.1 Import data
+
+source: vgsales is table('duckdb:../data/datathon/vgsales.parquet') extend {
+    where: Region != "Global_Sales"
+}
+
+source: department is table('duckdb:../data/datathon/department.parquet') extend {
+    primary_key: id
+}
+
+source: pricing is table('duckdb:../data/datathon/pricing.parquet') extend {
+    primary_key: size
+}
+
+source: metrics is table('duckdb:../data/datathon/metrics.parquet') extend {
+    join_one: department with id
+    join_one: pricing with size
+}
+
+// 1.2 How many departments use the appliances of the Data Platform?
+
+query: metrics_unique is metrics -> {
+    group_by: id, department.department, disk_size, type, size
+}
+
+run: metrics_unique -> {
+    group_by: department
+    aggregate: department_count is count()
+}
+
+run: metrics_unique -> {
+    aggregate: department_all is count(distinct department)
+}
+
+// 1.3 What is the most popular appliance size used by all departments?
+// And how many of those popular sizes did you find in the whole dataset?
+
+run: metrics_unique -> {
+    group_by: size
+    aggregate: size_count is count()
+}
+
+// 2.1 Which is the most popular appliance type per department?
+
+run: metrics_unique -> {
+    group_by: department, type
+    aggregate: type_per_department is count()
+    order_by: department, type_per_department desc
+}
+
+// 2.2 Wich appliance size had the lowest vCPU utilization
+// over the full time range of the dataset based on the listed metrics?
+// Calculate a value with 6 digits after zero for each metric:
+
+query: vcpu_by_size is metrics -> {
+    group_by: id, data_timestamp, size, vcpu
+}
+
+run: vcpu_by_size -> {
+    group_by: size
+
+    # value_format="0.000000"
+    aggregate: 
+        minimum is min(vcpu)
+        // median is median(vcpu)
+        mean is avg(vcpu)
+    order_by: minimum
+}
+
+// 2.3 Which department has used the most appliances between 15.12.2022 and 16.01.2023?
+// How many appliances did they use in this time range?
+
+source: data_in_periods is metrics extend {
+    where: data_timestamp > @2022-12-15
+    where: data_timestamp < @2023-01-16
+}
+
+query: data_in_periods -> {
+    group_by: department.department
+    aggregate: appliance_count is count(distinct id)
+}
+
+// 2.4 What is the most expensive size of an appliance used in the Data Platform
+// in terms of hours used per department?
+query: data_usage is metrics -> {
+    group_by: department.department, size, pricing.cost_per_hour, data_timestamp
+} -> {
+    group_by: department, size, cost_per_hour
+    aggregate: timestamp_count is count()
+}
+
+source: cost_calc is data_usage extend {
+    # value_format="0.000000"
+    dimension: cost is timestamp_count / 12 * cost_per_hour
+}
+
+run: cost_calc -> {
+    project: *
+    order_by: department desc, cost desc
+}
+
+// 3.1 Which fields are important to find out if an appliance is idle
+// - meaning that an appliance is running but no action is performed on it?
+// Sort the correct values in alphabetic order, before submitting your response.
+
+// 3.2 Which appliances were idle and when?
+
+query: max_net_in_out is metrics -> {
+    project: size, net_in, net_out
+} -> {
+    group_by: size
+    aggregate: 
+        max_net_in is max(net_in)
+        max_net_out is max(net_out)
+}
+
+source: max_network is max_net_in_out extend {
+    dimension: max_network is max_net_in + max_net_out
+    primary_key: size
+}
+
+source: metrics_check is metrics extend {
+    join_one: max_network with size
+    dimension: net_usage is net_in + net_out
+    dimension: check_network is
+        pick "idle" when net_usage < max_network.max_network * 0.02
+        else "running"
+    dimension: check_vcpu is
+        pick "idle" when type = 'deeplearning' and vcpu < 10 or vcpu < 5
+        else "running"
+    dimension: check_idle is
+        pick "idle" when check_network = "idle" and check_vcpu = "idle"
+        else "running"
+}
+
+query: check_network is metrics_check -> {
+    project: size, net_usage, max_network.max_network, check_network
+    where: check_network = "running"
+}
+
+query: check_vcpu is metrics_check -> {
+    project: size, type, vcpu
+    where: check_vcpu = "running"
+}
+
+query: check_idle is metrics_check -> {
+    group_by: id, data_timestamp, check_idle
+    where: check_idle = "running"
+    order_by: data_timestamp, id
+}
+
+// 3.3.1 How much costs did the appliances generate in the idle state?
+
+
+// 3.3.2 Compared to the total cost generated overall,
+// how much percent are attributed to the idle appliances?

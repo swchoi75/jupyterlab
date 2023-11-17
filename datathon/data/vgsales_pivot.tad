@@ -1,0 +1,84 @@
+{
+  "tadFileFormatVersion": 2,
+  "contents": {
+    "dsPath": {
+      "sourceId": {
+        "providerName": "localfs",
+        "resourceId": "C:\\Users\\uid98421\\datasets\\5M8S-rworkspace\\datathon\\vgsales.parquet"
+      },
+      "path": [
+        "."
+      ]
+    },
+    "viewParams": {
+      "showRoot": false,
+      "displayColumns": [
+        "Region",
+        "Genre",
+        "Sales"
+      ],
+      "vpivots": [
+        "Region",
+        "Genre"
+      ],
+      "pivotLeafColumn": null,
+      "sortKey": [
+        [
+          "Sales",
+          false
+        ]
+      ],
+      "openPaths": {
+        "_rep": {
+          "\"NA_Sales\"": {},
+          "\"EU_Sales\"": {}
+        }
+      },
+      "aggMap": {},
+      "defaultFormats": {
+        "string": {
+          "type": "TextFormatOptions",
+          "urlsAsHyperlinks": true
+        },
+        "integer": {
+          "type": "NumFormatOptions",
+          "commas": true,
+          "decimalPlaces": 0,
+          "exponential": false
+        },
+        "real": {
+          "type": "NumFormatOptions",
+          "commas": true,
+          "decimalPlaces": 2,
+          "exponential": false
+        },
+        "boolean": {
+          "type": "NumFormatOptions",
+          "commas": true,
+          "decimalPlaces": 0,
+          "exponential": false
+        }
+      },
+      "columnFormats": {},
+      "showHiddenCols": false,
+      "filterExp": {
+        "expType": "FilterExp",
+        "op": "AND",
+        "opArgs": [
+          {
+            "expType": "BinRelExp",
+            "op": "NEQ",
+            "lhs": {
+              "expType": "ColRef",
+              "colName": "Region"
+            },
+            "rhs": {
+              "expType": "ConstVal",
+              "val": "Global_Sales"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
