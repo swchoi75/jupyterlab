@@ -19,7 +19,9 @@ __pycache__/
 *.parquet
 *.csv
 *.txt
+*.dat
 
+*.xls
 *.xlsx
 *.xlsm
 
