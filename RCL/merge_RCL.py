@@ -1,12 +1,11 @@
 import pandas as pd
-import os
 from pathlib import Path
 from janitor import clean_names
 
 
 # Path
 path = Path(__file__).parent
-data_path = path / "data/"
+data_path = path / "data"
 
 
 # Budget FX rate
@@ -43,6 +42,9 @@ def read_multiple_files(list_of_files):
     # Merge the list of DataFrames into a single DataFrame
     df = pd.concat(dataframes)
 
+    # reorder columns
+    df = df[["source"] + [col for col in df.columns if col not in ["source"]]]
+    
     return df
 
 
