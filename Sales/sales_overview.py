@@ -6,16 +6,22 @@ try:
     path = Path(__file__).parent
 except NameError:
     import inspect
-    
+
     path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
-input_file = path / "db" / "ZSales 2013-2020.parquet"
+input_file_1 = path / "db" / "ZSales 2013-2020.parquet"
+input_file_2 = path / "db" / "COPA_Sales 2021-2022.parquet"
 
-df = pd.read_parquet(input_file)
+df_1 = pd.read_parquet(input_file_1)
+df_2 = pd.read_parquet(input_file_2)
 
-df = df[["fy", "sales_hw"]]
+df_1 = df_1[["fy", "sales_hw"]]
+df_2 = df_2[["period", "totsaleslc"]]
 
-df = df.groupby("fy").sum()
+df_1 = df_1.groupby("fy").sum()
+df_2 = df_2.groupby("period").sum()
 
-df
+df_1
+
+df_2
