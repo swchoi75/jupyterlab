@@ -17,8 +17,8 @@ input_file_1 = path / "db" / "ZSales 2013-2020.parquet"
 input_file_2 = path / "db" / "COPA_Sales 2021-2022.parquet"
 input_file_3 = path / "db" / "COPA_Sales_2023.parquet"
 
-out_parquet_file = path / "output" / "Sales 2019-2023 YTD.parquet"
-out_csv_file = path / "output" / "Sales 2019-2023 YTD.csv"
+out_parquet_file = path / "output" / "Sales BU CT.parquet"
+out_csv_file = path / "output" / "Sales BU CT.csv"
 
 
 # Read data
@@ -30,7 +30,7 @@ df_3 = pd.read_parquet(input_file_3)
 # Rename columns from Zsales to COPA Sales
 df_1 = df_1.rename(
     columns={
-        "gl_acct": "cost_elem_",        
+        "gl_acct": "cost_elem_",
         "material": "product",
         "material_description": "matnr_descr_",
         "billto_name": "sold_to_name_1",
@@ -60,13 +60,23 @@ df_3["fy"] = (df_3["fy"].astype(int) - 1).astype(str)
 
 
 # Functions
+def filter_profit_ctr(df):
+    df = df[
+        (df["profit_ctr"] == "50803-003")
+        | (df["profit_ctr"] == "50803-010")
+        | (df["profit_ctr"] == "50803-049")
+        | (df["profit_ctr"] == "50803-050")
+    ]
+    return df
+
+
 def select_columns(df):
     df = df[
         [
             "fy",
             "profit_ctr",
             "recordtype",
-            "cost_elem_",            
+            "cost_elem_",
             "product",
             "matnr_descr_",
             "sold_to_name_1",
@@ -84,10 +94,10 @@ def sales_overview(df):
                 "fy",
                 "profit_ctr",
                 "recordtype",
-                "cost_elem_",                
-                # "product",
-                # "matnr_descr_",
-                # "sold_to_name_1",
+                "cost_elem_",
+                "product",
+                "matnr_descr_",
+                "sold_to_name_1",
             ]
         )
         .sum(
@@ -102,9 +112,9 @@ def sales_overview(df):
 
 
 # Wrangle dataframes
-df_1 = df_1.pipe(select_columns).pipe(sales_overview)
-df_2 = df_2.pipe(select_columns).pipe(sales_overview)
-df_3 = df_3.pipe(select_columns).pipe(sales_overview)
+df_1 = df_1.pipe(filter_profit_ctr).pipe(select_columns).pipe(sales_overview)
+df_2 = df_2.pipe(filter_profit_ctr).pipe(select_columns).pipe(sales_overview)
+df_3 = df_3.pipe(filter_profit_ctr).pipe(select_columns).pipe(sales_overview)
 df = pd.concat([df_1, df_2, df_3])
 
 
