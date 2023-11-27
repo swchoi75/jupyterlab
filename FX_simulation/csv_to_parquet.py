@@ -12,56 +12,21 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
+# Filenames
 input_file = path / "data" / "BOM price.txt"
 output_file = path / "data" / "BOM_2023.parquet"
 
+
+# Read txt file
 df = pd.read_csv(
     input_file,
-    sep="\t",
-    skiprows=5,
-    usecols=(range(2, 29)),
-    header=None,
+    delimiter="\t",
+    skiprows=3,
+    encoding="UTF-16LE",
+    skipinitialspace=True,
     thousands=",",
-    encoding="utf-16le",
-)
-
-
-# New list of column names
-new_column_names = [
-    "Product",
-    "DV",
-    "Component No",
-    "Material Type",
-    "Description",
-    "Quota",
-    "Quantity",
-    "Qty Unit",
-    "Price",
-    "CUR",
-    "Unit",
-    "Amount(Doc)",
-    "Freight",
-    "Custom",
-    "Total Amount(Org. CUR)",
-    "Total Amount(Locl)",
-    "Exchange Rate",
-    "Type None",
-    "Vendor ID",
-    "Vendor Name",
-    "Planned price 1",
-    "Planned date 1",
-    "Planned price 2",
-    "Planned date 2",
-    "Planned price 3",
-    "Planned date 3",
-    "IcoT",
-]
-
-# Replace existing column names with the new list
-df.columns = new_column_names
-
-df = df.astype(
-    {
+    engine="python",
+    dtype={
         "DV": str,
         # "Quota": int,
         "Amount(Doc)": float,
@@ -71,13 +36,16 @@ df = df.astype(
         "Vendor ID": str,
         "Planned price 1": float,
         "Planned price 2": float,
-    }
+    },
 )
-df["DV"] = df["DV"].str.rstrip(".0")
-df["DV"] = df["DV"].str.zfill(2)
 
+
+# Remove first two columns
+df = df.iloc[:, 2:]
+
+# Clean column names
 df = df.clean_names()
 
-df.info()
-
+# Write data
 df.to_parquet(output_file)
+print("A parquet file is created")
