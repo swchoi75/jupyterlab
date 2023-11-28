@@ -30,7 +30,7 @@ df_3 = pd.read_parquet(input_file_3)
 # Rename columns from Zsales to COPA Sales
 df_1 = df_1.rename(
     columns={
-        "gl_acct": "cost_elem_",        
+        "gl_acct": "cost_elem_",
         "material": "product",
         "material_description": "matnr_descr_",
         "billto_name": "sold_to_name_1",
@@ -66,7 +66,7 @@ def select_columns(df):
             "fy",
             "profit_ctr",
             "recordtype",
-            "cost_elem_",            
+            "cost_elem_",
             "product",
             "matnr_descr_",
             "sold_to_name_1",
@@ -84,7 +84,7 @@ def sales_overview(df):
                 "fy",
                 "profit_ctr",
                 "recordtype",
-                "cost_elem_",                
+                "cost_elem_",
                 # "product",
                 # "matnr_descr_",
                 # "sold_to_name_1",
