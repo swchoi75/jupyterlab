@@ -24,7 +24,7 @@ output_file = path / "output" / "Sales BU CT_with PH.csv"
 df = pd.read_csv(input_file)
 cg = pd.read_excel(cg_file)
 mm = pd.read_excel(mm_file, usecols="A:H").clean_names()
-mm = mm[["material", "material_type", "product_hierachy"]]
+mm = mm[["material", "material_type","ext_matl_group", "product_hierachy"]]
 mm = mm.rename(columns={"product_hierachy":"product_hierarchy"})
 pg = pd.read_excel(pg_file)
 
