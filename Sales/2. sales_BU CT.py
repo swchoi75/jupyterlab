@@ -60,11 +60,6 @@ df_3["fy"] = (df_3["fy"].astype(int) - 1).astype(str)
 
 
 # Functions
-def filter_record_type(df):
-    df = df[df["recordtype"] == "F"]
-    return df
-
-
 def filter_profit_ctr(df):
     df = df[
         (df["profit_ctr"] == "50803-003")
@@ -103,7 +98,8 @@ def sales_overview(df):
                 "product",
                 "matnr_descr_",
                 "sold_to_name_1",
-            ]
+            ],
+            dropna=False,  # To avoid deleting rows with missing values
         )
         .sum(
             [
@@ -117,24 +113,9 @@ def sales_overview(df):
 
 
 # Wrangle dataframes
-df_1 = (
-    df_1.pipe(filter_record_type)
-    .pipe(filter_profit_ctr)
-    .pipe(select_columns)
-    .pipe(sales_overview)
-)
-df_2 = (
-    df_2.pipe(filter_record_type)
-    .pipe(filter_profit_ctr)
-    .pipe(select_columns)
-    .pipe(sales_overview)
-)
-df_3 = (
-    df_3.pipe(filter_record_type)
-    .pipe(filter_profit_ctr)
-    .pipe(select_columns)
-    .pipe(sales_overview)
-)
+df_1 = df_1.pipe(filter_profit_ctr).pipe(select_columns).pipe(sales_overview)
+df_2 = df_2.pipe(filter_profit_ctr).pipe(select_columns).pipe(sales_overview)
+df_3 = df_3.pipe(filter_profit_ctr).pipe(select_columns).pipe(sales_overview)
 df = pd.concat([df_1, df_2, df_3])
 
 

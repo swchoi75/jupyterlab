@@ -27,12 +27,18 @@ df = (
     df.groupby(
         [
             "fy",
+            "recordtype",
             "product_hierarchy",
+            "PH_description",
             "product",
             "material_type",
             "ext_matl_group",
+            "product_group",
+            "productline",
+            "customer_group",
             "HMG_PN",
-        ]
+        ],
+        dropna=False,  # To avoid deleting rows with missing values
     )
     .sum(
         [
@@ -45,8 +51,9 @@ df = (
 
 
 # Filter data
-df = df[(df["material_type"] == "FERT") | (df["material_type"] == "HALB")]
-df = df[df["totsaleslc"] > 10**8]  # over 100M KRW
+df = df.loc[df["recordtype"] == "F"]
+df = df.loc[(df["material_type"] == "FERT") | (df["material_type"] == "HALB")]
+df = df.loc[(df["totsaleslc"] > 5e7) | (df["totsaleslc"] < -5e7)]  # over +/- 50M KRW
 
 
 # Sort data
