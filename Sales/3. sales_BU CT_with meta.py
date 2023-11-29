@@ -18,7 +18,7 @@ mm_file = path / "meta" / "material_master_BU CT.xlsx"
 cg_file = path / "meta" / "customer_group.xlsx"
 ph_file = path / "meta" / "product_hierarchy_BU CT.xlsx"
 pg_file = path / "meta" / "product_group_BU CT.xlsx"
-output_file = path / "output" / "Sales BU CT_with PH.csv"
+output_file = path / "output" / "Sales BU CT_with meta.csv"
 
 
 # Read data
@@ -27,7 +27,7 @@ cg = pd.read_excel(cg_file, usecols="A:B")
 mm = pd.read_excel(mm_file, usecols="A:H").clean_names()
 mm = mm[["material", "material_type","ext_matl_group", "product_hierachy"]]
 mm = mm.rename(columns={"product_hierachy":"product_hierarchy"})
-ph = pd.read_excel(ph_file, usecols="A:B")
+ph = pd.read_excel(ph_file, usecols="A:D")
 pg = pd.read_excel(pg_file, usecols="A:B")
 
 

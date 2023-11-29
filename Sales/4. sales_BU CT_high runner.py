@@ -13,7 +13,7 @@ except NameError:
 
 
 # Filenames
-input_file = path / "output" / "Sales BU CT_with PH.csv"
+input_file = path / "output" / "Sales BU CT_with meta.csv"
 output_file = path / "output" / "Sales high runner per PH.csv"
 result_file = path / "output" / "Sales high runner PN.csv"
 
@@ -30,6 +30,8 @@ df = (
             "recordtype",
             "product_hierarchy",
             "PH_description",
+            "customer_engines",
+            "customer_products",
             "product",
             "material_type",
             "ext_matl_group",
