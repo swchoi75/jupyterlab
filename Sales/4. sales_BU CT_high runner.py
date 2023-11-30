@@ -42,20 +42,15 @@ df = (
         ],
         dropna=False,  # To avoid deleting rows with missing values
     )
-    .sum(
-        [
-            "quantity",
-            "totsaleslc",
-        ]
-    )
+    .agg({"quantity": "sum", "totsaleslc": "sum"})
     .reset_index()
 )
 
 
 # Filter data
-df = df.loc[df["recordtype"] == "F"]
-df = df.loc[(df["material_type"] == "FERT") | (df["material_type"] == "HALB")]
-df = df.loc[(df["totsaleslc"] > 5e7) | (df["totsaleslc"] < -5e7)]  # over +/- 50M KRW
+df = df[df["recordtype"] == "F"]
+df = df[df["material_type"].isin(["FERT", "HALB"])]
+df = df[(df["totsaleslc"] > 5e7) | (df["totsaleslc"] < -5e7)]  # over +/- 50M KRW
 
 
 # Sort data

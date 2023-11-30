@@ -42,7 +42,7 @@ df_1 = df_1.rename(
 
 # Filter ZSales 2019-2020
 df_1["fy"] = (df_1["fy"].astype(int) - 1).astype(str)
-df_1 = df_1[(df_1["fy"] == "2019") | (df_1["fy"] == "2020")]
+df_1 = df_1[df_1["fy"].isin(["2019", "2020"])]
 
 
 # Add new columns for ZSales
@@ -59,35 +59,14 @@ df_3[["fy", "month"]] = df_3["period"].str.split(".", expand=True)
 df_3["fy"] = (df_3["fy"].astype(int) - 1).astype(str)
 
 
-# Functions
-def filter_profit_ctr(df):
-    df = df[
-        (df["profit_ctr"] == "50803-003")
-        | (df["profit_ctr"] == "50803-010")
-        | (df["profit_ctr"] == "50803-049")
-        | (df["profit_ctr"] == "50803-051")
+# Function to filter rows and generate sales overview
+def process_dataframe(df):
+    # Filter rows using isin
+    df = df.loc[
+        df["profit_ctr"].isin(["50803-003", "50803-010", "50803-049", "50803-051"])
     ]
-    return df
 
-
-def select_columns(df):
-    df = df[
-        [
-            "fy",
-            "profit_ctr",
-            "recordtype",
-            "cost_elem_",
-            "product",
-            "matnr_descr_",
-            "sold_to_name_1",
-            "quantity",
-            "totsaleslc",
-        ]
-    ]
-    return df
-
-
-def sales_overview(df):
+    # Combine filtering and grouping
     df = (
         df.groupby(
             [
@@ -101,21 +80,18 @@ def sales_overview(df):
             ],
             dropna=False,  # To avoid deleting rows with missing values
         )
-        .sum(
-            [
-                "quantity",
-                "totsaleslc",
-            ]
-        )
+        .agg({"quantity": "sum", "totsaleslc": "sum"})
         .reset_index()
     )
+
     return df
 
 
 # Wrangle dataframes
-df_1 = df_1.pipe(filter_profit_ctr).pipe(select_columns).pipe(sales_overview)
-df_2 = df_2.pipe(filter_profit_ctr).pipe(select_columns).pipe(sales_overview)
-df_3 = df_3.pipe(filter_profit_ctr).pipe(select_columns).pipe(sales_overview)
+df_1 = process_dataframe(df_1)
+df_2 = process_dataframe(df_2)
+df_3 = process_dataframe(df_3)
+
 df = pd.concat([df_1, df_2, df_3])
 
 

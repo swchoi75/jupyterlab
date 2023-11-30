@@ -42,7 +42,7 @@ df_1 = df_1.rename(
 
 # Filter ZSales 2019-2020
 df_1["fy"] = (df_1["fy"].astype(int) - 1).astype(str)
-df_1 = df_1[(df_1["fy"] == "2019") | (df_1["fy"] == "2020")]
+df_1 = df_1[df_1["fy"].isin(["2019", "2020"])]
 
 
 # Add new columns for ZSales
@@ -59,52 +59,24 @@ df_3[["fy", "month"]] = df_3["period"].str.split(".", expand=True)
 df_3["fy"] = (df_3["fy"].astype(int) - 1).astype(str)
 
 
-# Functions
-def select_columns(df):
-    df = df[
-        [
-            "fy",
-            "profit_ctr",
-            "recordtype",
-            "cost_elem_",
-            "product",
-            "matnr_descr_",
-            "sold_to_name_1",
-            "quantity",
-            "totsaleslc",
-        ]
-    ]
-    return df
-
-
-def sales_overview(df):
+# Function to generate sales overview
+def process_dataframe(df):
     df = (
         df.groupby(
-            [
-                "fy",
-                "profit_ctr",
-                "recordtype",
-                "cost_elem_",
-                # "product",
-                # "matnr_descr_",
-                # "sold_to_name_1",
-            ]
+            ["fy", "profit_ctr", "recordtype", "cost_elem_"],
+            dropna=False,  # To avoid deleting rows with missing values
         )
-        .sum(
-            [
-                "quantity",
-                "totsaleslc",
-            ]
-        )
+        .agg({"quantity": "sum", "totsaleslc": "sum"})
         .reset_index()
     )
     return df
 
 
 # Wrangle dataframes
-df_1 = df_1.pipe(select_columns).pipe(sales_overview)
-df_2 = df_2.pipe(select_columns).pipe(sales_overview)
-df_3 = df_3.pipe(select_columns).pipe(sales_overview)
+df_1 = process_dataframe(df_1)
+df_2 = process_dataframe(df_2)
+df_3 = process_dataframe(df_3)
+
 df = pd.concat([df_1, df_2, df_3])
 
 
