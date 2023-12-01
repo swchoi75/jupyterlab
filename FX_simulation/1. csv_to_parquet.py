@@ -13,8 +13,9 @@ except NameError:
 
 
 # Filenames
-input_file = path / "data" / "BOM price.txt"
-output_file = path / "data" / "BOM_2023.parquet"
+year = "2023"
+input_file = path / "data" / f"BOM_{year}.txt"
+output_file = path / "data" / f"BOM_{year}.parquet"
 
 
 # Read txt file
@@ -43,8 +44,19 @@ df = pd.read_csv(
 # Remove first two columns
 df = df.iloc[:, 2:]
 
+
 # Clean column names
 df = df.clean_names()
+
+
+# Remove subtotal rows
+df = df.dropna(subset="product")
+
+
+# Add year column
+df.loc[:, "year"] = year
+df = df[["year"] + [col for col in df.columns if col not in ["year"]]]
+
 
 # Write data
 df.to_parquet(output_file)
