@@ -16,6 +16,7 @@ except NameError:
 input_file = path / "output" / "Sales BU CT_with meta.csv"
 output_file = path / "output" / "Sales high runner per PH.csv"
 result_file = path / "output" / "Sales high runner PN.csv"
+full_sales = path / "output" / "Sales with representative PN.csv"
 
 
 # Read data
@@ -63,7 +64,19 @@ df = df.sort_values(
 result = df.groupby(["fy", "product_hierarchy"]).head(1)
 
 
+# Full sales data
+df_full = pd.read_csv(input_file)
+representative = result[["fy", "recordtype", "product_hierarchy", "product"]].rename(
+    columns={"product": "representative_pn"}
+)
+
+df_full = df_full.merge(
+    representative, how="left", on=["fy", "recordtype", "product_hierarchy"]
+)
+
+
 # Write data
 df.to_csv(output_file, index=False)
 result.to_csv(result_file, index=False)
+df_full.to_csv(full_sales, index=False)
 print("files are created.")
