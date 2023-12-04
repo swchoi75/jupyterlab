@@ -14,9 +14,10 @@ except NameError:
 
 
 # Filenames
-year = "2023"
-input_file = path / "data" / "zf_rate.xlsx"
-output_file = path / "data" / f"FX_{year}.csv"
+year = "2023"  # from 2019 to 2023 ytd
+fx_type = "ytd"
+input_file = path / "data" / "FX Rates" / "zf_rate.xlsx"
+output_file = path / "data" / "FX Rates" / f"FX {fx_type}_{year}.csv"
 
 
 # Read data
@@ -25,41 +26,50 @@ df = pd.read_excel(
 )
 
 
-# New list of column names
-new_column_names = [
+# Replace existing column names with the new list
+df.columns = [
     "cur",
     "py_Dec",
-    "ytd_Jan",
-    "ytd_Feb",
-    "ytd_Mar",
-    "ytd_Apr",
-    "ytd_May",
-    "ytd_Jun",
-    "ytd_Jul",
-    "ytd_Aug",
-    "ytd_Sep",
-    "ytd_Oct",
-    "ytd_Nov",
-    "ytd_Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
 ]
 
-# Replace existing column names with the new list
-df.columns = new_column_names
+
+# Add new columns of fx_type and year
+df["fx_type"] = fx_type
+df["year"] = year
+# reorder columns
+df = df[
+    ["fx_type", "year"] + [col for col in df.columns if col not in ["fx_type", "year"]]
+]
 
 
-# Extract alphabet
+# Extract Currencies in Alphabet letters
 df["cur"] = df["cur"].str.extract(r"([A-Z]{3})")
 
 
+# Divide by 100 for 100 JPY
 # Identify the row index
 row_index = 6  # 100 JPY
-
 # Select numerical columns
 numerical_columns = df.select_dtypes(include=[np.number])
-
 # Apply division
 for col in numerical_columns:
     df.loc[row_index, col] /= 100
+
+
+# Select major currencies
+df = df[df["cur"].isin(["USD", "EUR", "JPY"])]
 
 
 # Write data

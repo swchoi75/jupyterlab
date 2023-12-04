@@ -13,8 +13,8 @@ except NameError:
 
 
 # Filenames
-input_file = path / "output" / "BOM.parquet"
-output_file = path / "output" / "BOM_price.csv"
+input_file = path / "data" / "BOM.parquet"
+output_file = path / "data" / "BOM_price.csv"
 
 
 # Read data

@@ -12,11 +12,11 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
-data_path = path / "data"
-output_file = path / "output" / "BOM.parquet"
+data_path = path / "data" / "BOM"
+output_file = path / "data" / "BOM.parquet"
 
 
-# Input data: List of multiple parquet files
+# Input data: List of multiple files
 parquet_files = [
     file for file in data_path.iterdir() if file.is_file() and file.suffix == ".parquet"
 ]
@@ -38,4 +38,4 @@ df = read_multiple_files(parquet_files)
 
 # Write data
 df.to_parquet(output_file)
-print("A parquet file is created")
+print("A file is created")

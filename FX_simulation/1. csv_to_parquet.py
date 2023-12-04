@@ -14,8 +14,8 @@ except NameError:
 
 # Filenames
 year = "2023"
-input_file = path / "data" / f"BOM_{year}.txt"
-output_file = path / "data" / f"BOM_{year}.parquet"
+input_file = path / "data" / "BOM" / f"BOM_{year}.txt"
+output_file = path / "data" / "BOM" / f"BOM_{year}.parquet"
 
 
 # Read txt file
