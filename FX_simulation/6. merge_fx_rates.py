@@ -22,7 +22,7 @@ csv_files = [
 ]
 
 
-# Function
+# Functions
 def read_multiple_files(list_of_files):
     dataframes = [pd.read_csv(file) for file in list_of_files]
     # Merge the list of DataFrames into a single DataFrame
@@ -30,7 +30,7 @@ def read_multiple_files(list_of_files):
     return df
 
 
-def missing_values(df):
+def fill_missing_values(df):
     # Fill in missing values in Dec with Nov data in 2023
     df["Dec"] = df["Dec"].where(df["Dec"] > 0, df["Nov"])
     return df
@@ -38,7 +38,7 @@ def missing_values(df):
 
 # Process data
 df = read_multiple_files(csv_files)
-df = missing_values(df)  # Fill in missing values in Dec with Nov data in 2023
+df = fill_missing_values(df)  # Fill in missing values in Dec with Nov data in 2023
 
 
 # Write data
