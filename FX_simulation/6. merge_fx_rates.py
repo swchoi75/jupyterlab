@@ -13,7 +13,7 @@ except NameError:
 
 
 data_path = path / "data" / "FX Rates"
-output_file = path / "data" / "fx_rates_vt.csv"
+output_file = path / "data" / "fx_rates_VT.csv"
 
 
 # Input data: List of multiple files
@@ -36,9 +36,33 @@ def fill_missing_values(df):
     return df
 
 
+def pivot_longer(df):
+    df = df.drop(columns=["py_Dec"])
+    df = df.melt(
+        id_vars=["fx_type", "cur", "year"],
+        var_name="month",
+        value_name="fx_rates_VT"
+    )
+    return df
+
+
+def sort_table(df):
+    df = df.sort_values(by=["fx_type", "cur", "year"],
+                        ascending=[False, False, True])
+    return df
+
+
 # Process data
 df = read_multiple_files(csv_files)
-df = fill_missing_values(df)  # Fill in missing values in Dec with Nov data in 2023
+# Fill in missing values in Dec with Nov data in 2023
+# df = fill_missing_values(df)
+# df = pivot_longer(df)
+# df = sort_table(df)
+df = (df
+      .pipe(fill_missing_values)
+      .pipe(pivot_longer)
+      .pipe(sort_table)
+      )
 
 
 # Write data
