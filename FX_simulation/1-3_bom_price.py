@@ -26,7 +26,7 @@ df = df[df["cur"] != "CNY"]
 
 # Aggregate data
 df = (
-    df.groupby(["year", "product", "type", "cur"], dropna=False)
+    df.groupby(["year", "product", "cur"], dropna=False)  # "type",
     .agg({"amount_doc_": "sum", "total_amount_org_cur_": "sum"})
     .reset_index()
 )
