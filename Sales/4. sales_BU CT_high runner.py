@@ -74,6 +74,11 @@ df_full = df_full.merge(
     representative, how="left", on=["fy", "recordtype", "product_hierarchy"]
 )
 
+# Remove representative_pn if material type is HAWA or ROH
+df_full["representative_pn"] = df_full["representative_pn"].where(
+    df_full["material_type"].isin(["FERT", "HALB"])
+)
+
 
 # Write data
 df.to_csv(output_file, index=False)
