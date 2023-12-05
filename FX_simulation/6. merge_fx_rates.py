@@ -39,30 +39,43 @@ def fill_missing_values(df):
 def pivot_longer(df):
     df = df.drop(columns=["py_Dec"])
     df = df.melt(
-        id_vars=["fx_type", "cur", "year"],
-        var_name="month",
-        value_name="fx_rates_VT"
+        id_vars=["fx_type", "cur", "year"], var_name="month", value_name="fx_rates_VT"
     )
     return df
 
 
 def sort_table(df):
-    df = df.sort_values(by=["fx_type", "cur", "year"],
-                        ascending=[False, False, True])
+    df = df.sort_values(by=["fx_type", "cur", "year"], ascending=[False, False, True])
+    return df
+
+
+def month_to_number(df):
+    replacement_dict = {
+        "Jan": "01",
+        "Feb": "02",
+        "Mar": "03",
+        "Apr": "04",
+        "May": "05",
+        "Jun": "06",
+        "Jul": "07",
+        "Aug": "08",
+        "Sep": "09",
+        "Oct": "10",
+        "Nov": "11",
+        "Dec": "12",
+    }
+    df["month"] = df["month"].replace(replacement_dict)
     return df
 
 
 # Process data
 df = read_multiple_files(csv_files)
-# Fill in missing values in Dec with Nov data in 2023
-# df = fill_missing_values(df)
-# df = pivot_longer(df)
-# df = sort_table(df)
-df = (df
-      .pipe(fill_missing_values)
-      .pipe(pivot_longer)
-      .pipe(sort_table)
-      )
+df = (
+    df.pipe(fill_missing_values)
+    .pipe(pivot_longer)
+    .pipe(sort_table)
+    .pipe(month_to_number)
+)
 
 
 # Write data
