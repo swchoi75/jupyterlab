@@ -5,8 +5,12 @@ from janitor import clean_names
 
 
 # Path
-# path = Path('datasets/home-dataset/data/')
-path = Path(__file__).parent
+try:
+    path = Path(__file__).parent
+except NameError:
+    import inspect
+
+    path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
 # Functions
@@ -98,3 +102,4 @@ race_bs = balance_sheet(race)
 # Output data
 race_pnl.to_csv(path / "output" / "RACE Profit and Loss.csv", index=False, na_rep="0")
 race_bs.to_csv(path / "output" / "RACE Balance sheet.csv", index=False, na_rep="0")
+print("A file is created")
