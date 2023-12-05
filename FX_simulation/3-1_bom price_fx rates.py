@@ -34,28 +34,53 @@ def filter_fx_vt(df):
     df = df[["cur", "year", "fx_rates_VT"]]
     return df
 
+
 def filter_fx_hmg(df):
-    # Filter rows    
+    # Filter rows
     df = df[df["month"] == 12]
-    # Select columns    
+    # Select columns
     df = df[["cur", "year", "fx_rates_HMG"]]
     return df
 
 
+def join_dataframes(base, df1, df2):
+    df = base.merge(df1, how="left", on=["cur", "year"])
+    df = df.merge(df2, how="left", on=["cur", "year"])
+    return df
+
+
+def remove_low_halb(df):
+    # Delete duplicate lines: exclude "HALB" with low amount (less than 200 KRW)
+    df = df[~((df["type"] == "HALB") & (df["amount_doc_"] < 200))]
+    return df
+
+
+# def set_KRW(df):
+#     # Set 1 KRW = 1 KRW
+#     df["fx_rates_VT"] = df["fx_rates_VT"].where(df["cur"] != "KRW", 1)
+#     df["fx_rates_HMG"] = df["fx_rates_HMG"].where(df["cur"] != "KRW", 1)
+#     return df
+
+
+def calculate_delta(df):
+    # Clculate delta price cause by fx rate difference
+    df["fx_rate_diff"] = df["fx_rates_VT"] - df["fx_rates_HMG"]
+    df["delta_price"] = df["amount_doc_"] * df["fx_rate_diff"]
+    return df
+
+
 # Process data
-# Filter FX rates
 fx_vt = filter_fx_vt(fx_vt)
 fx_hmg = filter_fx_hmg(fx_hmg)
 
-# Join two dataframes
-df = pd.merge(bom, fx_vt, how="left", on=["cur", "year"])
-df = pd.merge(df, fx_hmg, how="left", on=["cur", "year"])
-df.info()
+df = join_dataframes(bom, fx_vt, fx_hmg)
+df = df.pipe(remove_low_halb)  # .pipe(set_KRW).pipe(calculate_delta)
 
-# Calculate the delta
-df = df[df["cur"] != "KRW"]
-df["fx_rate_diff"] = df["fx_rates_VT"] - df["fx_rates_HMG"]
-df["delta_amt"] = df["amount_doc_"] * df["fx_rate_diff"]
+# Set 1 KRW = 1 KRW
+df["fx_rates_VT"] = df["fx_rates_VT"].where(df["cur"] != "KRW", 1)
+df["fx_rates_HMG"] = df["fx_rates_HMG"].where(df["cur"] != "KRW", 1)
+
+df = df.pipe(calculate_delta)
 
 
 # Write data
