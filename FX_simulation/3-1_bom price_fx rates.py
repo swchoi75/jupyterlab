@@ -1,6 +1,5 @@
 import pandas as pd
 from pathlib import Path
-from janitor import clean_names
 
 
 # Path
@@ -16,7 +15,6 @@ except NameError:
 bom_file = path / "data" / "BOM_price.csv"
 fx_vt_file = path / "data" / "fx_rates_VT.csv"
 fx_hmg_file = path / "data" / "fx_rates_HMG.csv"
-sales_file = path / "data" / "Sales with representative PN.csv"
 
 output_file = path / "output" / "bom_price_fx rate_delta.csv"
 
@@ -25,7 +23,6 @@ output_file = path / "output" / "bom_price_fx rate_delta.csv"
 bom = pd.read_csv(bom_file)
 fx_vt = pd.read_csv(fx_vt_file)
 fx_hmg = pd.read_csv(fx_hmg_file)
-sales = pd.read_csv(sales_file)
 
 
 # Functions

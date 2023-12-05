@@ -1,6 +1,5 @@
 import pandas as pd
 from pathlib import Path
-from janitor import clean_names
 
 
 # Path
