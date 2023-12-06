@@ -17,7 +17,6 @@ input_file_1 = path / "db" / "ZSales 2013-2020.parquet"
 input_file_2 = path / "db" / "COPA_Sales 2021-2022.parquet"
 input_file_3 = path / "db" / "COPA_Sales_2023.parquet"
 
-out_parquet_file = path / "output" / "Sales BU CT.parquet"
 out_csv_file = path / "output" / "Sales BU CT.csv"
 
 
@@ -71,6 +70,7 @@ def process_dataframe(df):
         df.groupby(
             [
                 "fy",
+                "period",  # on / off
                 "profit_ctr",
                 "recordtype",
                 "cost_elem_",
@@ -92,10 +92,16 @@ df_1 = process_dataframe(df_1)
 df_2 = process_dataframe(df_2)
 df_3 = process_dataframe(df_3)
 
+
+# Process period
+df_1["period"] = df_1["period"].astype(str).str.zfill(2)  # ZSales
+df_2["period"] = df_2["period"].str[6:]  # COPA_Sales
+df_3["period"] = df_3["period"].str[6:]  # COPA_Sales
+
+
 df = pd.concat([df_1, df_2, df_3])
 
 
 # Write data
-# df.to_parquet(out_parquet_file, index=False)
 df.to_csv(out_csv_file, index=False)
 print("A file is created.")
