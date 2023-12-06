@@ -27,6 +27,7 @@ def select_columns(df):
     df = df[
         [
             "year",
+            "month",
             "product",
             "cur",
             "amount_doc_",
@@ -45,11 +46,11 @@ def join_dataframes(df1, df2):
         df1,
         df2,
         how="left",
-        left_on=["fy", "representative_pn"],
-        right_on=["year", "product"],
+        left_on=["fy", "period", "representative_pn"],
+        right_on=["year", "month", "product"],
     )
     # post-processing
-    df = df.drop(columns=["year"])
+    df = df.drop(columns=["year", "month", "product"])
     return df
 
 
@@ -64,6 +65,7 @@ sales = (
     sales.groupby(
         [
             "fy",
+            "period",
             "recordtype",
             "customer_group",
             "material_type",

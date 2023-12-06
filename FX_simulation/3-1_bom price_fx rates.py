@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from pathlib import Path
 
 
@@ -26,26 +27,43 @@ fx_hmg = pd.read_csv(fx_hmg_file)
 
 
 # Functions
-def filter_fx_vt(df):
+def select_fx_vt(df):
     # Filter rows
     df = df[df["fx_type"] == "ytd"]
-    df = df[df["month"] == 12]
     # Select columns
-    df = df[["cur", "year", "fx_rates_VT"]]
+    df = df[["cur", "year", "month", "fx_rates_VT"]]
     return df
 
 
-def filter_fx_hmg(df):
-    # Filter rows
-    df = df[df["month"] == 12]
+def select_fx_hmg(df):
     # Select columns
-    df = df[["cur", "year", "fx_rates_HMG"]]
+    df = df[["cur", "year", "month", "fx_rates_HMG"]]
     return df
 
 
 def join_dataframes(base, df1, df2):
     df = base.merge(df1, how="left", on=["cur", "year"])
-    df = df.merge(df2, how="left", on=["cur", "year"])
+    df = df.merge(df2, how="left", on=["cur", "year", "month"])
+    return df
+
+
+def krw_month_table():
+    currencies = [
+        "KRW",
+        "KRW",
+        "KRW",
+        "KRW",
+        "KRW",
+        "KRW",
+        "KRW",
+        "KRW",
+        "KRW",
+        "KRW",
+        "KRW",
+        "KRW",
+    ]
+    months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+    df = pd.DataFrame({"cur": currencies, "period": months})
     return df
 
 
@@ -57,10 +75,18 @@ def calculate_delta(df):
 
 
 # Process data
-fx_vt = filter_fx_vt(fx_vt)
-fx_hmg = filter_fx_hmg(fx_hmg)
-
+# Join 3 datatables
+fx_vt = select_fx_vt(fx_vt)
+fx_hmg = select_fx_hmg(fx_hmg)
 df = join_dataframes(bom, fx_vt, fx_hmg)
+
+
+# Add KRW for 12 months
+krw_month = krw_month_table()
+df = df.merge(krw_month, how="left", on="cur")
+df["month"] = np.where(df["cur"] == "KRW", df["period"], df["month"])
+df = df.drop(columns=["period"])
+
 
 # Set 1 KRW = 1 KRW
 df["fx_rates_VT"] = df["fx_rates_VT"].where(df["cur"] != "KRW", 1)
