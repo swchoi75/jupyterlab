@@ -49,8 +49,7 @@ def join_dataframes(df1, df2):
         right_on=["year", "product"],
     )
     # post-processing
-    df = df.drop(columns=["year", "product_y"])
-    df = df.rename(columns={"product_x": "product"})
+    df = df.drop(columns=["year"])
     return df
 
 
@@ -60,11 +59,33 @@ def calc_delta_costs(df):
 
 
 # Process data
-sales = sales.dropna(subset=["representative_pn"])
+# Aggregate data
+sales = (
+    sales.groupby(
+        [
+            "fy",
+            "recordtype",
+            "customer_group",
+            "material_type",
+            "product_hierarchy",
+            "PH_description",
+            "customer_engines",
+            "customer_products",
+            "product_group",
+            "productline",
+            "HMG_PN",
+            "representative_pn",
+        ],
+        dropna=False,
+    )
+    .agg({"quantity": "sum", "totsaleslc": "sum"})
+    .reset_index()
+)
+
 bom = select_columns(bom)
-# bom = bom[bom["cur"] != "KRW"]
+
 df = join_dataframes(sales, bom)
-# Calculate the delta costs
+
 df = calc_delta_costs(df)
 
 
