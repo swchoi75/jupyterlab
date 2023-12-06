@@ -44,7 +44,7 @@ def join_dataframes(df1, df2):
     df = pd.merge(
         df1,
         df2,
-        how="inner",  # dropna
+        how="left",
         left_on=["fy", "representative_pn"],
         right_on=["year", "product"],
     )
@@ -73,7 +73,6 @@ sales = (
             "customer_products",
             "product_group",
             "productline",
-            "HMG_PN",
             "representative_pn",
         ],
         dropna=False,
@@ -90,8 +89,9 @@ df = calc_delta_costs(df)
 
 
 # Remove duplicate sales qty and amount
-df["quantity"] = df["quantity"].where(df["cur"] == "KRW", 0)
-df["totsaleslc"] = df["totsaleslc"].where(df["cur"] == "KRW", 0)
+cur_krw_or_missing = (df["cur"] == "KRW") | (df["cur"].isna())
+df["quantity"] = df["quantity"].where(cur_krw_or_missing, 0)
+df["totsaleslc"] = df["totsaleslc"].where(cur_krw_or_missing, 0)
 
 
 # Write data
