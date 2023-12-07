@@ -12,7 +12,7 @@ except NameError:
 
 
 data_path = path / "data" / "FX Rates"
-output_file = path / "data" / "fx_rates_VT.csv"
+output_file = path / "data" / "fx_rates_VT_actual.csv"
 
 
 # Input data: List of multiple files
@@ -38,7 +38,7 @@ def fill_missing_values(df):
 def pivot_longer(df):
     df = df.drop(columns=["py_Dec"])
     df = df.melt(
-        id_vars=["fx_type", "cur", "year"], var_name="month", value_name="fx_rates_VT"
+        id_vars=["fx_type", "cur", "year"], var_name="month", value_name="fx_act"
     )
     return df
 

@@ -33,20 +33,20 @@ def rename_columns(df):
             "년도": "year",
             "차수": "quarter",
             "화폐": "cur",
-            "환율": "fx_rates_HMG",
+            "환율": "fx_HMG",
         }
     )
     return df
 
 
 def reorder_columns(df):
-    df = df[["cur", "year", "quarter", "fx_rates_HMG"]]
+    df = df[["cur", "year", "quarter", "fx_HMG"]]
     return df
 
 
 def filter_rows(df):
     df = df[df["cur"].isin(["USD", "EUR", "JPY"])]
-    df = df[df["year"].isin([2019, 2020, 2021, 2022, 2023])]
+    # df = df[df["year"].isin([2019, 2020, 2021, 2022, 2023])]
     return df
 
 
@@ -89,7 +89,7 @@ df = (
 # Merge two tables
 month = quarter_month_table()
 df = df.merge(month, how="left", on="quarter")
-df = df[["fx_type", "cur", "year", "quarter", "month", "fx_rates_HMG"]]
+df = df[["fx_type", "cur", "year", "quarter", "month", "fx_HMG"]]
 
 
 # Write data

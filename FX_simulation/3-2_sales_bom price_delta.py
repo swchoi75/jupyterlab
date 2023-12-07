@@ -31,9 +31,9 @@ def select_columns(df):
             "product",
             "cur",
             "amount_doc_",
-            "fx_rates_VT",
-            "fx_rates_HMG",
-            "fx_rate_diff",
+            "fx_act",
+            "fx_HMG",
+            "fx_diff",
             "delta_price",
         ]
     ]
