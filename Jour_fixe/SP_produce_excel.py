@@ -25,7 +25,11 @@ df = pd.merge(list, members, on="email")
 
 
 # Filter active members, open action items in 2023
-df = df[(df["active"] == "yes") & (df["status"] == "Action") & (df["year"] == 2023)]
+df = df[
+    (df["active"] == "yes")
+    & (df["status"].isin(["Action", "Decision"]))
+    & (df["year"] == 2023)
+]
 
 
 # Unique values
