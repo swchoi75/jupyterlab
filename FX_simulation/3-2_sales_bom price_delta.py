@@ -23,39 +23,10 @@ sales = pd.read_csv(sales_file)
 
 
 # Functions
-def select_columns(df):
-    df = df[
-        [
-            "year",
-            "month",
-            "product",
-            "cur",
-            "amount_doc_",
-            "fx_act",
-            "fx_HMG",
-            "fx_diff",
-            "delta_price",
-        ]
-    ]
-    return df
-
-
-def join_dataframes(df1, df2):
-    # join
-    df = pd.merge(
-        df1,
-        df2,
-        how="left",
-        left_on=["fy", "period", "representative_pn"],
-        right_on=["year", "month", "product"],
-    )
-    # post-processing
-    df = df.drop(columns=["year", "month", "product"])
-    return df
-
-
 def calc_delta_costs(df):
-    df["delta_costs"] = df["quantity"] * df["delta_price"] * -1  # Sign logic for costs
+    # # Sign logic for costs: * -1
+    df["delta_costs_to_bud_fx"] = df["quantity"] * df["delta_price_to_bud_fx"] * -1
+    df["delta_costs_to_HMG_fx"] = df["quantity"] * df["delta_price_to_HMG_fx"] * -1
     return df
 
 
@@ -83,9 +54,16 @@ sales = (
     .reset_index()
 )
 
-bom = select_columns(bom)
-
-df = join_dataframes(sales, bom)
+# Join dataframes
+df = pd.merge(
+    sales,
+    bom,
+    how="left",
+    left_on=["fy", "period", "representative_pn"],
+    right_on=["year", "month", "product"],
+).drop(  # post-processing
+    columns=["year", "month", "product"]
+)
 
 df = calc_delta_costs(df)
 
