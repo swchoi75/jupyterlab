@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from pathlib import Path
 
 
@@ -24,9 +25,15 @@ df = pd.read_parquet(input_file)
 df = df[df["cur"] != "CNY"]
 
 
+# Add ICO column
+df["ICO_part"] = np.where(
+    (df["component_no"] == "AAA2043950000") & (df["cur"] == "USD"), "Y", "N"
+)
+
+
 # Aggregate data
 df = (
-    df.groupby(["year", "product", "cur"], dropna=False)
+    df.groupby(["year", "product", "cur", "ICO_part"], dropna=False)
     .agg({"total_amount_org_cur_": "sum"})
     .reset_index()
 )
