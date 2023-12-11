@@ -15,6 +15,7 @@ except NameError:
 bom_file = path / "output" / "bom_price_fx rate_delta.csv"
 sales_file = path / "data" / "Sales with representative PN.csv"
 output_file = path / "output" / "sales with bom costs.csv"
+output_parquet = path / "output" / "sales with bom costs.parquet"
 
 
 # Read data
@@ -76,4 +77,5 @@ df["totsaleslc"] = df["totsaleslc"].where(cur_krw_or_missing, 0)
 
 # Write data
 df.to_csv(output_file, index=False)
+df.to_parquet(output_parquet)
 print("A file is created")
