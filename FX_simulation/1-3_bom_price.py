@@ -26,14 +26,14 @@ df = df[df["cur"] != "CNY"]
 
 
 # Add ICO column
-df["ICO_part"] = np.where(
-    (df["component_no"] == "AAA2043950000") & (df["cur"] == "USD"), "Y", "N"
+df["outs_ic"] = np.where(
+    (df["component_no"] == "AAA2043950000") & (df["cur"] == "USD"), "IC", "FR"
 )
 
 
 # Aggregate data
 df = (
-    df.groupby(["year", "product", "cur", "ICO_part"], dropna=False)
+    df.groupby(["year", "product", "cur", "outs_ic"], dropna=False)
     .agg({"total_amount_org_cur_": "sum"})
     .reset_index()
 )
