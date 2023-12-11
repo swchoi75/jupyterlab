@@ -12,22 +12,28 @@ except NameError:
 
 
 # Filenames
-bom_file = path / "output" / "bom_price_fx rate_delta.csv"
 sales_file = path / "data" / "Sales with representative PN.csv"
+bom_file_1 = path / "output" / "1. bom_price_fx rate_delta.csv"
+bom_file_2 = path / "output" / "2. bom_price_fx rate_delta.csv"
+bom_file_3 = path / "output" / "3. bom_price_fx rate_delta.csv"
+bom_file_4 = path / "output" / "4. bom_price_fx rate_delta.csv"
 output_file = path / "output" / "sales with bom costs.csv"
 output_parquet = path / "output" / "sales with bom costs.parquet"
 
 
 # Read data
-bom = pd.read_csv(bom_file)
 sales = pd.read_csv(sales_file)
+bom_1 = pd.read_csv(bom_file_1)
+bom_2 = pd.read_csv(bom_file_2)
+bom_3 = pd.read_csv(bom_file_3)
+bom_4 = pd.read_csv(bom_file_4)
+bom = pd.concat([bom_1, bom_2, bom_3, bom_4])
 
 
 # Functions
 def calc_delta_costs(df):
     # # Sign logic for costs: * -1
     df["delta_costs_to_bud_fx"] = df["quantity"] * df["delta_price_to_bud_fx"] * -1
-    df["delta_costs_to_HMG_fx"] = df["quantity"] * df["delta_price_to_HMG_fx"] * -1
     return df
 
 

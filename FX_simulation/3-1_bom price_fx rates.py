@@ -13,48 +13,87 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
+# Scenario
+vt_fx_type = "ytd"  # fx_type: ytd or spot
+anchor_year = "quotation_year"  # anchor_year: quotation_year or sop_year
+VT_or_HMG = "VT"  # fx_actual: VT or HMG
+scenario_txt = f"fx_bud on {anchor_year} and fx_act from {VT_or_HMG}"
+output_file = path / "output" / "1. bom_price_fx rate_delta.csv"
+
+
 # Filenames
 bom_file = path / "data" / "BOM_price.csv"
-fx_project_file = path / "data" / "Sales high runner PN_survey with PSM.xlsx"
+prj_file = path / "data" / "Sales high runner PN_survey with PSM.xlsx"
 fx_bud_file = path / "data" / "fx_rates_VT_budget.csv"
 fx_act_file = path / "data" / "fx_rates_VT_actual.csv"
 fx_hmg_file = path / "data" / "fx_rates_HMG.csv"
 
-output_file = path / "output" / "bom_price_fx rate_delta.csv"
-
 
 # Read data
 bom = pd.read_csv(bom_file)
-fx_project = pd.read_excel(
-    fx_project_file, sheet_name="PSM entry", skiprows=3
-).clean_names()
+prj = pd.read_excel(prj_file, sheet_name="PSM entry", skiprows=3).clean_names()
 fx_bud = pd.read_csv(fx_bud_file)
-fx_act = pd.read_csv(fx_act_file)
+fx_vt = pd.read_csv(fx_act_file)
 fx_hmg = pd.read_csv(fx_hmg_file)
 
 
 # Functions
-def process_fx_project(df):
-    # convert into date type
-    df["sop_year_month"] = pd.to_datetime(df["sop_year_month"], format="%Y/%m")
+def process_project_year(df):
+    # take first 4 letters for year only
+    df["sop_year_month"] = df["sop_year_month"].str[:4].astype(int)
+    df = df.rename(columns={"sop_year_month": "sop_year"})
     # select columns
-    df = df[["product", "quotation_year", "sop_year_month"]]
+    df = df[["product", "quotation_year", "sop_year"]]
     return df
 
 
-def process_fx_act(df):
+def process_fx_vt(df, fx_type):
     # Filter rows
-    df = df[df["fx_type"] == "ytd"]
+    df = df[df["fx_type"] == fx_type]  # fx_type: ytd or spot
     # Select columns
     df = df[["cur", "year", "month", "fx_act"]]
     return df
 
 
 def process_fx_hmg(df):
-    # Combine 'year' and 'month' columns into a date column
-    df["year_month"] = pd.to_datetime(df[["year", "month"]].assign(day=1))
+    # copy column
+    df["fx_act"] = df["fx_HMG"]
     # Select columns
-    df = df[["cur", "year_month", "fx_HMG"]]
+    df = df[["cur", "year", "month", "fx_act"]]
+    return df
+
+
+def select_fx_act(fx_vt, fx_hmg, VT_HMG):
+    if VT_HMG == "VT":
+        df = fx_vt
+    elif VT_HMG == "HMG":
+        df = fx_hmg
+    return df
+
+
+def process_bom():
+    df = pd.merge(
+        bom,
+        prj_year,
+        how="inner",
+        on="product",  # dropna=True to exclude GM and KG Mobility
+    )
+    return df
+
+
+def process_fx_bud(df, anchor_year):  # anchor_year: quotation_year or sop_year
+    df = pd.merge(
+        df,
+        fx_bud,
+        how="left",
+        left_on=[anchor_year, "cur"],
+        right_on=["plan_year", "cur"],
+    ).drop(columns=["plan_year"])
+    return df
+
+
+def process_fx_act(df, fx_act):  # fx_act: fx_act_vt or fx_act_hmg
+    df = df.merge(fx_act, how="left", on=["cur", "year"])  # month is exploded
     return df
 
 
@@ -67,39 +106,28 @@ def krw_month_table():
 
 def calc_delta_price(df):
     df["fx_diff_to_bud"] = df["fx_act"] - df["fx_bud"]
-    df["fx_diff_to_HMG"] = df["fx_act"] - df["fx_HMG"]
     df["delta_price_to_bud_fx"] = df["fx_diff_to_bud"] * df["total_amount_org_cur_"]
-    df["delta_price_to_HMG_fx"] = df["fx_diff_to_HMG"] * df["total_amount_org_cur_"]
+    return df
+
+
+def add_scenario_text(df, text):
+    df["scenario"] = text
+
     return df
 
 
 # Process data
 # Pre-processing
-fx_project = process_fx_project(fx_project)
-fx_act = process_fx_act(fx_act)
-fx_hmg = process_fx_hmg(fx_hmg)
+prj_year = process_project_year(prj)
+fx_act_vt = process_fx_vt(fx_vt, vt_fx_type)
+fx_act_hmg = process_fx_hmg(fx_hmg)
+fx_act = select_fx_act(fx_act_vt, fx_act_hmg, VT_or_HMG)
 
 
-# Join dataframes: bom, sales_pn, fx_project, fx_bud
-df = pd.merge(
-    bom,
-    fx_project,
-    how="inner",  # dropna=True to exclude GM and KG Mobility
-    on="product",
-)
-
-df = df.merge(fx_bud, how="left", on=["quotation_year", "cur"])
-
-
-# Join dataframes: fx_hmg and fx_act
-df = df.merge(
-    fx_hmg,
-    how="left",
-    left_on=["cur", "sop_year_month"],
-    right_on=["cur", "year_month"],
-).drop(columns="year_month")
-
-df = df.merge(fx_act, how="left", on=["cur", "year"])
+# Join dataframes: bom, project_year, fx_bud, fx_act
+df = process_bom()
+df = process_fx_bud(df, anchor_year)
+df = process_fx_act(df, fx_act)
 
 
 # Add KRW for 12 months
@@ -112,12 +140,13 @@ df = df.drop(columns=["period"])
 # Set 1 KRW = 1 KRW
 df["fx_bud"] = df["fx_bud"].where(df["cur"] != "KRW", 1)
 df["fx_act"] = df["fx_act"].where(df["cur"] != "KRW", 1)
-df["fx_HMG"] = df["fx_HMG"].where(df["cur"] != "KRW", 1)
 
 
 df = calc_delta_price(df)
+df = add_scenario_text(df, scenario_txt)
 
 
 # Write data
 df.to_csv(output_file, index=False)
 print("A file is created")
+print(scenario_txt)
