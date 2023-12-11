@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from pathlib import Path
 
 
@@ -79,6 +80,18 @@ df = calc_delta_costs(df)
 cur_krw_or_missing = (df["cur"] == "KRW") | (df["cur"].isna())
 df["quantity"] = df["quantity"].where(cur_krw_or_missing, 0)
 df["totsaleslc"] = df["totsaleslc"].where(cur_krw_or_missing, 0)
+
+
+# Replace non-finite values with a default value (e.g., 0) and then change data type
+df["quotation_year"] = (
+    df["quotation_year"].replace([np.inf, -np.inf, np.nan], 0).astype(int)
+)
+df["sop_year"] = df["sop_year"].replace([np.inf, -np.inf, np.nan], 0).astype(int)
+
+
+# Re-order and sort columns
+df = df[["scenario"] + [col for col in df.columns if col not in ["scenario"]]]
+df = df.sort_values(by=["scenario"])
 
 
 # Write data
