@@ -13,12 +13,8 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
-# Scenario
-vt_fx_type = "ytd"  # fx_type: ytd or spot
-anchor_year = "quotation_year"  # anchor_year: quotation_year or sop_year
-VT_or_HMG = "VT"  # fx_actual: VT or HMG
-scenario_txt = f"fx_bud on {anchor_year} and fx_act from {VT_or_HMG}"
-output_file = path / "output" / "1. bom_price_fx rate_delta.csv"
+# FX Scenario
+fx_scenario_option = 1  # 1 to 4
 
 
 # Filenames
@@ -38,12 +34,39 @@ fx_hmg = pd.read_csv(fx_hmg_file)
 
 
 # Functions
+def fx_scenario(option):
+    if option == 1:
+        anchor_year = "quotation_year"
+        VT_or_HMG = "VT"
+        output_file = path / "output" / "1. bom_price_fx rate_delta.csv"
+
+    elif option == 2:
+        anchor_year = "quotation_year"
+        VT_or_HMG = "HMG"
+        output_file = path / "output" / "2. bom_price_fx rate_delta.csv"
+
+    elif option == 3:
+        anchor_year = "sop_year"
+        VT_or_HMG = "VT"
+        output_file = path / "output" / "3. bom_price_fx rate_delta.csv"
+
+    elif option == 4:
+        anchor_year = "sop_year"
+        VT_or_HMG = "HMG"
+        output_file = path / "output" / "4. bom_price_fx rate_delta.csv"
+
+    vt_fx_type = "ytd"  # fx_type: ytd or spot
+    scenario_txt = f"Plan FX rate on {anchor_year} and Actual FX rate from {VT_or_HMG}"
+
+    return (vt_fx_type, anchor_year, VT_or_HMG, scenario_txt, output_file)
+
+
 def process_project_year(df):
     # take first 4 letters for year only
     df["sop_year_month"] = df["sop_year_month"].str[:4].astype(int)
     df = df.rename(columns={"sop_year_month": "sop_year"})
     # select columns
-    df = df[["product", "quotation_year", "sop_year"]]
+    df = df[["product", "hmg_pn", "quotation_year", "sop_year"]]
     return df
 
 
@@ -110,14 +133,18 @@ def calc_delta_price(df):
     return df
 
 
-def add_scenario_text(df, text):
-    df["scenario"] = text
+def add_col_fx_scenario(df, text):
+    df["fx_scenario"] = text
 
     return df
 
 
 # Process data
 # Pre-processing
+(vt_fx_type, anchor_year, VT_or_HMG, scenario_txt, output_file) = fx_scenario(
+    fx_scenario_option
+)
+
 prj_year = process_project_year(prj)
 fx_act_vt = process_fx_vt(fx_vt, vt_fx_type)
 fx_act_hmg = process_fx_hmg(fx_hmg)
@@ -143,7 +170,7 @@ df["fx_act"] = df["fx_act"].where(df["cur"] != "KRW", 1)
 
 
 df = calc_delta_price(df)
-df = add_scenario_text(df, scenario_txt)
+df = add_col_fx_scenario(df, scenario_txt)
 
 
 # Write data
