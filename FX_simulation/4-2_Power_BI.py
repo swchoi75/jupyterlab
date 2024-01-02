@@ -12,22 +12,32 @@ except NameError:
 
 
 # Filenames
-input_file = path / "output" / "sales with bom costs.csv"
-output_file = path / "output" / "power_bi_dimensions.csv"
+input_file_1 = path / "data" / "Sales with representative PN.csv"
+input_file_2 = path / "data" / "fx_rates_HMG.csv"
+
+output_file_1 = path / "output" / "power_bi_dimensions.csv"
+output_file_2 = path / "output" / "fx_rates_HMG_by_Quarter.csv"
 
 
 # Read data
-df = pd.read_csv(input_file)
+df_1 = pd.read_csv(input_file_1)
+df_2 = pd.read_csv(input_file_2)
 
 
 # Process data
 # Aggregate data
 selected_columns = ["productline", "product_hierarchy", "PH_description"]
-df = df[selected_columns].groupby(selected_columns).first().reset_index()
+df_1 = df_1[selected_columns].groupby(selected_columns).first().reset_index()
 # Filter data
-df = df[df["productline"].isin(["PL DTC", "PL ENC", "PL MTC"])]
+df_1 = df_1[df_1["productline"].isin(["PL DTC", "PL ENC", "PL MTC"])]
+
+
+# Aggregate data
+selected_columns = ["cur", "year", "quarter", "fx_HMG"]
+df_2 = df_2[selected_columns].groupby(selected_columns).first().reset_index()
 
 
 # Write data
-df.to_csv(output_file, index=False)
-print("A file is created")
+df_1.to_csv(output_file_1, index=False)
+df_2.to_csv(output_file_2, index=False)
+print("files are created")

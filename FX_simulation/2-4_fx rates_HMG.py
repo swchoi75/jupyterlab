@@ -46,7 +46,7 @@ def reorder_columns(df):
 
 def filter_rows(df):
     df = df[df["cur"].isin(["USD", "EUR", "JPY"])]
-    # df = df[df["year"].isin([2019, 2020, 2021, 2022, 2023])]
+    df = df[df["year"].isin([2019, 2020, 2021, 2022, 2023])]
     return df
 
 
