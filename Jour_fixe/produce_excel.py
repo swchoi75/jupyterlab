@@ -29,8 +29,12 @@ df = pd.merge(list, members, on="email")
 df = df[
     (df["active"] == "yes")
     & (df["status"].isin(["Action", "Decision"]))
-    & (df["year"] == 2023)
+    & (df["year"].isin([2022, 2023, 2024]))
 ]
+
+
+# Sort
+df = df.sort_values(by=["year", "calendarweek"], ascending=False)
 
 
 # Unique values
