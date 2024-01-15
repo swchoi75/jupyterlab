@@ -25,7 +25,7 @@ members = pd.read_csv(meta_file).rename(columns={"first_name": "responsible"})
 df = pd.merge(list, members, on="email")
 
 
-# Filter active members, open action items in 2023
+# Filter active members, open action items in 2022 - 2024
 df = df[
     (df["active"] == "yes")
     & (df["status"].isin(["Action", "Decision"]))
