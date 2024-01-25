@@ -31,7 +31,8 @@ df = pd.read_excel(
     input_file,
     sheet_name="Sheet1",
     dtype={
-        "Fire-Outlet": str,
+        "Outlet(Receiver)": str,
+        "Fire-Outlet": str,        
         "FiRe Outlet NY(Receiver)": str,
         "FiRe plant(Receiver)": str,
         "Investment type": str,
@@ -48,8 +49,8 @@ df_meta = pd.read_excel(
 
 df_ppap = pd.read_excel(
     ppap_file,
-    header=2,
     sheet_name="PPAP",
+    header=2,
     usecols="G,I",
     parse_dates=["PPAP"],
 ).dropna()
@@ -68,7 +69,6 @@ def clean_trailing_underscore(column_name):
 df.columns = df.columns.map(clean_new_lines)
 df = df.clean_names()
 df.columns = df.columns.map(clean_trailing_underscore)
-df.columns
 
 
 # Select columns
@@ -84,9 +84,9 @@ key_columns = [
     "investment_type",
     "status",
     "master",
-    "unnamed_29",
+    "unnamed_28",
     "sub",
-    "unnamed_31",
+    "unnamed_30",
 ]
 
 value_columns = df.columns[df.columns.str.contains("spend")].tolist()
@@ -98,8 +98,8 @@ df = df[key_columns + value_columns]
 df = df.rename(
     columns={
         "categorie_of_investm": "category_of_investment",
-        "unnamed_29": "master_description",
-        "unnamed_31": "sub_description",
+        "unnamed_28": "master_description",
+        "unnamed_30": "sub_description",
     }
 )
 # Remove the GPA version prefix from each column name
