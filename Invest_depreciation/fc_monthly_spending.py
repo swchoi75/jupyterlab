@@ -117,7 +117,7 @@ df = df.merge(df_meta, how="left", on="category_of_investment")
 df = df.merge(df_ppap, how="left", on="sub")
 
 
-# Asset Under Construction if PPAP is in the future year
+# Business Logic: Asset Under Construction if PPAP is in the future year #
 def reclassfy_fs_item(df):
     ppap_future_year = df["PPAP"] > current_year_end
 
