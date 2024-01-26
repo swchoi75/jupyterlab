@@ -96,7 +96,7 @@ df_depr = (
 )
 
 
-# Monthly calculation
+# Business Logic: Monthly deprecation #
 df_month_ends = pd.DataFrame(
     {"month_ends": pd.date_range(period_start, period_end, freq="M")}
 )
