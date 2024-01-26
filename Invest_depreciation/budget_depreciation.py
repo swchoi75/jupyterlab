@@ -12,6 +12,11 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
+# Variables
+period_start = "2024-01-31"
+period_end = "2025-01-01"
+
+
 # Filenames
 input_file = (
     path / "bud_data" / "Budget 2024 Investment and depreciation all_20230913 v2.xlsx"
@@ -47,7 +52,7 @@ df["Spending date"] = pd.to_datetime(df["Spending date"].str.replace(".", "-"))
 
 # Functions to clean column names
 def clean_preceding_underscore(column_name):
-    return column_name.lstrip("_")
+    return column_name.lstrip("_").rstrip("_")
 
 
 # Apply the cleaning function to all column names
@@ -59,10 +64,9 @@ df.columns = df.columns.map(clean_preceding_underscore)
 df = df.rename(
     columns={
         "acquisitio": "acquisition_date",
-        "acqusition": "acquisition",        
-        "odep_start":"start_of_depr",
-        # "":"",
-        # "":"",
+        "con": "useful_life",
+        "acqusition": "acquisition",
+        "odep_start": "start_of_depr",
     }
 )
 
@@ -70,7 +74,7 @@ df = df.rename(
 # Remove unnecessary columns
 columns_to_exclude = [
     "ending_date",
-    "cost_elem_",
+    "cost_elem",
     "new_cc_1",
     "check",
     "wbs",
@@ -92,27 +96,39 @@ df_depr = (
 )
 
 
-# Output data
-df_depr.to_csv(output_1, index=False)
-
-
 # Monthly calculation
 df_month_ends = pd.DataFrame(
-    {"months": pd.date_range("2024-01-31", "2025-01-01", freq="M")}
+    {"month_ends": pd.date_range(period_start, period_end, freq="M")}
 )
 
 
-# Cross Join two tables
-joined = df_month_ends.join(df, how="cross")
+def calc_depr_end(row):
+    years = row["useful_life"]
+    row = row["acquisition_date"] + pd.DateOffset(years=years)
+    return row
 
 
-result = joined.assign(
-    current_depr=lambda row: row["acquisition"] / row["con"] / 12,
+def filter_depr_periods(df):
+    depr_periods = (df["depr_start"] < df["month_ends"]) & (
+        df["month_ends"] < df["depr_end"]
+    )
+    df["monthly_depr"] = df["monthly_depr"].where(depr_periods, 0)
+    return df
+
+
+df = df.assign(
+    monthly_depr=lambda row: row["acquisition"] / row["useful_life"] / 12,
     depr_start=lambda row: row["acquisition_date"],
-    # depr_end=lambda row: row["acquisition_date"] + row["con"] * 12 * 30,
 )
+df["useful_life"].fillna(0, inplace=True)  # fill missing values with 0
+df["depr_end"] = df.apply(calc_depr_end, axis="columns")
+
+
+df = df_month_ends.join(df, how="cross")
+df = filter_depr_periods(df)
 
 
 # Output data
-result.to_csv(output_2, index=False)
+df_depr.to_csv(output_1, index=False)
+df.to_csv(output_2, index=False)
 print("Files are created")
