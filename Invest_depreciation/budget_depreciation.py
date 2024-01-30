@@ -64,7 +64,8 @@ df.columns = df.columns.map(clean_preceding_underscore)
 df = df.rename(
     columns={
         "acquisitio": "acquisition_date",
-        "con": "useful_life",
+        "con": "useful_life_year",
+        "con_p": "useful_life_month",
         "acqusition": "acquisition",
         "odep_start": "start_of_depr",
     }
@@ -80,6 +81,11 @@ columns_to_exclude = [
     "wbs",
     "project",
     "sub_no",
+    #
+    "kor",
+    "sie",
+    "total",
+    "book_value",
     "vendor",
     "vendor_name",
     "p_o",
@@ -96,15 +102,43 @@ df_depr = (
 )
 
 
-# Business Logic: Monthly deprecation #
+# # Business Logic: Monthly deprecation # #
+
+# Dataframe for month end dates
 df_month_ends = pd.DataFrame(
     {"month_ends": pd.date_range(period_start, period_end, freq="M")}
 )
 
 
+# Functions
+def calc_monthly_depr(row):
+    # To avoid Division by zero error
+    if (row["useful_life_year"] == 0) & (row["useful_life_month"] == 0):
+        return 0
+    # Depreciation is finished already
+    elif row["acquisition"] + row["previous"] == 0:
+        return 0
+    # Yearly Depreciation is bigger than expected due to additional investment
+    elif abs(row["current"]) > abs(
+        row["acquisition"] / ((row["useful_life_year"] + row["useful_life_month"] / 12))
+    ):
+        return row["current"] * -1 / 12
+    # ICO asset transfer
+    elif "(ICO)" in row["description"]:
+        return row["current"] * -1 / 12
+    # Main calculation logic
+    else:
+        return row["acquisition"] / (
+            (row["useful_life_year"] * 12 + row["useful_life_month"])
+        )
+
+    
 def calc_depr_end(row):
-    years = row["useful_life"]
-    row = row["acquisition_date"] + pd.DateOffset(years=years)
+    years = row["useful_life_year"]
+    months = row["useful_life_month"]
+    row = (
+        row["start_of_depr"] + pd.DateOffset(years=years) + pd.DateOffset(months=months)
+    )
     return row
 
 
@@ -116,19 +150,33 @@ def filter_depr_periods(df):
     return df
 
 
-df = df.assign(
-    monthly_depr=lambda row: row["acquisition"] / row["useful_life"] / 12,
-    depr_start=lambda row: row["acquisition_date"],
-)
-df["useful_life"].fillna(0, inplace=True)  # fill missing values with 0
+# Fill missing values
+df["useful_life_year"].fillna(0, inplace=True)  # fill missing values with 0
+df["useful_life_month"].fillna(0, inplace=True)  # fill missing values with 0
+
+
+# Create new columns
+df["depr_start"] = df["start_of_depr"]
 df["depr_end"] = df.apply(calc_depr_end, axis="columns")
+df["monthly_depr"] = df.apply(calc_monthly_depr, axis="columns")
 
 
+# Cross Join & Filter deprciation periods
 df = df_month_ends.join(df, how="cross")
 df = filter_depr_periods(df)
 
 
-# Output data
+# # Pivot_wider
+# df["month_ends"] = df["month_ends"].astype(str)
+# df = pd.pivot(
+#     df,
+#     index=[col for col in df.columns if col not in ["month_ends", "monthly_depr"]],
+#     columns="month_ends",
+#     values="monthly_depr",
+# ).reset_index()
+
+
+# Write data
 df_depr.to_csv(output_1, index=False)
 df.to_csv(output_2, index=False)
 print("Files are created")
