@@ -177,9 +177,9 @@ def filter_depr_periods(df, period_start):
     return df
 
 
-# Fill missing values
-df["useful_life_year"].fillna(0, inplace=True)  # fill missing values with 0
-df["useful_life_month"].fillna(0, inplace=True)  # fill missing values with 0
+# Fill missing values with 0
+df["useful_life_year"].fillna(0, inplace=True)
+df["useful_life_month"].fillna(0, inplace=True)
 
 
 # Create new columns
