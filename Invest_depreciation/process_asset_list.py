@@ -122,14 +122,12 @@ def calc_monthly_depr(row, period_start, period_end):
     if (
         # To avoid Division by zero error (e.g. Asset under construction)
         row["useful_life_year"] == row["useful_life_month"] == 0
-        # Depreciation is finished already
-        or row["acquisition"] + row["previous"] == 0
     ):
         return 0
 
     # Main calculation logic
     monthly_depr = (
-        row["acquisition"] / (row["useful_life_year"] * 12 + row["useful_life_month"]),
+        row["acquisition"] / (row["useful_life_year"] * 12 + row["useful_life_month"])
     )
     alterative_monthly_depr = row["current"] * -1 / 12
 
