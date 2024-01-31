@@ -111,7 +111,7 @@ df_month_ends = pd.DataFrame(
 
 
 # Functions
-def calc_monthly_depr(row, period_start):
+def calc_monthly_depr(row, period_start, period_end):
     if (
         # To avoid Division by zero error (e.g. Asset under construction)
         row["useful_life_year"] == row["useful_life_month"] == 0
@@ -120,27 +120,39 @@ def calc_monthly_depr(row, period_start):
     ):
         return 0
 
-    elif (
-        # Yearly Depreciation is bigger than expected due to additional investment
-        abs(row["current"])
-        > abs(
-            row["acquisition"]
-            / ((row["useful_life_year"] + row["useful_life_month"] / 12))
-        )
-        # ICO asset transfer
-        or "(ICO)" in row["description"]
-    ):
-        return row["current"] * -1 / 12
-
-    # If it is still depreciated even after depr_end date as usage is restarted
-    elif row["depr_end"] < pd.to_datetime(period_start) and abs(row["current"]) > 0:
-        return row["current"] * -1 / 12
-
     # Main calculation logic
+    monthly_depr = (
+        row["acquisition"] / (row["useful_life_year"] * 12 + row["useful_life_month"]),
+    )
+    alterative_monthly_depr = row["current"] * -1 / 12
+
+    # If the depreciation starts after period_start
+    if pd.to_datetime(period_start) < row["depr_start"]:
+        date1 = pd.to_datetime(period_start)
+        date2 = row["depr_start"]
+        months_difference = (date2.year - date1.year) * 12 + date2.month - date1.month
+        return row["current"] * -1 / (12 - months_difference)
+
+    # If the depreciation ends between period_start and period_end
+    elif pd.to_datetime(period_start) < row["depr_end"] and row[
+        "depr_end"
+    ] < pd.to_datetime(period_end):
+        date1 = row["depr_end"]
+        date2 = pd.to_datetime(period_end)
+        months_difference = (date2.year - date1.year) * 12 + date2.month - date1.month
+        return row["current"] * -1 / (12 - months_difference)
+
+    # If it is still depreciated even after depr_end date because usage is restarted
+    elif row["depr_end"] < pd.to_datetime(period_start) and abs(row["current"]) > 0:
+        return alterative_monthly_depr
+
+    # Yearly Depreciation is not equal to the expected value
+    # due to additional investment, ICO asset transfer, etc
+    elif abs(row["current"] + (monthly_depr * 12)) > 1:
+        return alterative_monthly_depr
+
     else:
-        return row["acquisition"] / (
-            row["useful_life_year"] * 12 + row["useful_life_month"]
-        )
+        return monthly_depr
 
 
 def calc_depr_end(row):
@@ -157,8 +169,10 @@ def filter_depr_periods(df, period_start):
         df["month_ends"] < df["depr_end"]
     )
     # If it is still depreciated even after depr_end date as usage is restarted
-    exceptions = (df["depr_end"] < pd.to_datetime(period_start)) & (abs(df["current"]) > 0)
-    
+    exceptions = (df["depr_end"] < pd.to_datetime(period_start)) & (
+        abs(df["current"]) > 0
+    )
+
     df["monthly_depr"] = df["monthly_depr"].where(depr_periods | exceptions, 0)
     return df
 
@@ -172,7 +186,7 @@ df["useful_life_month"].fillna(0, inplace=True)  # fill missing values with 0
 df["depr_start"] = df["start_of_depr"]
 df["depr_end"] = df.apply(calc_depr_end, axis="columns")
 df["monthly_depr"] = df.apply(
-    calc_monthly_depr, axis="columns", period_start=period_start
+    calc_monthly_depr, axis="columns", period_start=period_start, period_end=period_end
 )
 
 
