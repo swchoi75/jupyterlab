@@ -22,8 +22,8 @@ df = pd.read_csv(input_file).clean_names()
 
 
 # Process data
-df = df.groupby("product_hierarchy").agg({"react_fx": "sum"}).reset_index()
-
+df = df.groupby(["product_hierarchy", "year"]).agg({"react_fx": "sum"}).reset_index()
+df["year"] = df["year"] - 1  # Correct SAP year to Financial Year
 
 # Write data
 df.to_csv(output_file, index=False)

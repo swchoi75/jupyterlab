@@ -14,7 +14,8 @@ except NameError:
 
 # Filenames
 input_file = path / "data" / "FX Rates" / "HMG 고시환율_20231113.xlsx"
-output_file = path / "data" / "fx_rates_HMG.csv"
+output_1 = path / "data" / "fx_rates_HMG_actual.csv"
+output_2 = path / "data" / "fx_rates_HMG_plan.csv"
 
 
 # Read data
@@ -46,7 +47,7 @@ def reorder_columns(df):
 
 def filter_rows(df):
     df = df[df["cur"].isin(["USD", "EUR", "JPY"])]
-    df = df[df["year"].isin([2019, 2020, 2021, 2022, 2023])]
+    # df = df[df["year"].isin([2019, 2020, 2021, 2022, 2023])]
     return df
 
 
@@ -92,6 +93,12 @@ df = df.merge(month, how="left", on="quarter")
 df = df[["fx_type", "cur", "year", "quarter", "month", "fx_HMG"]]
 
 
+# Yearly Average
+df_avg = df.groupby(["cur", "year"]).agg({"fx_HMG": "mean"}).reset_index()
+df_avg = df_avg.rename(columns={"fx_HMG": "fx_plan", "year": "plan_year"})
+
+
 # Write data
-df.to_csv(output_file, index=False)
-print("A file is created")
+df.to_csv(output_1, index=False)
+df_avg.to_csv(output_2, index=False)
+print("Files are created")

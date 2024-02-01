@@ -14,51 +14,89 @@ except NameError:
 
 
 # FX Scenario
-fx_scenario_option = 1  # 1 to 4
+fx_scenario_option = 1  # 1 to 8
 
 
 # Filenames
 bom_file = path / "data" / "BOM_price.csv"
 prj_file = path / "data" / "Sales high runner PN_survey with PSM.xlsx"
-fx_bud_file = path / "data" / "fx_rates_VT_budget.csv"
-fx_act_file = path / "data" / "fx_rates_VT_actual.csv"
-fx_hmg_file = path / "data" / "fx_rates_HMG.csv"
+fx_vt_plan_file = path / "data" / "fx_rates_VT_plan.csv"
+fx_vt_act_file = path / "data" / "fx_rates_VT_actual.csv"
+fx_hmg_act_file = path / "data" / "fx_rates_HMG_actual.csv"
+fx_hmg_plan_file = path / "data" / "fx_rates_HMG_plan.csv"
 
 
 # Read data
 bom = pd.read_csv(bom_file)
 prj = pd.read_excel(prj_file, sheet_name="PSM entry", skiprows=3).clean_names()
-fx_bud = pd.read_csv(fx_bud_file)
-fx_vt = pd.read_csv(fx_act_file)
-fx_hmg = pd.read_csv(fx_hmg_file)
+fx_vt_plan = pd.read_csv(fx_vt_plan_file)
+fx_vt_act = pd.read_csv(fx_vt_act_file)
+fx_hmg_act = pd.read_csv(fx_hmg_act_file)
+fx_hmg_plan = pd.read_csv(fx_hmg_plan_file)
 
 
 # Functions
 def fx_scenario(option):
+    vt_fx_type = "ytd"  # fx_type: ytd or spot
+
     if option == 1:
         anchor_year = "quotation_year"
-        VT_or_HMG = "VT"
+        plan_fx_source = "VT"
+        act_fx_source = "VT"
         output_file = path / "output" / "1. bom_price_fx rate_delta.csv"
 
     elif option == 2:
         anchor_year = "quotation_year"
-        VT_or_HMG = "HMG"
+        plan_fx_source = "VT"
+        act_fx_source = "HMG"
         output_file = path / "output" / "2. bom_price_fx rate_delta.csv"
 
     elif option == 3:
         anchor_year = "sop_year"
-        VT_or_HMG = "VT"
+        plan_fx_source = "VT"
+        act_fx_source = "VT"
         output_file = path / "output" / "3. bom_price_fx rate_delta.csv"
 
     elif option == 4:
         anchor_year = "sop_year"
-        VT_or_HMG = "HMG"
+        plan_fx_source = "VT"
+        act_fx_source = "HMG"
         output_file = path / "output" / "4. bom_price_fx rate_delta.csv"
 
-    vt_fx_type = "ytd"  # fx_type: ytd or spot
-    scenario_txt = f"Plan FX rate on {anchor_year} and Actual FX rate from {VT_or_HMG}"
+    if option == 5:
+        anchor_year = "quotation_year"
+        plan_fx_source = "HMG"
+        act_fx_source = "VT"
+        output_file = path / "output" / "5. bom_price_fx rate_delta.csv"
 
-    return (vt_fx_type, anchor_year, VT_or_HMG, scenario_txt, output_file)
+    elif option == 6:
+        anchor_year = "quotation_year"
+        plan_fx_source = "HMG"
+        act_fx_source = "HMG"
+        output_file = path / "output" / "6. bom_price_fx rate_delta.csv"
+
+    elif option == 7:
+        anchor_year = "sop_year"
+        plan_fx_source = "HMG"
+        act_fx_source = "VT"
+        output_file = path / "output" / "7. bom_price_fx rate_delta.csv"
+
+    elif option == 8:
+        anchor_year = "sop_year"
+        plan_fx_source = "HMG"
+        act_fx_source = "HMG"
+        output_file = path / "output" / "8. bom_price_fx rate_delta.csv"
+
+    scenario_txt = f"Plan FX rate on {anchor_year} from {plan_fx_source} and Actual FX rate from {act_fx_source}"
+
+    return (
+        vt_fx_type,
+        anchor_year,
+        plan_fx_source,
+        act_fx_source,
+        scenario_txt,
+        output_file,
+    )
 
 
 def process_project_year(df):
@@ -70,7 +108,7 @@ def process_project_year(df):
     return df
 
 
-def process_fx_vt(df, fx_type):
+def process_fx_vt_act(df, fx_type):
     # Filter rows
     df = df[df["fx_type"] == fx_type]  # fx_type: ytd or spot
     # Select columns
@@ -78,7 +116,7 @@ def process_fx_vt(df, fx_type):
     return df
 
 
-def process_fx_hmg(df):
+def process_fx_hmg_act(df):
     # copy column
     df["fx_act"] = df["fx_HMG"]
     # Select columns
@@ -86,11 +124,19 @@ def process_fx_hmg(df):
     return df
 
 
-def select_fx_act(fx_vt, fx_hmg, VT_HMG):
-    if VT_HMG == "VT":
-        df = fx_vt
-    elif VT_HMG == "HMG":
-        df = fx_hmg
+def select_fx_plan(fx_vt_plan, fx_hmg_plan, plan_fx_source):
+    if plan_fx_source == "VT":
+        df = fx_vt_plan
+    elif plan_fx_source == "HMG":
+        df = fx_hmg_plan
+    return df
+
+
+def select_fx_act(fx_vt_act, fx_hmg_act, act_fx_source):
+    if act_fx_source == "VT":
+        df = fx_vt_act
+    elif act_fx_source == "HMG":
+        df = fx_hmg_act
     return df
 
 
@@ -104,11 +150,12 @@ def process_bom():
     return df
 
 
-def process_fx_bud(df, anchor_year):  # anchor_year: quotation_year or sop_year
+def process_fx_plan(df, fx_plan, anchor_year):
     df = pd.merge(
         df,
-        fx_bud,
+        fx_plan,
         how="left",
+        # anchor_year: quotation_year or sop_year
         left_on=[anchor_year, "cur"],
         right_on=["plan_year", "cur"],
     ).drop(columns=["plan_year"])
@@ -128,32 +175,40 @@ def krw_month_table():
 
 
 def calc_delta_price(df):
-    df["fx_diff_to_bud"] = df["fx_act"] - df["fx_bud"]
-    df["delta_price_to_bud_fx"] = df["fx_diff_to_bud"] * df["total_amount_org_cur_"]
+    df["fx_diff_to_plan"] = df["fx_act"] - df["fx_plan"]
+    df["delta_price_to_plan_fx"] = df["fx_diff_to_plan"] * df["total_amount_org_cur_"]
     return df
 
 
-def add_col_fx_scenario(df, text):
+def add_col_fx_scenario(df, text, anchor_year, plan_fx_source, act_fx_source):
     df["fx_scenario"] = text
-
+    df["plan_fx_on"] = anchor_year
+    df["plan_fx_from"] = plan_fx_source
+    df["actual_fx_from"] = act_fx_source
     return df
 
 
 # Process data
 # Pre-processing
-(vt_fx_type, anchor_year, VT_or_HMG, scenario_txt, output_file) = fx_scenario(
-    fx_scenario_option
-)
+(
+    vt_fx_type,
+    anchor_year,
+    plan_fx_source,
+    act_fx_source,
+    scenario_txt,
+    output_file,
+) = fx_scenario(fx_scenario_option)
 
 prj_year = process_project_year(prj)
-fx_act_vt = process_fx_vt(fx_vt, vt_fx_type)
-fx_act_hmg = process_fx_hmg(fx_hmg)
-fx_act = select_fx_act(fx_act_vt, fx_act_hmg, VT_or_HMG)
+fx_vt_act = process_fx_vt_act(fx_vt_act, vt_fx_type)
+fx_hmg_act = process_fx_hmg_act(fx_hmg_act)
+fx_plan = select_fx_plan(fx_vt_plan, fx_hmg_plan, plan_fx_source)
+fx_act = select_fx_act(fx_vt_act, fx_hmg_act, act_fx_source)
 
 
-# Join dataframes: bom, project_year, fx_bud, fx_act
+# Join dataframes: bom, project_year, fx_plan, fx_act
 df = process_bom()
-df = process_fx_bud(df, anchor_year)
+df = process_fx_plan(df, fx_plan, anchor_year)
 df = process_fx_act(df, fx_act)
 
 
@@ -165,12 +220,12 @@ df = df.drop(columns=["period"])
 
 
 # Set 1 KRW = 1 KRW
-df["fx_bud"] = df["fx_bud"].where(df["cur"] != "KRW", 1)
+df["fx_plan"] = df["fx_plan"].where(df["cur"] != "KRW", 1)
 df["fx_act"] = df["fx_act"].where(df["cur"] != "KRW", 1)
 
 
 df = calc_delta_price(df)
-df = add_col_fx_scenario(df, scenario_txt)
+df = add_col_fx_scenario(df, scenario_txt, anchor_year, plan_fx_source, act_fx_source)
 
 
 # Write data
