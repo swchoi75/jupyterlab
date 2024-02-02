@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from janitor import clean_names
+from enum import Enum
 
 
 # Path
@@ -35,57 +36,34 @@ fx_hmg_act = pd.read_csv(fx_hmg_act_file)
 fx_hmg_plan = pd.read_csv(fx_hmg_plan_file)
 
 
+class Option(Enum):
+    ONE = 1
+    TWO = 2
+    THREE = 3
+    FOUR = 4
+    FIVE = 5
+    SIX = 6
+    SEVEN = 7
+    EIGHT = 8
+
+
 # Functions
-def fx_scenario(option):
+def fx_scenario(option: Option) -> tuple:
     vt_fx_type = "ytd"  # fx_type: ytd or spot
 
-    if option == 1:
-        anchor_year = "quotation_year"
-        plan_fx_source = "VT"
-        act_fx_source = "VT"
-        output_file = path / "output" / "1. bom_price_fx rate_delta.csv"
+    options = {
+        Option.ONE: ("quotation_year", "VT", "VT", "1. bom_price_fx rate_delta.csv"),
+        Option.TWO: ("quotation_year", "VT", "HMG", "2. bom_price_fx rate_delta.csv"),
+        Option.THREE: ("sop_year", "VT", "VT", "3. bom_price_fx rate_delta.csv"),
+        Option.FOUR: ("sop_year", "VT", "HMG", "4. bom_price_fx rate_delta.csv"),
+        Option.FIVE: ("quotation_year", "HMG", "VT", "5. bom_price_fx rate_delta.csv"),
+        Option.SIX: ("quotation_year", "HMG", "HMG", "6. bom_price_fx rate_delta.csv"),
+        Option.SEVEN: ("sop_year", "HMG", "VT", "7. bom_price_fx rate_delta.csv"),
+        Option.EIGHT: ("sop_year", "HMG", "HMG", "8. bom_price_fx rate_delta.csv"),
+    }
 
-    elif option == 2:
-        anchor_year = "quotation_year"
-        plan_fx_source = "VT"
-        act_fx_source = "HMG"
-        output_file = path / "output" / "2. bom_price_fx rate_delta.csv"
-
-    elif option == 3:
-        anchor_year = "sop_year"
-        plan_fx_source = "VT"
-        act_fx_source = "VT"
-        output_file = path / "output" / "3. bom_price_fx rate_delta.csv"
-
-    elif option == 4:
-        anchor_year = "sop_year"
-        plan_fx_source = "VT"
-        act_fx_source = "HMG"
-        output_file = path / "output" / "4. bom_price_fx rate_delta.csv"
-
-    if option == 5:
-        anchor_year = "quotation_year"
-        plan_fx_source = "HMG"
-        act_fx_source = "VT"
-        output_file = path / "output" / "5. bom_price_fx rate_delta.csv"
-
-    elif option == 6:
-        anchor_year = "quotation_year"
-        plan_fx_source = "HMG"
-        act_fx_source = "HMG"
-        output_file = path / "output" / "6. bom_price_fx rate_delta.csv"
-
-    elif option == 7:
-        anchor_year = "sop_year"
-        plan_fx_source = "HMG"
-        act_fx_source = "VT"
-        output_file = path / "output" / "7. bom_price_fx rate_delta.csv"
-
-    elif option == 8:
-        anchor_year = "sop_year"
-        plan_fx_source = "HMG"
-        act_fx_source = "HMG"
-        output_file = path / "output" / "8. bom_price_fx rate_delta.csv"
+    anchor_year, plan_fx_source, act_fx_source, output_file = options[option]
+    output_file = Path("output") / output_file
 
     scenario_txt = f"Plan FX rate on {anchor_year} from {plan_fx_source} and Actual FX rate from {act_fx_source}"
 
@@ -197,7 +175,7 @@ def add_col_fx_scenario(df, text, anchor_year, plan_fx_source, act_fx_source):
     act_fx_source,
     scenario_txt,
     output_file,
-) = fx_scenario(fx_scenario_option)
+) = fx_scenario(Option(fx_scenario_option))
 
 prj_year = process_project_year(prj)
 fx_vt_act = process_fx_vt_act(fx_vt_act, vt_fx_type)
