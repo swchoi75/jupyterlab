@@ -68,17 +68,22 @@ def sort_by_fx_scenario(df):
     return df
 
 
-def reorder_columns(df):
-    # Reorder columns
-    first_columns = ["fx_scenario", "plan_fx_on", "plan_fx_from", "actual_fx_from"]
-    df = df[first_columns + [col for col in df.columns if col not in first_columns]]
-    return df
-
-
 def process_sales_year(df):
     # Sales Year
     df["fy"] = "Act " + df["fy"].astype(str)
     df["fy"] = df["fy"].str.replace("Act 2024", "YTD Act 2024")
+    return df
+
+
+def combine_id_cols(df, two_id_columns):
+    # concatenate columns
+    df["key_id"] = df[two_id_columns[0]] + "_" + df[two_id_columns[1]]
+    return df
+
+
+def reorder_columns(df, first_columns):
+    # Reorder columns
+    df = df[first_columns + [col for col in df.columns if col not in first_columns]]
     return df
 
 
@@ -118,13 +123,22 @@ df = pd.merge(
 )
 
 
+two_id_columns = ["fy", "product_hierarchy"]
+first_columns = [
+    "key_id",
+    "fx_scenario",
+    "plan_fx_on",
+    "plan_fx_from",
+    "actual_fx_from",
+]
 df = (
     df.pipe(calc_delta_costs)
     .pipe(remove_duplacate_sales)
     .pipe(change_dtypes_year)
     .pipe(sort_by_fx_scenario)
-    .pipe(reorder_columns)
     .pipe(process_sales_year)
+    .pipe(combine_id_cols, two_id_columns)
+    .pipe(reorder_columns, first_columns)
 )
 
 
