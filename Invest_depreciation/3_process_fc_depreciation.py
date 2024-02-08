@@ -95,7 +95,7 @@ df = pd.pivot(
 ).reset_index()
 
 
-# Depreciation in current year
+# New column: Depreciation in current year
 value_columns = df.columns[df.columns.str.contains("2023-")].tolist()
 df["depr_current"] = df[value_columns].sum(axis="columns")
 
