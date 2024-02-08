@@ -38,6 +38,7 @@ df = pd.read_csv(
         "financial_statement_item": str,
     },
 )
+df = df.drop(columns=spending_total_col)
 
 df_meta = pd.read_excel(
     meta_file,
@@ -55,7 +56,6 @@ df = df.merge(df_meta, how="left", on="sub")
 # # Business Logic: Get the last spending months
 # Melt the dataframe
 value_columns = df.columns[df.columns.str.contains("spend")].tolist()
-value_columns = [item for item in value_columns if item != spending_total_col]
 key_columns = [col for col in df.columns if col not in value_columns]
 
 df = df.melt(
