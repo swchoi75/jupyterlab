@@ -13,13 +13,13 @@ except NameError:
 
 
 # Variables
-period_start = "2023-01-31"
-period_end = "2024-01-01"
+period_start = "2024-01-31"
+period_end = "2025-01-01"
 
 
 # Filenames
-input_file = path / "fc_output" / "fc_acquisition_future_assets.csv"
-output_file = path / "fc_output" / "fc_depreciation_future_assets.csv"
+input_file = path / "bud_output" / "bud_acquisition_future_assets.csv"
+output_file = path / "bud_output" / "bud_depreciation_future_assets.csv"
 
 
 # Read data

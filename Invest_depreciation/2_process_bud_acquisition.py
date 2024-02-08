@@ -14,9 +14,9 @@ except NameError:
 
 
 # Filenames
-input_file = path / "fc_output" / "fc_monthly_spending_1.csv"
-meta_file = path / "meta" / "fc_GPA_master.xlsx"
-output_file = path / "fc_output" / "fc_acquisition_future_assets.csv"
+input_file = path / "bud_output" / "bud_monthly_spending_1.csv"
+meta_file = path / "meta" / "bud_GPA_master.xlsx"
+output_file = path / "bud_output" / "bud_acquisition_future_assets.csv"
 
 
 # Read data
@@ -68,13 +68,13 @@ last_months.rename(columns={"spend_month": "last_spend_month"}, inplace=True)
 # New column "Acquisition date" based on last spending months
 def str_to_month_ends(series):
     # Convert year_month to datetime with day set to 1st
-    series = pd.to_datetime(series, format="%Y_%m")
+    series = pd.to_datetime(series, format="%m_%Y")
     # Add one month and subtract one day to get the month end
     series = series + pd.DateOffset(months=1, days=-1)
     return series
 
 
-s = last_months["last_spend_month"].str.replace("spend_fc_", "")
+s = last_months["last_spend_month"].str.replace("spend_plan", "")
 s = str_to_month_ends(s)
 last_months["acquisition_date"] = s
 
