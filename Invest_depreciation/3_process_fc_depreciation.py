@@ -39,7 +39,6 @@ df = pd.read_csv(
 # Forecast assumptions
 value_columns = df.columns[df.columns.str.contains("spend")].tolist()
 df["acquisition"] = df[value_columns].sum(axis="columns")
-df["useful_life_month"] = 0
 
 
 # # Business Logic: Monthly deprecation # #
@@ -53,18 +52,13 @@ df_month_ends = pd.DataFrame(
 
 # Functions
 def calc_monthly_depr(row):
-    monthly_depr = row["acquisition"] / (
-        row["useful_life_year"] * 12
-    )  # row["useful_life_month"] is excluded for future assets
+    monthly_depr = row["acquisition"] / (row["useful_life_year"] * 12)
     return monthly_depr
 
 
 def calc_depr_end(row):
     years = row["useful_life_year"]
-    months = row["useful_life_month"]
-    row = (
-        row["start_of_depr"] + pd.DateOffset(years=years) + pd.DateOffset(months=months)
-    )
+    row = row["start_of_depr"] + pd.DateOffset(years=years)
     return row
 
 
@@ -76,9 +70,8 @@ def filter_depr_periods(df):
     return df
 
 
-# Fill missing values with default value 4
-df["useful_life_year"].fillna(4, inplace=True)
-# df["useful_life_month"].fillna(0, inplace=True)
+# Fill missing values with default value 8
+df["useful_life_year"].fillna(8, inplace=True)
 
 
 # Create new columns
