@@ -34,6 +34,21 @@ df = pd.read_csv(
 )
 
 
+# Melt the dataframe
+value_columns = df.columns[df.columns.str.contains("spend")].tolist()
+key_columns = [col for col in df.columns if col not in value_columns]
+
+df = df.melt(
+    id_vars=key_columns,
+    value_vars=value_columns,
+    var_name="spend_month",
+    value_name="spend_amt",
+)
+
+# df = df.where(df["spend_amt"] != 0, np.nan)  # turn 0 into n/a values
+df = df.dropna(subset="spend_amt")  # remove rows with n/a values
+
+
 # Write data
 df.to_csv(output_file, index=False)
 print("A file is created")

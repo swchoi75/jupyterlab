@@ -59,16 +59,16 @@ df = df.melt(
     id_vars=key_columns,
     value_vars=value_columns,
     var_name="spend_month",
-    value_name="spend_fc",
+    value_name="spend_amt",
 )
 
-df = df.where(df["spend_fc"] != 0, np.nan)  # turn 0 into n/a values
-df = df.dropna(subset="spend_fc")  # remove rows with n/a values
+df = df.where(df["spend_amt"] != 0, np.nan)  # turn 0 into n/a values
+df = df.dropna(subset="spend_amt")  # remove rows with n/a values
 
 
 # Aggregate data
 last_months = df[["sub", "spend_month"]].groupby(["sub"]).last()  # .reset_index()
-last_months.rename(columns={"spend_month": "last_spend_month"}, inplace=True)
+last_months.rename(columns={"spend_month": "last_month"}, inplace=True)
 
 
 # New column: "Acquisition date" based on last spending months
@@ -80,7 +80,7 @@ def str_to_month_ends(series):
     return series
 
 
-s = last_months["last_spend_month"].str.replace("spend_fc_", "")
+s = last_months["last_month"].str.replace("spend_fc_", "")
 s = str_to_month_ends(s)
 last_months["acquisition_date"] = s
 
@@ -96,9 +96,9 @@ df["start_of_depr"] = np.where(pd.isna(df["PPAP"]), df["acquisition_date"], df["
 # Pivot wider
 df = pd.pivot(
     df,
-    index=[col for col in df.columns if col not in ["spend_month", "spend_fc"]],
+    index=[col for col in df.columns if col not in ["spend_month", "spend_amt"]],
     columns="spend_month",
-    values="spend_fc",
+    values="spend_amt",
 ).reset_index()
 
 
