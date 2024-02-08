@@ -13,6 +13,11 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
+# Variables
+current_year = "2023"
+current_year_end = pd.to_datetime(current_year + "-12-31")
+
+
 # Filenames
 input_file = path / "fc_output" / "fc_monthly_spending.csv"
 meta_file = path / "meta" / "fc_GPA_master.xlsx"
@@ -95,6 +100,23 @@ df = pd.pivot(
     columns="spend_month",
     values="spend_fc",
 ).reset_index()
+
+
+# Business Logic: Asset Under Construction if PPAP is in the future year #
+def reclassfy_fs_item(df):
+    ppap_future_year = df["PPAP"] > current_year_end
+
+    df["financial_statement_item"] = df["financial_statement_item"].where(
+        ~ppap_future_year, "122632000"
+    )
+
+    df["fs_item_description"] = df["fs_item_description"].where(
+        ~ppap_future_year, "Assets under construction and advances to suppliers"
+    )
+    return df
+
+
+df = reclassfy_fs_item(df)
 
 
 # Write data
