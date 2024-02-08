@@ -13,13 +13,12 @@ except NameError:
 
 
 # Variables
-spending_total_col = "spend_fc_2023"
 period_start = "2023-01-31"
 period_end = "2024-01-01"
 
 
 # Filenames
-input_file = path / "fc_output" / "fc_adjustment_future_assets.csv"
+input_file = path / "fc_output" / "fc_acquisition_future_assets.csv"
 output_file = path / "fc_output" / "fc_depreciation_future_assets.csv"
 
 
@@ -36,8 +35,10 @@ df = pd.read_csv(
     parse_dates=["acquisition_date", "PPAP", "start_of_depr"],
 )
 
+
 # Forecast assumptions
-df["acquisition"] = df[spending_total_col]
+value_columns = df.columns[df.columns.str.contains("spend")].tolist()
+df["acquisition"] = df[value_columns].sum(axis="columns")
 df["useful_life_month"] = 0
 
 
