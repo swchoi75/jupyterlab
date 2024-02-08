@@ -13,12 +13,13 @@ except NameError:
 
 
 # Variables
+spending_total_col = "plan_spend_2024"
 period_start = "2024-01-31"
 period_end = "2025-01-01"
 
 
 # Filenames
-input_file = path / "bud_output" / "bud_acquisition_future_assets.csv"
+input_file = path / "bud_output" / "bud_adjustment_future_assets.csv"
 output_file = path / "bud_output" / "bud_depreciation_future_assets.csv"
 
 
@@ -32,12 +33,11 @@ df = pd.read_csv(
         "fire_plant_receiver": str,
         "investment_type": str,
     },
-    parse_dates=["acquisition_date"],
+    parse_dates=["acquisition_date", "PPAP", "start_of_depr"],
 )
 
 # Forecast assumptions
-df["acquisition"] = df["spend_fc_2023"]
-df["start_of_depr"] = df["acquisition_date"]
+df["acquisition"] = df[spending_total_col]
 df["useful_life_month"] = 0
 
 

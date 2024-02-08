@@ -37,6 +37,7 @@ df_meta = pd.read_excel(
     sheet_name="Manual input",
     skiprows=3,
     usecols="E, M:P",
+    parse_dates=["PPAP"],
 )
 
 
@@ -65,7 +66,7 @@ last_months = df[["sub", "spend_month"]].groupby(["sub"]).last()  # .reset_index
 last_months.rename(columns={"spend_month": "last_spend_month"}, inplace=True)
 
 
-# New column "Acquisition date" based on last spending months
+# New column: "Acquisition date" based on last spending months
 def str_to_month_ends(series):
     # Convert year_month to datetime with day set to 1st
     series = pd.to_datetime(series, format="%m_%Y")
@@ -81,6 +82,10 @@ last_months["acquisition_date"] = s
 
 # Join two dataframes
 df = df.merge(last_months, how="left", on="sub")
+
+
+# New column: "Start of Depreciation"
+df["start_of_depr"] = np.where(pd.isna(df["PPAP"]), df["acquisition_date"], df["PPAP"])
 
 
 # Pivot wider
