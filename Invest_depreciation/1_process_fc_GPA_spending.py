@@ -24,7 +24,7 @@ current_year_end = pd.to_datetime(current_year + "-12-31")
 input_file = path / "fc_data" / "2023-11_GPA_WMS - All data report_FC.xlsx"
 meta_file = path / "meta" / "category_of_investment.xlsx"
 master_file = path / "fc_output" / "fc_GPA_master.csv"
-output_file = path / "fc_output" / "fc_monthly_spending_1.csv"
+output_file = path / "fc_output" / "fc_monthly_spending.csv"
 
 
 # Read data

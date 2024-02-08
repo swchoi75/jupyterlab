@@ -14,7 +14,7 @@ except NameError:
 
 
 # Filenames
-input_file = path / "bud_output" / "bud_monthly_spending_1.csv"
+input_file = path / "bud_output" / "bud_monthly_spending.csv"
 meta_file = path / "meta" / "bud_GPA_master.xlsx"
 output_file = path / "bud_output" / "bud_acquisition_future_assets.csv"
 
