@@ -14,8 +14,10 @@ except NameError:
 
 
 # Variables
+spending_total_col = "spend_fc_2023"
 current_year = "2023"
 current_year_end = pd.to_datetime(current_year + "-12-31")
+actual_month_end = "2023-11-30"
 
 
 # Filenames
@@ -53,6 +55,7 @@ df = df.merge(df_meta, how="left", on="sub")
 # # Business Logic: Get the last spending months
 # Melt the dataframe
 value_columns = df.columns[df.columns.str.contains("spend")].tolist()
+value_columns = [item for item in value_columns if item != spending_total_col]
 key_columns = [col for col in df.columns if col not in value_columns]
 
 df = df.melt(
@@ -85,12 +88,21 @@ s = str_to_month_ends(s)
 last_months["acquisition_date"] = s
 
 
-# Join two dataframes
-df = df.merge(last_months, how="left", on="sub")
-
-
 # New column: "Start of Depreciation"
+df = df.merge(last_months, how="left", on="sub")
 df["start_of_depr"] = np.where(pd.isna(df["PPAP"]), df["acquisition_date"], df["PPAP"])
+
+
+# New column: "category" based on the temporary column "month_ends"
+s = df["spend_month"].str.replace("spend_fc_", "")
+s = str_to_month_ends(s)
+df["month_ends"] = s
+
+df["category"] = np.where(
+    df["month_ends"] <= pd.to_datetime(actual_month_end), "past", "future"
+)
+
+df = df.drop(columns=["month_ends"])
 
 
 # Pivot wider
