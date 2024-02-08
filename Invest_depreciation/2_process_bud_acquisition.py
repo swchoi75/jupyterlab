@@ -96,13 +96,13 @@ df["start_of_depr"] = np.where(pd.isna(df["PPAP"]), df["acquisition_date"], df["
 # New column: "category" based on the temporary column "month_ends"
 s = df["spend_month"].str.replace("spend_plan", "")
 s = str_to_month_ends(s)
-df["month_ends"] = s
+df["temp_month_ends"] = s
 
 df["category"] = np.where(
-    df["month_ends"] <= pd.to_datetime(actual_month_end), "past", "future"
+    df["temp_month_ends"] <= pd.to_datetime(actual_month_end), "past", "future"
 )
 
-df = df.drop(columns=["month_ends"])
+df = df.drop(columns=["temp_month_ends"])
 
 
 # Pivot wider
