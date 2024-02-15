@@ -21,10 +21,10 @@ current_year_end = pd.to_datetime(current_year + "-12-31")
 
 
 # Filenames
-input_file = path / "bud_data" / "2023_GPA_WMS - All data report_Budget.xlsx"
+input_file = path / "plan_data" / "2023_GPA_WMS - All data report_Budget.xlsx"
 meta_file = path / "meta" / "category_of_investment.xlsx"
-master_file = path / "bud_output" / "bud_GPA_master.csv"
-output_file = path / "bud_output" / "bud_monthly_spending.csv"
+master_file = path / "plan_output" / "plan_GPA_master.csv"
+output_file = path / "plan_output" / "plan_monthly_spending.csv"
 
 
 # Read data

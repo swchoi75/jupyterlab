@@ -18,8 +18,8 @@ period_end = "2025-01-01"
 
 
 # Filenames
-input_file = path / "bud_output" / "bud_acquisition_future_assets.csv"
-output_file = path / "bud_output" / "bud_depreciation_future_assets.csv"
+input_file = path / "plan_output" / "plan_acquisition_future_assets.csv"
+output_file = path / "plan_output" / "plan_depreciation_future_assets.csv"
 
 
 # Read data

@@ -21,9 +21,9 @@ actual_month_end = "2023-07-31"
 
 
 # Filenames
-input_file = path / "bud_output" / "bud_monthly_spending.csv"
-meta_file = path / "meta" / "bud_GPA_master.xlsx"
-output_file = path / "bud_output" / "bud_acquisition_future_assets.csv"
+input_file = path / "plan_output" / "plan_monthly_spending.csv"
+meta_file = path / "meta" / "plan_GPA_master.xlsx"
+output_file = path / "plan_output" / "plan_acquisition_future_assets.csv"
 
 
 # Read data
