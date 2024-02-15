@@ -20,6 +20,7 @@ period_end = "2024-01-01"
 # Filenames
 input_file = path / "fc_data" / "2023-11_Asset History Leger_20231130.xlsx"
 meta_file = path / "meta" / "0012_TABLE_MASTER_SAP-Fire mapping table.xlsx"
+meta_2 = path / "meta" / "0000_TABLE_MASTER_Cost center.xlsx"
 output_file = path / "fc_output" / "fc_depreciation_existing_assets.csv"
 
 
@@ -83,7 +84,6 @@ df_meta = pd.read_excel(
     },
 ).clean_names()
 
-
 # Rename columns
 df_meta = df_meta.rename(
     columns={
@@ -93,7 +93,6 @@ df_meta = df_meta.rename(
     }
 )
 
-
 # select columns
 selected_columns = [
     "asset_class",
@@ -101,15 +100,48 @@ selected_columns = [
     "financial_statement_item",
     "fs_item_description",
     "zv2_account",
+    "gl_account",
+    "fs_item_sub",
+    "fix_var",
+    "mv_type",
 ]
 df_meta = df_meta.select(columns=selected_columns)
 
 
-# Join two dataframes
+# Read cost center master data
+cc_master = pd.read_excel(
+    meta_2,
+    sheet_name="General master",
+    dtype={
+        "Cctr": str,
+    },
+).clean_names()
+
+# Rename columns
+cc_master = cc_master.rename(
+    columns={
+        "cctr": "cost_center",
+        "validity": "cc_validity",
+        "pctr": "profit_ctr",
+    }
+)
+
+# select columns
+selected_columns = [
+    "cost_center",
+    "cc_validity",
+    "profit_ctr",
+]
+cc_master = cc_master.select(columns=selected_columns)
+
+
+# Join dataframes
 df = df.merge(df_meta, how="left", on="asset_class")
+df = df.merge(cc_master, how="left", on="cost_center")
 
 
 # # Business Logic: Monthly deprecation # #
+
 
 # Dataframe for month end dates
 df_month_ends = pd.DataFrame(
@@ -121,13 +153,15 @@ df_month_ends = pd.DataFrame(
 def calc_monthly_depr(row, period_start, period_end):
     if (
         # To avoid Division by zero error (e.g. Asset under construction)
-        row["useful_life_year"] == row["useful_life_month"] == 0
+        row["useful_life_year"]
+        == row["useful_life_month"]
+        == 0
     ):
         return 0
 
     # Main calculation logic
-    monthly_depr = (
-        row["acquisition"] / (row["useful_life_year"] * 12 + row["useful_life_month"])
+    monthly_depr = row["acquisition"] / (
+        row["useful_life_year"] * 12 + row["useful_life_month"]
     )
     alterative_monthly_depr = row["current"] * -1 / 12
 
