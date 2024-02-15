@@ -26,21 +26,22 @@ lines = f.readlines()
 password = lines[0]
 
 
-# connect to Sharepoint
-sharepoint_url = "https://vitesco.sharepoint.com/teams/team_10016532/"
+# connect to Business OneDrive
+sharepoint_url = "https://vitesco-my.sharepoint.com/personal/uid98421_vitesco_com/"
 sp = SF(username, password, sharepoint_url)
 
 
 # list files in sharepoint folder
-folder_url = "/teams/team_10016532/Shared Documents/120. Data automation/jupyterlab/Jour_fixe/output/"
+folder_url = "Documents/Github/jupyterlab/Jour_fixe/output/"
 
 file_list = sp.get_filelist_sharepoint(folder_url)
 # for file in file_list:
 #     print(file.properties["Name"])
+# print(file_list[0].properties)
 
 
 # read from sharepoint
-file_url = "/teams/team_10016532/Shared Documents/120. Data automation/jupyterlab/Jour_fixe/data/download_jour_fixe.csv"
+file_url = "/personal/uid98421_vitesco_com/Documents/GitHub/jupyterlab/Jour_fixe/data/download_jour_fixe.csv"
 file_data = sp.read_file_sharepoint(file_url)
 
 

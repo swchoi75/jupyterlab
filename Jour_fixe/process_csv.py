@@ -6,10 +6,6 @@ from janitor import clean_names  # pip install pyjanitor
 
 
 # Path
-# path = Path('./datasets/home-dataset/data/')
-# path = Path(
-#     r"C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe"
-# )
 path = Path(__file__).parent
 
 
@@ -156,8 +152,32 @@ def main(input_file):
     return df
 
 
+# Process data
 resulting_df = main(input_file)
 
 
 # Output data
 resulting_df.to_csv(output_file, index=False)
+
+
+# Part II: convert from CSV to Excel
+df = pd.read_csv(input_file).clean_names()
+
+selected_columns = [
+    "id",
+    "year",
+    "calendarweek",
+    "title",
+    "description",
+    "originator",
+    "information_x002f_action_x002f_d",
+    "responsible_x002f_report#claims",
+    "duedate",
+    "delegate",
+]
+
+df = df[selected_columns]
+
+df.to_excel(path / "data" / "download_jour_fixe.xlsx", index=False)
+
+print("Files are created")
