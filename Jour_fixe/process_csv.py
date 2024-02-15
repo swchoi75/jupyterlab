@@ -6,7 +6,12 @@ from janitor import clean_names  # pip install pyjanitor
 
 
 # Path
-path = Path(__file__).parent
+try:
+    path = Path(__file__).parent
+except NameError:
+    import inspect
+
+    path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
 # Input file & Output file

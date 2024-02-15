@@ -3,11 +3,12 @@ from pathlib import Path
 
 
 # Path
-# path = Path('./datasets/home-dataset/data/')
-# path = Path(
-#     r"C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe"
-# )
-path = Path(__file__).parent
+try:
+    path = Path(__file__).parent
+except NameError:
+    import inspect
+
+    path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
 # Input file & Output file
