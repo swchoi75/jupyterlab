@@ -37,7 +37,8 @@ df = pd.read_csv(
 
 
 # Forecast assumptions
-df["acquisition"] = df["spend_amt"]
+value_columns = df.columns[df.columns.str.contains("spend")].tolist()
+df["acquisition"] = df[value_columns].sum(axis="columns")
 
 
 # # Business Logic: Monthly deprecation # #

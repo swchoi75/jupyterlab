@@ -35,9 +35,9 @@ df = pd.read_csv(
     parse_dates=["acquisition_date", "PPAP", "start_of_depr"],
 )
 
+
 # Forecast assumptions
-value_columns = df.columns[df.columns.str.contains("spend")].tolist()
-df["acquisition"] = df[value_columns].sum(axis="columns")
+df["acquisition"] = df["spend_amt"]
 
 
 # # Business Logic: Monthly deprecation # #

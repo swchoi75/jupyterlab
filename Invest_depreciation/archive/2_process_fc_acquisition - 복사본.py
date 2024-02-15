@@ -53,7 +53,7 @@ df_meta = pd.read_excel(
 df = df.merge(df_meta, how="left", on="sub")
 
 
-# # Business Logic: Get the spending months
+# # Business Logic: Get the last spending months
 # Melt the dataframe
 value_columns = df.columns[df.columns.str.contains("spend")].tolist()
 key_columns = [col for col in df.columns if col not in value_columns]
@@ -69,7 +69,12 @@ df = df.where(df["spend_amt"] != 0, np.nan)  # turn 0 into n/a values
 df = df.dropna(subset="spend_amt")  # remove rows with n/a values
 
 
-# New column: "Acquisition date" based on the spending months
+# Aggregate data
+last_months = df[["sub", "spend_month"]].groupby(["sub"]).last()  # .reset_index()
+last_months.rename(columns={"spend_month": "last_month"}, inplace=True)
+
+
+# New column: "Acquisition date" based on last spending months
 def str_to_month_ends(series):
     # Convert year_month to datetime with day set to 1st
     series = pd.to_datetime(series, format="%Y_%m")
@@ -78,19 +83,35 @@ def str_to_month_ends(series):
     return series
 
 
-s = df["spend_month"].str.replace("spend_fc_", "")
+s = last_months["last_month"].str.replace("spend_fc_", "")
 s = str_to_month_ends(s)
-df["acquisition_date"] = s
+last_months["acquisition_date"] = s
 
 
 # New column: "Start of Depreciation"
+df = df.merge(last_months, how="left", on="sub")
 df["start_of_depr"] = np.where(pd.isna(df["PPAP"]), df["acquisition_date"], df["PPAP"])
 
 
-# New column: "category" based on the column "start_of_depr"
+# New column: "category" based on the temporary column "month_ends"
+s = df["spend_month"].str.replace("spend_fc_", "")
+s = str_to_month_ends(s)
+df["temp_month_ends"] = s
+
 df["category"] = np.where(
-    df["start_of_depr"] < pd.to_datetime(actual_month_end), "past", "future"
+    df["temp_month_ends"] <= pd.to_datetime(actual_month_end), "past", "future"
 )
+
+df = df.drop(columns=["temp_month_ends"])
+
+
+# Pivot wider
+df = pd.pivot(
+    df,
+    index=[col for col in df.columns if col not in ["spend_month", "spend_amt"]],
+    columns="spend_month",
+    values="spend_amt",
+).reset_index()
 
 
 # Business Logic: Asset Under Construction if PPAP is in the future year #
