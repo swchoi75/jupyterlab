@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 from pathlib import Path
 from janitor import clean_names
@@ -95,7 +96,8 @@ df = pd.pivot(
 
 
 # New column: Depreciation in current year
-value_columns = df.columns[df.columns.str.contains("2023-")].tolist()
+pattern = re.compile(r"\d{4}-\d{2}-\d{2}")
+value_columns = df.columns[df.columns.str.contains(pattern)].tolist()
 df["depr_current"] = df[value_columns].sum(axis="columns")
 
 
