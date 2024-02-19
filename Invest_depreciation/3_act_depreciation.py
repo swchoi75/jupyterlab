@@ -23,6 +23,7 @@ input_file = path / "fc_data" / "2023-11_Asset History Leger_20231130.xlsx"
 meta_file = path / "meta" / "0012_TABLE_MASTER_SAP-Fire mapping table.xlsx"
 meta_2 = path / "meta" / "0000_TABLE_MASTER_Cost center.xlsx"
 output_file = path / "fc_output" / "fc_depreciation_existing_assets.csv"
+output_2 = path / "fc_output" / "fc_depreciation_auc.csv"
 
 
 # Read data
@@ -123,7 +124,7 @@ cc_master = cc_master.rename(
     columns={
         "cctr": "cost_center",
         "validity": "cc_validity",
-        "pctr": "profit_ctr",
+        "pctr": "profit_center",
     }
 )
 
@@ -131,7 +132,7 @@ cc_master = cc_master.rename(
 selected_columns = [
     "cost_center",
     "cc_validity",
-    "profit_ctr",
+    "profit_center",
 ]
 cc_master = cc_master.select(columns=selected_columns)
 
@@ -251,6 +252,23 @@ value_columns = df.columns[df.columns.str.contains(pattern)].tolist()
 df["depr_current"] = df[value_columns].sum(axis="columns")
 
 
+# # Asset Under Construction # #
+
+# filter rows
+auc = df[df["asset_class"].isin(["991", "997", "998"])]
+
+# select columns
+selected_columns = [
+    "",
+    "",
+    "",
+    "",
+    "",
+]
+# auc = auc.select(columns=selected_columns)
+
+
 # Write data
 df.to_csv(output_file, index=False)
-print("A file is created")
+auc.to_csv(output_2, index=False)
+print("Files are created")
