@@ -24,7 +24,9 @@ df_1 = pd.read_csv(
     input_1,
     dtype={
         "outlet_receiver": str,
+        "fire_outlet": str,
         "fire_outlet_ny_receiver": str,
+        "fire_plant_receiver": str,
         "investment_type": str,
         "financial_statement_item": str,
     },
