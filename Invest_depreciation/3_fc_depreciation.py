@@ -32,6 +32,7 @@ df = pd.read_csv(
         "fire_outlet_ny_receiver": str,
         "fire_plant_receiver": str,
         "investment_type": str,
+        "financial_statement_item": str,
     },
     parse_dates=["acquisition_date", "PPAP", "start_of_depr"],
 )
