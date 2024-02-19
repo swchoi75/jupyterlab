@@ -44,7 +44,7 @@ df_meta = pd.read_excel(
     meta_file,
     sheet_name="Manual input",
     skiprows=3,
-    usecols="E, M:P",
+    usecols="E, N:Q",
     parse_dates=["PPAP"],
 )
 

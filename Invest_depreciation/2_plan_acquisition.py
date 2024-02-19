@@ -44,7 +44,7 @@ df_meta = pd.read_excel(
     meta_file,
     sheet_name="Manual input",
     skiprows=3,
-    usecols="E, M:P",
+    usecols="E, N:Q",
     parse_dates=["PPAP"],
 )
 
@@ -78,7 +78,7 @@ def str_to_month_ends(series):
     return series
 
 
-s = df["spend_month"].str.replace("spend_fc_", "")
+s = df["spend_month"].str.replace("spend_plan", "")
 s = str_to_month_ends(s)
 df["acquisition_date"] = s
 
