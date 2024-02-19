@@ -123,9 +123,9 @@ def add_responsiblities(row):
     if row["outlet_sender"] in outlet_cf:
         return "central function"
     elif (row["location_receiver"] == "Icheon") & (row["outlet_sender"] in outlet_pl1):
-        return "productline_1"
+        return "productlines_1"
     elif (row["location_receiver"] == "Icheon") & (row["outlet_sender"] in outlet_pl2):
-        return "productline_2"
+        return "productlines_2"
     elif (row["location_receiver"] == "Icheon NPF") & (
         row["outlet_sender"] in outlet_rnd
     ):
