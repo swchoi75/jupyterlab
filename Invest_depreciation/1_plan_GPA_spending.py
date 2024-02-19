@@ -81,8 +81,13 @@ key_columns = [
     "unnamed_30",
 ]
 
-value_columns = df.columns[df.columns.str.contains("spend")].tolist()
 
+# Select value columns and mutiply by 1000
+value_columns = df.columns[df.columns.str.contains("spend")].tolist()
+df[value_columns] = df[value_columns].mul(1000, axis="columns")
+
+
+# Select key columns and value columns
 df = df[key_columns + value_columns]
 
 
