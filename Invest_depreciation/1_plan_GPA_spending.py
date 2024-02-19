@@ -144,7 +144,7 @@ selected_columns = [
 
 df_master = (
     df[selected_columns + [spending_total_col]]
-    .groupby(selected_columns)
+    .groupby(selected_columns, dropna=False)
     .agg({spending_total_col: "sum"})
     .reset_index()
 )
