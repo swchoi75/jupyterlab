@@ -89,7 +89,7 @@ df["start_of_depr"] = np.where(pd.isna(df["PPAP"]), df["acquisition_date"], df["
 
 # New column: "category" based on the column "start_of_depr"
 df["category"] = np.where(
-    df["start_of_depr"] < pd.to_datetime(actual_month_end), "past", "future"
+    df["start_of_depr"] < pd.to_datetime(actual_month_end), "past fc", "future"
 )
 
 
