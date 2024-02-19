@@ -55,7 +55,7 @@ df_1["source"] = "GPA"
 df_2["source"] = "SAP"
 
 
-# Add values
+# Add new columns
 def add_mv_type(row):
     if row["financial_statement_item"] == "122637000":  # Molds / containers / tooling
         return "211 Depr. of tools"
@@ -64,7 +64,7 @@ def add_mv_type(row):
 
 
 df_1["mv_type"] = df_1.apply(add_mv_type, axis="columns")
-df_2["category"] = "existing"
+df_2["asset_category"] = "existing"
 
 
 # Rename columns
@@ -98,12 +98,52 @@ def add_missing_value(row):
 df_1["profit_center"] = df_1.apply(add_missing_value, axis="columns")
 
 
-# Combine data
+# Businss logic: Combine data
 df = pd.concat([df_1, df_2])
 
 
+# Businss logic: Add a new column
+def add_responsiblities(row):
+    # define variable
+    outlet_cf = ["Central Functions"]
+    outlet_pl1 = ["PL ENC", "PL DTC", "PL MTC", "PL VBC"]
+    outlet_pl2 = [
+        "PL HVD",
+        "PL EAC",
+        "PL DAC",
+        "PL MES",
+        "PL HYD",
+        "PL CM CCN",
+        "PL CM CVS",
+        "PL CM PSS",
+    ]
+    outlet_rnd = ["DIV E Eng.", "PL DAC", "PL MES"]
+    outlet_shs = ["DIV E C", "DIV P C", "PT - Quality"]
+    # If conditions
+    if row["outlet_sender"] in outlet_cf:
+        return "central function"
+    elif (row["location_receiver"] == "Icheon") & (row["outlet_sender"] in outlet_pl1):
+        return "productline_1"
+    elif (row["location_receiver"] == "Icheon") & (row["outlet_sender"] in outlet_pl2):
+        return "productline_2"
+    elif (row["location_receiver"] == "Icheon NPF") & (
+        row["outlet_sender"] in outlet_rnd
+    ):
+        return "R&D"
+    elif (row["location_receiver"] == "Icheon NPF") & (
+        row["outlet_sender"] in outlet_shs
+    ):
+        return "Share Service"
+
+
+df["responsiblities"] = df.apply(add_responsiblities, axis="columns")
+
+
 # Reorder columns
-df = df[["source"] + [col for col in df.columns if col not in ["source"]]]
+df = df[
+    ["source", "responsiblities"]
+    + [col for col in df.columns if col not in ["source", "responsiblities"]]
+]
 
 
 # Write data
