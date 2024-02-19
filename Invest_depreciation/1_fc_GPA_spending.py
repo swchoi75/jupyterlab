@@ -23,6 +23,7 @@ current_year_end = pd.to_datetime(current_year + "-12-31")
 # Filenames
 input_file = path / "fc_data" / "2023-11_GPA_WMS - All data report_FC.xlsx"
 meta_file = path / "meta" / "category_of_investment.xlsx"
+meta_file_2 = path / "meta" / "cost_centers.csv"
 master_file = path / "fc_output" / "fc_GPA_master.csv"
 output_file = path / "fc_output" / "fc_monthly_spending.csv"
 
@@ -40,12 +41,14 @@ df = pd.read_excel(
     },
 )
 
-df_meta = pd.read_excel(
+df_meta_coi = pd.read_excel(
     meta_file,
     sheet_name="Sheet1",
     usecols="A:G",
     dtype={"financial_statement_item": str},
 ).dropna()
+
+df_meta_cc = pd.read_csv(meta_file_2)
 
 
 # Functions to clean column names
@@ -109,8 +112,10 @@ df = df.dropna(subset=spending_total_col)
 df = df[df[spending_total_col] != 0]
 
 
-# Join two dataframes
-df = df.merge(df_meta, how="left", on="category_of_investment")
+# Add meta data
+df = df.merge(df_meta_coi, how="left", on="category_of_investment").merge(
+    df_meta_cc, how="left", on="sub"
+)
 
 
 # Create new column
@@ -134,11 +139,12 @@ selected_columns = [
     "gl_account",
     "gl_account_description",
     "basic_or_project",
+    "cost_center",
 ]
 
 df_master = (
     df[selected_columns + [spending_total_col]]
-    .groupby(selected_columns)
+    .groupby(selected_columns, dropna=False)
     .agg({spending_total_col: "sum"})
     .reset_index()
 )
