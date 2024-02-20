@@ -145,8 +145,8 @@ df_cdf = (
     .reset_index()
 )
 
-# Manual input of CDF outlet 7210
-cdf_outlet = "7210"
+# Manual input of CDF outlet 7110
+cdf_outlet = "7110"
 df_cdf["outlet_receiver"] = cdf_outlet
 df_cdf["fire_outlet"] = cdf_outlet
 df_cdf["fire_outlet_ny_receiver"] = cdf_outlet
