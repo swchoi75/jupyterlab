@@ -66,34 +66,6 @@ df = df.clean_names()
 df.columns = df.columns.map(clean_trailing_underscore)
 
 
-# Select columns
-key_columns = [
-    "outlet_sender",
-    "outlet_receiver",
-    "categorie_of_investm",
-    "category_of_invest_historic",
-    "fire_outlet",
-    "fire_outlet_ny_receiver",
-    "fire_plant_receiver",
-    "location_receiver",
-    "investment_type",
-    "status",
-    "master",
-    "unnamed_28",
-    "sub",
-    "unnamed_30",
-]
-
-
-# Select value columns and mutiply by 1000
-value_columns = df.columns[df.columns.str.contains("spend")].tolist()
-df[value_columns] = df[value_columns].mul(1000, axis="columns")
-
-
-# Select key columns and value columns
-df = df[key_columns + value_columns]
-
-
 # Rename columns
 df = df.rename(
     columns={
@@ -104,6 +76,34 @@ df = df.rename(
 )
 # Remove the GPA version prefix from each column name
 df.columns = df.columns.str.replace(GPA_version, "")
+
+
+# Select columns
+key_columns = [
+    "outlet_sender",
+    "outlet_receiver",
+    "category_of_investment",
+    "category_of_invest_historic",
+    "fire_outlet",
+    "fire_outlet_ny_receiver",
+    "fire_plant_receiver",
+    "location_receiver",
+    "investment_type",
+    "status",
+    "master",
+    "master_description",
+    "sub",
+    "sub_description",
+]
+
+
+# Select value columns and mutiply by 1000
+value_columns = df.columns[df.columns.str.contains("spend")].tolist()
+df[value_columns] = df[value_columns].mul(1000, axis="columns")
+
+
+# Select key columns and value columns
+df = df[key_columns + value_columns]
 
 
 # Filter out missing or zero value
@@ -124,6 +124,34 @@ df["basic_or_project"] = np.where(
     "basic",
     "project",
 )
+
+
+# # Business Logic: Aggregate CDF in GPA
+
+# Split dataframe
+df_cdf = df[df["outlet_sender"] == "PT - Quality"]
+df_rest = df[df["outlet_sender"] != "PT - Quality"]
+
+# Select columns
+columns_to_drop = ["outlet_receiver", "fire_outlet", "fire_outlet_ny_receiver"]
+key_columns_2 = [x for x in key_columns if x not in columns_to_drop]
+
+# Aggregate CDF outlet
+df_cdf = (
+    df_cdf[key_columns_2 + value_columns]
+    .groupby(key_columns_2)
+    .agg("sum")
+    .reset_index()
+)
+
+# Manual input of CDF outlet 7210
+cdf_outlet = "7210"
+df_cdf["outlet_receiver"] = cdf_outlet
+df_cdf["fire_outlet"] = cdf_outlet
+df_cdf["fire_outlet_ny_receiver"] = cdf_outlet
+
+# Merge dataframes
+df = pd.concat([df_rest, df_cdf])
 
 
 # GPA master
