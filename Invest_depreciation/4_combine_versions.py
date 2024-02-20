@@ -1,6 +1,5 @@
 import pandas as pd
 from pathlib import Path
-from janitor import clean_names
 
 
 # Path
@@ -15,7 +14,7 @@ except NameError:
 # Filenames
 input_1 = path / "fc_output" / "fc_depreciation_future_assets.csv"
 input_2 = path / "fc_output" / "fc_depreciation_existing_assets.csv"
-meta_file = path / "meta" / "POC_for_GPA.csv"
+meta_file = path / "meta" / "POC_for_GPA.xlsx"
 output_file = path / "fc_output" / "fc_depreciation_combined.csv"
 
 
@@ -40,14 +39,16 @@ df_2 = pd.read_csv(
         "sub_no": str,
     },
 )
-df_meta = pd.read_csv(
+df_meta = pd.read_excel(
     meta_file,
+    sheet_name="Sheet1",
     dtype={
-        "CU": str,
-        "Plant": str,
-        "Outlet": str,
+        "cu": str,
+        "plant": str,
+        "outlet": str,
     },
-).clean_names()
+)
+df_meta["plant_name"] = df_meta["plant_name"].str.replace("ICH ", "")
 
 
 # Add source column
@@ -67,34 +68,49 @@ df_1["mv_type"] = df_1.apply(add_mv_type, axis="columns")
 df_2["asset_category"] = "existing"
 
 
-# Rename columns
-df_meta = df_meta.rename(
+# Add meta data to GPA
+df_meta_1 = df_meta[["outlet", "bu", "division", "plant_name", "profit_center"]]
+df_meta_1 = df_meta_1.rename(
     columns={
-        "outlet": "fire_outlet",
-        "outlet_name": "outlet_sender",
-        "plant": "fire_plant_receiver",
+        "outlet": "outlet_receiver",
         "plant_name": "location_receiver",
     }
 )
-df_meta["location_receiver"] = df_meta["location_receiver"].str.replace("ICH ", "")
+df_1 = df_1.merge(df_meta_1, how="left", on=["outlet_receiver", "location_receiver"])
 
 
-# Add meta data
-df_meta_1 = df_meta.drop(columns=["fire_outlet", "fire_plant_receiver"])
-df_1 = df_1.merge(df_meta_1, how="left", on=["outlet_sender", "location_receiver"])
-df_2 = df_2.merge(df_meta, how="left", on="profit_center")
+# Add meta data to SAP on profit_center
+df_meta_2 = df_meta[["outlet_name", "profit_center"]]
+df_meta_2 = df_meta_2.rename(columns={"outlet_name": "outlet_sender"})
+df_2 = df_2.merge(df_meta_2, how="left", on="profit_center")
 
 
-# Add missing value
+# Add meta data to SAP on rec_prctr
+df_2["rec_prctr"].fillna(df_2["profit_center"], inplace=True)
+
+df_meta_3 = df_meta[
+    ["plant", "outlet", "bu", "division", "plant_name", "profit_center"]
+]
+df_meta_3 = df_meta_3.rename(
+    columns={
+        "outlet": "outlet_receiver",
+        "plant": "fire_plant_receiver",
+        "plant_name": "location_receiver",
+        "profit_center": "rec_prctr",
+    }
+)
+df_2 = df_2.merge(df_meta_3, how="left", on="rec_prctr")
+
+
+# Profit center information for GPA
 def add_missing_value(row):
     if row["outlet_sender"] == "Central Functions":
         return "50899-999"  # Central Function Icheon
-    elif row["outlet_sender"] == "PT - Quality":
-        return "50803-320"  # Central Group Functions Icheon NPF
     else:
         return row["profit_center"]
 
 
+df_1["rec_prctr"] = df_1["profit_center"]
 df_1["profit_center"] = df_1.apply(add_missing_value, axis="columns")
 
 
