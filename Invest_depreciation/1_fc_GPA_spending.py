@@ -134,6 +134,7 @@ df_rest = df[df["outlet_sender"] != "PT - Quality"]
 
 # Select columns
 columns_to_drop = ["outlet_receiver", "fire_outlet", "fire_outlet_ny_receiver"]
+key_columns = [x for x in df.columns if x not in value_columns]
 key_columns_2 = [x for x in key_columns if x not in columns_to_drop]
 
 # Aggregate CDF outlet
