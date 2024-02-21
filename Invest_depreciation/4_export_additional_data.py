@@ -15,7 +15,7 @@ except NameError:
 # Filenames
 input_file = path / "fc_output" / "fc_depreciation_combined.csv"
 output_master = path / "fc_output" / "fc_GPA_master.csv"
-output_auc = path / "fc_output" / "act_SAP_AUC.csv"
+output_auc = path / "fc_output" / "fc_SAP_AUC.csv"
 
 
 # Read data
