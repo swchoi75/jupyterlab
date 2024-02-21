@@ -170,11 +170,15 @@ auc = df[df["asset_class"].isin(["991", "997", "998"])]
 
 # select columns
 selected_columns = [
-    "",
-    "",
-    "",
-    "",
-    "",
+    "asset_class",
+    "cost_center",
+    "asset_no",
+    "sub_no",
+    "description",
+    "acquisition_date",
+    "useful_life_year",
+    "acquisition",
+    "profit_center",
 ]
 # auc = auc.select(columns=selected_columns)
 
