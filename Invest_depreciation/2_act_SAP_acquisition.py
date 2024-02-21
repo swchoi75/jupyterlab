@@ -25,7 +25,7 @@ df = pd.read_excel(
     input_file,
     sheet_name="Asset ledger 1130",
     header=3,
-    usecols="C:U",
+    usecols=range(2, None),  # Skip first two columns, which are empty
     dtype={
         "Asset Clas": str,
         "Cost Cente": str,
@@ -96,9 +96,10 @@ selected_columns = [
     "asset_class_name",
     "financial_statement_item",
     "fs_item_description",
+    "fs_item_sub",
     "zv2_account",
     "gl_account",
-    "fs_item_sub",
+    "gl_account_description",
     "fix_var",
     "mv_type",
 ]
