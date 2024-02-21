@@ -112,4 +112,4 @@ df = reclassfy_fs_item(df)
 
 # Write data
 df.to_csv(output_file, index=False)
-print("Files are created")
+print("A file is created")

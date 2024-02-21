@@ -18,7 +18,6 @@ meta_file = path / "meta" / "0012_TABLE_MASTER_SAP-Fire mapping table.xlsx"
 meta_cc = path / "meta" / "0000_TABLE_MASTER_Cost center.xlsx"
 meta_pc = path / "meta" / "2023_profit_center_master_KE5X.xlsx"
 output_file = path / "fc_output" / "fc_acquisition_existing_assets.csv"
-output_2 = path / "fc_output" / "fc_acquisition_auc.csv"
 
 
 # Read data
@@ -186,5 +185,4 @@ selected_columns = [
 
 # Write data
 df.to_csv(output_file, index=False)
-auc.to_csv(output_2, index=False)
-print("Files are created")
+print("A file is created")
