@@ -68,7 +68,7 @@ df_1["mv_type"] = df_1.apply(add_mv_type, axis="columns")
 df_2["asset_category"] = "existing"
 
 
-# Add meta data to GPA data
+# Add meta data (incl. dummy POC) to GPA data
 df_meta_1 = df_meta[["outlet", "bu", "division", "plant_name", "profit_center"]]
 df_meta_1 = df_meta_1.rename(
     columns={
@@ -77,6 +77,10 @@ df_meta_1 = df_meta_1.rename(
     }
 )
 df_1 = df_1.merge(df_meta_1, how="left", on=["outlet_receiver", "location_receiver"])
+
+
+# Remove duplicate profit centers (i.e. remove dummy POC)
+df_meta = df_meta.drop_duplicates(subset="profit_center")
 
 
 # Add meta data to SAP data on profit_center
@@ -146,6 +150,8 @@ def add_responsibilities(row):
     elif (row["location_receiver"] == "Icheon") & (row["outlet_sender"] in outlet_pl1):
         return "Productlines_1"
     elif (row["location_receiver"] == "Icheon") & (row["outlet_sender"] in outlet_pl2):
+        return "Productlines_2"
+    elif row["location_receiver"] == "Sejong":  # CM Inbound
         return "Productlines_2"
     elif (row["location_receiver"] == "Icheon NPF") & (
         row["outlet_sender"] in outlet_rnd
