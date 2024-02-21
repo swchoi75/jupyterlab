@@ -71,10 +71,6 @@ def filter_depr_periods(df):
     return df
 
 
-# Fill missing values with default value 8
-df["useful_life_year"].fillna(8, inplace=True)
-
-
 # Create new columns
 df["depr_start"] = df["start_of_depr"]
 df["depr_end"] = df.apply(calc_depr_end, axis="columns")

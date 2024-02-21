@@ -47,7 +47,7 @@ df_meta = pd.read_excel(
     parse_dates=["PPAP"],
 )
 df_meta = df_meta[
-    ["sub", "new_gl_account", "new_cost_center", "PPAP", "useful_life_year"]
+    ["sub", "input_gl_account", "input_cost_center", "PPAP", "input_useful_life_year"]
 ]
 
 
@@ -97,10 +97,17 @@ df["asset_category"] = np.where(
 
 # Overwrite existing values if Manual input value is available
 df["gl_account"] = np.where(
-    pd.isna(df["new_gl_account"]), df["gl_account"], df["new_gl_account"]
+    pd.isna(df["input_gl_account"]), df["gl_account"], df["input_gl_account"]
 )
 df["cost_center"] = np.where(
-    pd.isna(df["new_cost_center"]), df["cost_center"], df["new_cost_center"]
+    pd.isna(df["input_cost_center"]), df["cost_center"], df["input_cost_center"]
+)
+
+df["useful_life_year"] = 8  # Default value
+df["useful_life_year"] = np.where(
+    pd.isna(df["input_useful_life_year"]),
+    df["useful_life_year"],
+    df["input_useful_life_year"],
 )
 
 
