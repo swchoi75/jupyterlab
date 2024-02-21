@@ -44,7 +44,7 @@ df_meta = pd.read_excel(
     meta_file,
     sheet_name="Manual input",
     skiprows=3,
-    usecols="E, N:Q",
+    usecols="E, S:V",
     parse_dates=["PPAP"],
 )
 
@@ -89,7 +89,7 @@ df["start_of_depr"] = np.where(pd.isna(df["PPAP"]), df["acquisition_date"], df["
 
 # New column: "asset category" based on the column "start_of_depr"
 df["asset_category"] = np.where(
-    df["start_of_depr"] < pd.to_datetime(actual_month_end), "past fc", "future"
+    df["start_of_depr"] < pd.to_datetime(actual_month_end), "past fc", "future fc"
 )
 
 
