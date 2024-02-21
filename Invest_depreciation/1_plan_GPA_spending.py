@@ -23,8 +23,7 @@ current_year_end = pd.to_datetime(current_year + "-12-31")
 # Filenames
 input_file = path / "plan_data" / "2023_GPA_WMS - All data report_Budget.xlsx"
 meta_file = path / "meta" / "category_of_investment.xlsx"
-meta_file_2 = path / "meta" / "cost_centers.csv"
-master_file = path / "plan_output" / "plan_GPA_master.csv"
+meta_cc = path / "meta" / "cost_centers.csv"
 output_file = path / "plan_output" / "plan_monthly_spending.csv"
 
 
@@ -48,7 +47,7 @@ df_meta_coi = pd.read_excel(
     dtype={"financial_statement_item": str},
 ).dropna()
 
-df_meta_cc = pd.read_csv(meta_file_2)
+df_meta_cc = pd.read_csv(meta_cc)
 
 
 # Functions to clean column names
@@ -134,6 +133,7 @@ df_rest = df[df["outlet_sender"] != "PT - Quality"]
 
 # Select columns
 columns_to_drop = ["outlet_receiver", "fire_outlet", "fire_outlet_ny_receiver"]
+key_columns = [x for x in df.columns if x not in value_columns]
 key_columns_2 = [x for x in key_columns if x not in columns_to_drop]
 
 # Aggregate CDF outlet
@@ -144,8 +144,8 @@ df_cdf = (
     .reset_index()
 )
 
-# Manual input of CDF outlet 7210
-cdf_outlet = "7210"
+# Manual input of CDF outlet 7110
+cdf_outlet = "7110"
 df_cdf["outlet_receiver"] = cdf_outlet
 df_cdf["fire_outlet"] = cdf_outlet
 df_cdf["fire_outlet_ny_receiver"] = cdf_outlet
@@ -154,31 +154,6 @@ df_cdf["fire_outlet_ny_receiver"] = cdf_outlet
 df = pd.concat([df_rest, df_cdf])
 
 
-# GPA master
-selected_columns = [
-    "outlet_sender",
-    "status",
-    "master",
-    "master_description",
-    "sub",
-    "sub_description",
-    "category_of_investment",
-    "category_description",
-    "gl_account",
-    "gl_account_description",
-    "basic_or_project",
-    "cost_center",
-]
-
-df_master = (
-    df[selected_columns + [spending_total_col]]
-    .groupby(selected_columns, dropna=False)
-    .agg({spending_total_col: "sum"})
-    .reset_index()
-)
-
-
 # Write data
-df_master.to_csv(master_file, index=False)
 df.to_csv(output_file, index=False)
-print("Files are created")
+print("A files is created")
