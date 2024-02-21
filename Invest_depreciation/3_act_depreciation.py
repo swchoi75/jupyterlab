@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+import numpy as np
 from pathlib import Path
 from janitor import clean_names
 
@@ -20,6 +21,7 @@ period_end = "2024-01-01"
 
 # Filenames
 input_file = path / "fc_output" / "fc_acquisition_existing_assets.csv"
+meta_file = path / "meta" / "fc_AUC_list.xlsx"
 output_file = path / "fc_output" / "fc_depreciation_existing_assets.csv"
 
 
@@ -34,6 +36,33 @@ df = pd.read_csv(
     },
     parse_dates=["acquisition_date", "start_of_depr"],
 )
+
+df_meta = pd.read_excel(
+    meta_file,
+    sheet_name="Manual input",
+    skiprows=3,
+    dtype={
+        "asset_class": str,
+        "cost_center": str,
+        "asset_no": str,
+        "sub_no": str,
+    },
+    parse_dates=["PPAP"],
+)
+df_meta = df_meta[["asset_no", "PPAP", "input_useful_life_year"]]
+
+
+# Join two dataframes
+df = df.merge(df_meta, how="left", on="asset_no")
+
+
+# Asset Under Construction: overwrite existing values if Manual input value is available
+df["useful_life_year"] = np.where(
+    pd.isna(df["input_useful_life_year"]),
+    df["useful_life_year"],
+    df["input_useful_life_year"],
+)
+df["start_of_depr"] = np.where(pd.isna(df["PPAP"]), df["start_of_depr"], df["PPAP"])
 
 
 # # Business Logic: Monthly deprecation # #

@@ -92,11 +92,13 @@ selected_columns = [
     "sub_no",
     "asset_description",
     "acquisition_date",
+    "start_of_depr",
     "fs_item_sub",
     "fs_item_description",
     "gl_account",
     "gl_account_description",
     "fix_var",
+    "useful_life_year",
     # "acquisition",
 ]
 
