@@ -124,7 +124,7 @@ df = pd.concat([df_1, df_2])
 
 
 # Businss logic: Add a new column
-def add_responsiblities(row):
+def add_responsibilities(row):
     # define variable
     outlet_cf = ["Central Functions"]
     outlet_pl1 = ["PL ENC", "PL DTC", "PL MTC", "PL VBC"]
@@ -157,13 +157,13 @@ def add_responsiblities(row):
         return "Share Service"
 
 
-df["responsiblities"] = df.apply(add_responsiblities, axis="columns")
+df["responsibilities"] = df.apply(add_responsibilities, axis="columns")
 
 
 # Reorder columns
 df = df[
-    ["source", "responsiblities"]
-    + [col for col in df.columns if col not in ["source", "responsiblities"]]
+    ["source", "responsibilities"]
+    + [col for col in df.columns if col not in ["source", "responsibilities"]]
 ]
 
 
