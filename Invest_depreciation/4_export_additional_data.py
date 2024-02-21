@@ -90,7 +90,7 @@ selected_columns = [
     "cost_center",
     "asset_no",
     "sub_no",
-    "description",
+    "asset_description",
     "acquisition_date",
     "fs_item_sub",
     "fs_item_description",

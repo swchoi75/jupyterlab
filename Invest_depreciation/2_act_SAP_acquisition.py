@@ -52,6 +52,7 @@ df = df.rename(
     columns={
         "asset_clas": "asset_class",
         "cost_cente": "cost_center",
+        "description": "asset_description",
         "acquisitio": "acquisition_date",
         "con": "useful_life_year",
         "con_p": "useful_life_month",
