@@ -43,7 +43,7 @@ df = pd.read_excel(
 df_meta_coi = pd.read_excel(
     meta_file,
     sheet_name="Sheet1",
-    usecols="A:G",
+    usecols="A:H",
     dtype={"financial_statement_item": str},
 ).dropna()
 
