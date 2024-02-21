@@ -95,6 +95,15 @@ df["asset_category"] = np.where(
 )
 
 
+# Overwrite existing values if Manual input value is available
+df["gl_account"] = np.where(
+    pd.isna(df["new_gl_account"]), df["gl_account"], df["new_gl_account"]
+)
+df["cost_center"] = np.where(
+    pd.isna(df["new_cost_center"]), df["cost_center"], df["new_cost_center"]
+)
+
+
 # Business Logic: Asset Under Construction if PPAP is in the future year #
 def reclassfy_fs_item(df):
     ppap_future_year = df["PPAP"] > current_year_end
