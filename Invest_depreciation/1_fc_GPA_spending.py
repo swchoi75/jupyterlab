@@ -23,8 +23,7 @@ current_year_end = pd.to_datetime(current_year + "-12-31")
 # Filenames
 input_file = path / "fc_data" / "2023-11_GPA_WMS - All data report_FC.xlsx"
 meta_file = path / "meta" / "category_of_investment.xlsx"
-meta_file_2 = path / "meta" / "cost_centers.csv"
-master_file = path / "fc_output" / "fc_GPA_master.csv"
+meta_cc = path / "meta" / "cost_centers.csv"
 output_file = path / "fc_output" / "fc_monthly_spending.csv"
 
 
@@ -48,7 +47,7 @@ df_meta_coi = pd.read_excel(
     dtype={"financial_statement_item": str},
 ).dropna()
 
-df_meta_cc = pd.read_csv(meta_file_2)
+df_meta_cc = pd.read_csv(meta_cc)
 
 
 # Functions to clean column names
@@ -155,31 +154,6 @@ df_cdf["fire_outlet_ny_receiver"] = cdf_outlet
 df = pd.concat([df_rest, df_cdf])
 
 
-# GPA master
-selected_columns = [
-    "outlet_sender",
-    "status",
-    "master",
-    "master_description",
-    "sub",
-    "sub_description",
-    "category_of_investment",
-    "category_description",
-    "gl_account",
-    "gl_account_description",
-    "basic_or_project",
-    "cost_center",
-]
-
-df_master = (
-    df[selected_columns + [spending_total_col]]
-    .groupby(selected_columns, dropna=False)
-    .agg({spending_total_col: "sum"})
-    .reset_index()
-)
-
-
 # Write data
-df_master.to_csv(master_file, index=False)
 df.to_csv(output_file, index=False)
-print("Files are created")
+print("A files is created")
