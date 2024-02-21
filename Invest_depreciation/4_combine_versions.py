@@ -68,7 +68,7 @@ df_1["mv_type"] = df_1.apply(add_mv_type, axis="columns")
 df_2["asset_category"] = "existing"
 
 
-# Add meta data to GPA
+# Add meta data to GPA data
 df_meta_1 = df_meta[["outlet", "bu", "division", "plant_name", "profit_center"]]
 df_meta_1 = df_meta_1.rename(
     columns={
@@ -79,13 +79,13 @@ df_meta_1 = df_meta_1.rename(
 df_1 = df_1.merge(df_meta_1, how="left", on=["outlet_receiver", "location_receiver"])
 
 
-# Add meta data to SAP on profit_center
+# Add meta data to SAP data on profit_center
 df_meta_2 = df_meta[["outlet_name", "profit_center"]]
 df_meta_2 = df_meta_2.rename(columns={"outlet_name": "outlet_sender"})
 df_2 = df_2.merge(df_meta_2, how="left", on="profit_center")
 
 
-# Add meta data to SAP on rec_prctr
+# Add meta data to SAP data on rec_prctr
 df_2["rec_prctr"].fillna(df_2["profit_center"], inplace=True)
 
 df_meta_3 = df_meta[
@@ -102,7 +102,7 @@ df_meta_3 = df_meta_3.rename(
 df_2 = df_2.merge(df_meta_3, how="left", on="rec_prctr")
 
 
-# Profit center information for GPA
+# Add profit center information to GPA data
 def add_missing_value(row):
     if row["outlet_sender"] == "Central Functions":
         return "50899-999"  # Central Function Icheon
@@ -112,6 +112,11 @@ def add_missing_value(row):
 
 df_1["rec_prctr"] = df_1["profit_center"]
 df_1["profit_center"] = df_1.apply(add_missing_value, axis="columns")
+
+
+# Add outlet information to SAP data
+df_2["fire_outlet"] = df_2["outlet_receiver"]
+df_2["fire_outlet_ny_receiver"] = df_2["outlet_receiver"]
 
 
 # Businss logic: Combine data
