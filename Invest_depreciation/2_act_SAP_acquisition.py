@@ -25,7 +25,6 @@ df = pd.read_excel(
     input_file,
     sheet_name="Asset ledger 1130",
     header=3,
-    usecols=range(2, None),  # Skip first two columns, which are empty
     dtype={
         "Asset Clas": str,
         "Cost Cente": str,
@@ -34,6 +33,7 @@ df = pd.read_excel(
     },
     parse_dates=["Acquisitio", "ODep.Start"],
 )
+df = df.drop(df.columns[:2], axis="columns")  # Drop first two columns, which are empty
 
 
 # Functions to clean column names
