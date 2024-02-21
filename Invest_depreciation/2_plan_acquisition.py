@@ -44,9 +44,11 @@ df_meta = pd.read_excel(
     meta_file,
     sheet_name="Manual input",
     skiprows=3,
-    usecols="G, S:V",
     parse_dates=["PPAP"],
 )
+df_meta = df_meta[
+    ["sub", "new_gl_account", "new_cost_center", "PPAP", "useful_life_year"]
+]
 
 
 # Join two dataframes
