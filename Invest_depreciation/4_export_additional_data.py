@@ -14,7 +14,7 @@ except NameError:
 
 # Filenames
 input_file = path / "fc_output" / "fc_depreciation_combined.csv"
-output_master = path / "fc_output" / "fc_GPA_master_new.csv"
+output_master = path / "fc_output" / "fc_GPA_master.csv"
 output_auc = path / "fc_output" / "act_SAP_AUC.csv"
 
 
@@ -56,10 +56,13 @@ selected_columns = [
     "sub_description",
     "category_of_investment",
     "category_description",
+    "fs_item_sub",
+    "fs_item_description",
     "gl_account",
     "gl_account_description",
     "basic_or_project",
     "cost_center",
+    "fix_var",
     # "acquisition",
 ]
 
@@ -81,14 +84,20 @@ df_auc = df[df["asset_class"].isin(["991", "997", "998"])]
 selected_columns = [
     "source",
     "responsibilities",
+    "profit_center",
     "asset_class",
+    "asset_class_name",
     "cost_center",
     "asset_no",
     "sub_no",
     "description",
     "acquisition_date",
+    "fs_item_sub",
+    "fs_item_description",
+    "gl_account",
+    "gl_account_description",
+    "fix_var",
     # "acquisition",
-    "profit_center",
 ]
 
 # aggregate data
