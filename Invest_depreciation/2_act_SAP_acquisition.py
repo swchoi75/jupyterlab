@@ -163,26 +163,6 @@ value_columns = ["acquisition", "previous", "current"]
 df[value_columns] = df[value_columns].mul(df["percentage"], axis=0)
 
 
-# # Asset Under Construction # #
-
-# filter rows
-auc = df[df["asset_class"].isin(["991", "997", "998"])]
-
-# select columns
-selected_columns = [
-    "asset_class",
-    "cost_center",
-    "asset_no",
-    "sub_no",
-    "description",
-    "acquisition_date",
-    "useful_life_year",
-    "acquisition",
-    "profit_center",
-]
-# auc = auc.select(columns=selected_columns)
-
-
 # Write data
 df.to_csv(output_file, index=False)
 print("A file is created")
