@@ -142,11 +142,11 @@ def add_responsibilities(row):
     outlet_shs = ["DIV E C", "DIV P C", "PT - Quality"]
     # If conditions
     if row["outlet_sender"] in outlet_cf:
-        return "central function"
+        return "Central Functions"
     elif (row["location_receiver"] == "Icheon") & (row["outlet_sender"] in outlet_pl1):
-        return "productlines_1"
+        return "Productlines_1"
     elif (row["location_receiver"] == "Icheon") & (row["outlet_sender"] in outlet_pl2):
-        return "productlines_2"
+        return "Productlines_2"
     elif (row["location_receiver"] == "Icheon NPF") & (
         row["outlet_sender"] in outlet_rnd
     ):
