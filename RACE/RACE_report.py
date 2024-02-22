@@ -15,12 +15,7 @@ except NameError:
 
 # Functions
 def read_excel_file(filename):
-    df = pd.read_excel(
-        filename,
-        sheet_name="Query",
-        skiprows=11,
-        # dtype={"ConsUnit": str, "Plant": str, "Outlet": str},
-    )
+    df = pd.read_excel(filename, sheet_name="Query", skiprows=11)
     # change data type
     df = df.astype({"ConsUnit": str, "Plant": str, "Outlet": str})
 

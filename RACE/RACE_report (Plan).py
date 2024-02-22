@@ -16,6 +16,10 @@ except NameError:
 # Functions
 def read_excel_file(filename):
     df = pd.read_excel(filename, sheet_name="Query", skiprows=11)
+    # change data type
+    df = df.astype({"ConsUnit": str, "Plant": str, "Outlet": str})
+
+    # change column names
     df = df.rename(
         columns={
             "Unnamed: 1": "FS item description",
@@ -40,7 +44,7 @@ def outlet():
     # POC
     col_poc = ["division", "bu", "new_outlet", "new_outlet_name"]
 
-    df = pd.read_excel(path / "meta" / "New outlet.xlsx", usecols="A:F")
+    df = pd.read_excel(path / "meta" / "New outlet.xlsx", usecols="A:F", dtype="str")
     df = clean_names(df)
     df = df.drop(columns=["outlet_name"])
     df = df[["outlet"] + col_poc]
