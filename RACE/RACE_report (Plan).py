@@ -15,16 +15,7 @@ except NameError:
 
 # Functions
 def read_excel_file(filename):
-    df = pd.read_excel(
-        filename,
-        sheet_name="Query",
-        skiprows=11,
-        # dtype={"ConsUnit": str, "Plant": str, "Outlet": str},
-    )
-    # change data type
-    df = df.astype({"ConsUnit": str, "Plant": str, "Outlet": str})
-
-    # change column names
+    df = pd.read_excel(filename, sheet_name="Query", skiprows=11)
     df = df.rename(
         columns={
             "Unnamed: 1": "FS item description",
@@ -34,8 +25,7 @@ def read_excel_file(filename):
             "YTD - 1": "YTD PM",  # PM means Previous Month
         }
     )
-    df = df.rename(columns=lambda x: re.sub("\nACT", "", x))
-    # clean column names
+    df = df.rename(columns=lambda x: re.sub("\nPLAN", "", x))
     df = clean_names(df)
     return df
 
@@ -50,7 +40,7 @@ def outlet():
     # POC
     col_poc = ["division", "bu", "new_outlet", "new_outlet_name"]
 
-    df = pd.read_excel(path / "meta" / "New outlet.xlsx", usecols="A:F", dtype="str")
+    df = pd.read_excel(path / "meta" / "New outlet.xlsx", usecols="A:F")
     df = clean_names(df)
     df = df.drop(columns=["outlet_name"])
     df = df[["outlet"] + col_poc]
@@ -60,6 +50,8 @@ def outlet():
 def join_with_outlet(df):
     outlet_df = outlet()
     df = df.merge(outlet_df, on="outlet", how="left")
+    # change column orders
+    # df = df[:8] + df[col_poc] + df[8:-4]
     return df
 
 
@@ -79,8 +71,8 @@ def balance_sheet(df):
 
 
 # Input data
-path_lc = path / "data" / "Analysis FS Item Hierarchy for CU 698_LC.xlsx"
-path_gc = path / "data" / "Analysis FS Item Hierarchy for CU 698_GC.xlsx"
+path_lc = path / "data" / "(Plan) Analysis FS Item Hierarchy for CU 698_LC.xlsx"
+path_gc = path / "data" / "(Plan) Analysis FS Item Hierarchy for CU 698_GC.xlsx"
 
 
 # Combine data
@@ -100,6 +92,10 @@ race_bs = balance_sheet(race)
 
 
 # Output data
-race_pnl.to_csv(path / "output" / "RACE Profit and Loss.csv", index=False, na_rep="0")
-race_bs.to_csv(path / "output" / "RACE Balance sheet.csv", index=False, na_rep="0")
+race_pnl.to_csv(
+    path / "output" / "(Plan) RACE Profit and Loss.csv", index=False, na_rep="0"
+)
+race_bs.to_csv(
+    path / "output" / "(Plan) RACE Balance sheet.csv", index=False, na_rep="0"
+)
 print("Files are created")
