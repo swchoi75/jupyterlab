@@ -129,7 +129,7 @@ df = pd.concat([df_1, df_2])
 
 # Businss logic: Add a new column
 def add_responsibilities(row):
-    # define variable
+    # define variables
     outlet_cf = ["Central Functions"]
     outlet_pl1 = ["PL ENC", "PL DTC", "PL MTC", "PL VBC"]
     outlet_pl2 = [
