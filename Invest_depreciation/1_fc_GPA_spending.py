@@ -24,6 +24,7 @@ current_year_end = pd.to_datetime(current_year + "-12-31")
 input_file = path / "fc_data" / "2023-11_GPA_WMS - All data report_FC.xlsx"
 meta_file = path / "meta" / "category_of_investment.xlsx"
 meta_cc = path / "meta" / "cost_centers.csv"
+meta_poc = path / "meta" / "POC_for_GPA.xlsx"
 output_file = path / "fc_output" / "fc_monthly_spending.csv"
 
 
@@ -31,20 +32,23 @@ output_file = path / "fc_output" / "fc_monthly_spending.csv"
 df = pd.read_excel(
     input_file,
     sheet_name="Sheet1",
-    dtype={
-        "Fire-Outlet": str,
-        "Investment type": str,
-    },
+    dtype={"Investment type": str},
 )
 
 df_meta_coi = pd.read_excel(
-    meta_file,
-    sheet_name="Sheet1",
-    usecols="A:H",
-    dtype=str,
+    meta_file, sheet_name="Sheet1", usecols="A:H", dtype=str
 ).dropna()
 
-df_meta_cc = pd.read_csv(meta_cc)
+cc_master = pd.read_csv(meta_cc, dtype=str)
+
+poc_master = pd.read_excel(meta_poc, dtype=str)
+poc_master["plant_name"] = poc_master["plant_name"].str.replace("ICH ", "")
+poc_master = poc_master.rename(
+    columns={
+        "plant_name": "location_sender",
+        "outlet_name": "outlet_sender",
+    }
+)
 
 
 # Functions to clean column names
@@ -66,16 +70,19 @@ df.columns = df.columns.map(clean_trailing_underscore)
 df = df.rename(
     columns={
         "categorie_of_investm": "category_of_investment",
-        "unnamed_19": "master_description",
-        "unnamed_21": "sub_description",
+        "unnamed_20": "master_description",
+        "unnamed_22": "sub_description",
     }
 )
+
+
 # Remove the GPA version prefix from each column name
 df.columns = df.columns.str.replace(GPA_version, "")
 
 
-# Select columns
+# Select key columns
 key_columns = [
+    "location_sender",
     "outlet_sender",
     "category_of_investment",
     "category_of_invest_historic",
@@ -104,8 +111,10 @@ df = df[df[spending_total_col] != 0]
 
 
 # Add meta data
-df = df.merge(df_meta_coi, how="left", on="category_of_investment").merge(
-    df_meta_cc, how="left", on="sub"
+df = (
+    df.merge(df_meta_coi, how="left", on="category_of_investment")
+    .merge(cc_master, how="left", on="sub")
+    .merge(poc_master, how="left", on=["location_sender", "outlet_sender"])
 )
 
 

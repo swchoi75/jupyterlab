@@ -15,7 +15,7 @@ except NameError:
 
 # Variables
 GPA_version = "v379"
-spending_total_col = "plan_spend_2024"
+spending_total_col = "spend_plan_2024"
 current_year = "2024"
 current_year_end = pd.to_datetime(current_year + "-12-31")
 
@@ -24,6 +24,7 @@ current_year_end = pd.to_datetime(current_year + "-12-31")
 input_file = path / "plan_data" / "2023_GPA_WMS - All data report_Budget.xlsx"
 meta_file = path / "meta" / "category_of_investment.xlsx"
 meta_cc = path / "meta" / "cost_centers.csv"
+meta_poc = path / "meta" / "POC_for_GPA.xlsx"
 output_file = path / "plan_output" / "plan_monthly_spending.csv"
 
 
@@ -31,23 +32,23 @@ output_file = path / "plan_output" / "plan_monthly_spending.csv"
 df = pd.read_excel(
     input_file,
     sheet_name="Sheet1",
-    dtype={
-        "Outlet(Receiver)": str,
-        "Fire-Outlet": str,
-        "FiRe Outlet NY(Receiver)": str,
-        "FiRe plant(Receiver)": str,
-        "Investment type": str,
-    },
+    dtype={"Investment type": str},
 )
 
 df_meta_coi = pd.read_excel(
-    meta_file,
-    sheet_name="Sheet1",
-    usecols="A:G",
-    dtype={"financial_statement_item": str},
+    meta_file, sheet_name="Sheet1", usecols="A:G", dtype=str
 ).dropna()
 
-df_meta_cc = pd.read_csv(meta_cc)
+cc_master = pd.read_csv(meta_cc, dtype=str)
+
+poc_master = pd.read_excel(meta_poc, dtype=str)
+poc_master["plant_name"] = poc_master["plant_name"].str.replace("ICH ", "")
+poc_master = poc_master.rename(
+    columns={
+        "plant_name": "location_sender",
+        "outlet_name": "outlet_sender",
+    }
+)
 
 
 # Functions to clean column names
@@ -69,24 +70,22 @@ df.columns = df.columns.map(clean_trailing_underscore)
 df = df.rename(
     columns={
         "categorie_of_investm": "category_of_investment",
-        "unnamed_28": "master_description",
-        "unnamed_30": "sub_description",
+        "unnamed_20": "master_description",
+        "unnamed_22": "sub_description",
     }
 )
+
+
 # Remove the GPA version prefix from each column name
 df.columns = df.columns.str.replace(GPA_version, "")
 
 
 # Select columns
 key_columns = [
+    "location_sender",
     "outlet_sender",
-    "outlet_receiver",
     "category_of_investment",
     "category_of_invest_historic",
-    "fire_outlet",
-    "fire_outlet_ny_receiver",
-    "fire_plant_receiver",
-    "location_receiver",
     "investment_type",
     "status",
     "master",
@@ -112,8 +111,10 @@ df = df[df[spending_total_col] != 0]
 
 
 # Add meta data
-df = df.merge(df_meta_coi, how="left", on="category_of_investment").merge(
-    df_meta_cc, how="left", on="sub"
+df = (
+    df.merge(df_meta_coi, how="left", on="category_of_investment")
+    .merge(cc_master, how="left", on="sub")
+    .merge(poc_master, how="left", on=["location_sender", "outlet_sender"])
 )
 
 
@@ -123,35 +124,6 @@ df["basic_or_project"] = np.where(
     "basic",
     "project",
 )
-
-
-# # Business Logic: Aggregate CDF in GPA
-
-# Split dataframe
-df_cdf = df[df["outlet_sender"] == "PT - Quality"]
-df_rest = df[df["outlet_sender"] != "PT - Quality"]
-
-# Select columns
-columns_to_drop = ["outlet_receiver", "fire_outlet", "fire_outlet_ny_receiver"]
-key_columns = [x for x in df.columns if x not in value_columns]
-key_columns_2 = [x for x in key_columns if x not in columns_to_drop]
-
-# Aggregate CDF outlet
-df_cdf = (
-    df_cdf[key_columns_2 + value_columns]
-    .groupby(key_columns_2)
-    .agg("sum")
-    .reset_index()
-)
-
-# Manual input of CDF outlet 7110
-cdf_outlet = "7110"
-df_cdf["outlet_receiver"] = cdf_outlet
-df_cdf["fire_outlet"] = cdf_outlet
-df_cdf["fire_outlet_ny_receiver"] = cdf_outlet
-
-# Merge dataframes
-df = pd.concat([df_rest, df_cdf])
 
 
 # Write data

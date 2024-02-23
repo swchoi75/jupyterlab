@@ -16,14 +16,13 @@ except NameError:
 input_file = path / "fc_data" / "2023-11_Asset History Leger_20231130.xlsx"
 meta_file = path / "meta" / "0012_TABLE_MASTER_SAP-Fire mapping table.xlsx"
 meta_cc = path / "meta" / "0000_TABLE_MASTER_Cost center.xlsx"
-meta_pc = path / "meta" / "2023_profit_center_master_KE5X.xlsx"
+meta_poc = path / "meta" / "POC_for_GPA.xlsx"
 output_file = path / "fc_output" / "fc_acquisition_existing_assets.csv"
 
 
 # Read data
 df = pd.read_excel(
     input_file,
-    sheet_name="Asset ledger 1130",
     header=3,
     dtype={
         "Asset Clas": str,
@@ -120,32 +119,24 @@ selected_columns = [
 cc_master = cc_master.select(columns=selected_columns)
 
 
-## Read profit center master data
-pc_master = pd.read_excel(meta_pc).clean_names()
-
-
-# select & rename columns
-pc_master = pc_master[["profit_ctr", "rec_prctr", "percentage"]].rename(
-    columns={"profit_ctr": "profit_center"}
+# Read POC (Plant Outlet Combination) master data
+poc_master = pd.read_excel(meta_poc, dtype=str)
+poc_master["plant_name"] = poc_master["plant_name"].str.replace("ICH ", "")
+poc_master = poc_master.rename(
+    columns={
+        "plant_name": "location_sender",
+        "outlet_name": "outlet_sender",
+    }
 )
-# # central function allocation ratio
-pc_master = pc_master[pc_master["profit_center"] == "50899-999"]
 
 
 # Add meta data
-df = df.merge(df_meta, how="left", on="asset_class")
-df = df.merge(cc_master, how="left", on="cost_center")
-df = df.merge(pc_master, how="left", on="profit_center")
-
-
-# fill missing percentage with 100
-df["percentage"].fillna(100, inplace=True)
-
-
-# Multiply percentage to value columns
-df["percentage"] = df["percentage"] * 0.01
-value_columns = ["acquisition", "previous", "current"]
-df[value_columns] = df[value_columns].mul(df["percentage"], axis=0)
+df = (
+    df.merge(df_meta, how="left", on="asset_class")
+    .merge(cc_master, how="left", on="cost_center")
+    .merge(poc_master, how="left", on="profit_center")
+    # .merge(pc_master, how="left", on="profit_center")
+)
 
 
 # Write data

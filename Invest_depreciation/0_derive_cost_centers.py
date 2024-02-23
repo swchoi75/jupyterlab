@@ -20,30 +20,21 @@ output_file = path / "meta" / "cost_centers.csv"
 
 
 # Read data
-df_1 = pd.read_csv(
-    input_1,
-    sep="\t",
-    skiprows=3,
-    encoding="UTF-16LE",
-    skipinitialspace=True,
-    dtype="str",
-)
-df_2 = pd.read_csv(
-    input_2,
-    sep="\t",
-    skiprows=3,
-    encoding="UTF-16LE",
-    skipinitialspace=True,
-    dtype="str",
-)
-df_3 = pd.read_csv(
-    input_3,
-    sep="\t",
-    skiprows=3,
-    encoding="UTF-16LE",
-    skipinitialspace=True,
-    dtype="str",
-)
+def read_tsv_file(filename):
+    df = pd.read_csv(
+        filename,
+        sep="\t",
+        skiprows=3,
+        encoding="UTF-16LE",
+        skipinitialspace=True,
+        dtype="str",
+    )
+    return df
+
+
+df_1 = read_tsv_file(input_1)
+df_2 = read_tsv_file(input_2)
+df_3 = read_tsv_file(input_3)
 
 
 # Select columns
@@ -61,8 +52,8 @@ df = df[["POSID", "AKSTL"]]
 df = df.rename(columns={"POSID": "sub", "AKSTL": "cost_center"})
 
 
-# Aggregate data
-df = df.groupby(["sub", "cost_center"]).first().reset_index()
+# Drop missing values & drop duplicates
+df = df.dropna().drop_duplicates(["sub", "cost_center"])
 
 
 # Business Logic : handle the multiple cost centers

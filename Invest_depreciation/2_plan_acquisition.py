@@ -14,7 +14,7 @@ except NameError:
 
 
 # Variables
-spending_total_col = "plan_spend_2024"
+spending_total_col = "spend_plan_2024"
 current_year = "2024"
 current_year_end = pd.to_datetime(current_year + "-12-31")
 actual_month_end = "2023-07-31"
@@ -30,10 +30,6 @@ output_file = path / "plan_output" / "plan_acquisition_future_assets.csv"
 df = pd.read_csv(
     input_file,
     dtype={
-        "outlet_receiver": str,
-        "fire_outlet": str,
-        "fire_outlet_ny_receiver": str,
-        "fire_plant_receiver": str,
         "investment_type": str,
         "financial_statement_item": str,
     },
