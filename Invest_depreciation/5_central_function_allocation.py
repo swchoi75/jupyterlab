@@ -78,7 +78,18 @@ def handle_poc_master(filename):
     # string manipulation
     df["plant_name"] = df["plant_name"].str.replace("ICH ", "")
     # rename columns
-    df = df.rename(columns={"profit_center": "rec_prctr"})
+    df = df.rename(
+        columns={
+            "cu": "cu_no",
+            "plant": "plant_no",
+            "outlet": "outlet_no",
+            "bu": "bu_receiver",
+            "division": "division_receiver",
+            "plant_name": "location_receiver",
+            "outlet_name": "outlet_receiver",
+            "profit_center": "rec_prctr",
+        }
+    )
 
     return df
 
