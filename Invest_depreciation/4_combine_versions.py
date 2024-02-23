@@ -65,7 +65,7 @@ def add_responsibilities(row):
     outlet_pl2 = [
         "PL HVD",
         "PL EAC",
-        "PL DAC",
+        "PL DAC E",
         "PL MES",
         "PL HYD",
         "PL CM CCN",
