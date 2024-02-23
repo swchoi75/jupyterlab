@@ -13,16 +13,37 @@ except NameError:
 
 
 # Filenames
-input_1 = path / "meta_cc" / "IMPR.xlsx"
-input_2 = path / "meta_cc" / "IMZO.xlsx"
-input_3 = path / "meta_cc" / "PRPS.xlsx"
+input_1 = path / "meta_cc" / "IMPR.XLS"
+input_2 = path / "meta_cc" / "IMZO.XLS"
+input_3 = path / "meta_cc" / "PRPS.XLS"
 output_file = path / "meta" / "cost_centers.csv"
 
 
 # Read data
-df_1 = pd.read_excel(input_1, sheet_name="Sheet1", skiprows=3)
-df_2 = pd.read_excel(input_2, sheet_name="Sheet1", skiprows=3)
-df_3 = pd.read_excel(input_3, sheet_name="Sheet1", skiprows=3, dtype={"AKSTL": str})
+df_1 = pd.read_csv(
+    input_1,
+    sep="\t",
+    skiprows=3,
+    encoding="UTF-16LE",
+    skipinitialspace=True,
+    dtype="str",
+)
+df_2 = pd.read_csv(
+    input_2,
+    sep="\t",
+    skiprows=3,
+    encoding="UTF-16LE",
+    skipinitialspace=True,
+    dtype="str",
+)
+df_3 = pd.read_csv(
+    input_3,
+    sep="\t",
+    skiprows=3,
+    encoding="UTF-16LE",
+    skipinitialspace=True,
+    dtype="str",
+)
 
 
 # Select columns
