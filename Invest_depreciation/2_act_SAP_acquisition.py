@@ -72,14 +72,7 @@ df = df.dropna(subset="asset_class")
 
 
 # Read meta data
-df_meta = pd.read_excel(
-    meta_file,
-    sheet_name="Sheet1",
-    dtype={
-        "Asset class": str,
-        "FIRE account": str,
-    },
-).clean_names()
+df_meta = pd.read_excel(meta_file, sheet_name="Sheet1", dtype=str).clean_names()
 
 # Rename columns
 df_meta = df_meta.rename(
@@ -107,13 +100,7 @@ df_meta = df_meta.select(columns=selected_columns)
 
 
 # Read cost center master data
-cc_master = pd.read_excel(
-    meta_cc,
-    sheet_name="General master",
-    dtype={
-        "Cctr": str,
-    },
-).clean_names()
+cc_master = pd.read_excel(meta_cc, sheet_name="General master", dtype=str).clean_names()
 
 # Rename columns
 cc_master = cc_master.rename(
@@ -134,10 +121,7 @@ cc_master = cc_master.select(columns=selected_columns)
 
 
 ## Read profit center master data
-pc_master = pd.read_excel(
-    meta_pc,
-    sheet_name="Sheet1",
-).clean_names()
+pc_master = pd.read_excel(meta_pc).clean_names()
 
 
 # select & rename columns
