@@ -63,7 +63,13 @@ df = df.merge(cf_master, how="left", on="profit_center")
 # Select value columns
 pattern = re.compile(r"\d{4}-\d{2}-\d{2}")
 monthly_depr_columns = df.columns[df.columns.str.contains(pattern)].tolist()
-value_columns = monthly_depr_columns + ["acquisition", "previous", "current"]
+value_columns = monthly_depr_columns + [
+    "spend_amt",
+    "acquisition",
+    "previous",
+    "current",
+    "depr_current",
+]
 
 
 # Multiply percentage to value columns
@@ -90,6 +96,8 @@ def handle_poc_master(filename):
             "profit_center": "rec_prctr",
         }
     )
+    # drop duplicates
+    df = df.drop_duplicates(subset="rec_prctr")
 
     return df
 

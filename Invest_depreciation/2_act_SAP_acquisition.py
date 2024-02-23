@@ -134,6 +134,8 @@ def handle_poc_master(filename):
     )
     # select columns
     df = df[["location_sender", "outlet_sender", "profit_center"]]
+    # drop duplicates
+    df = df.drop_duplicates(subset="profit_center")
 
     return df
 
@@ -146,7 +148,6 @@ df = (
     df.merge(df_meta, how="left", on="asset_class")
     .merge(cc_master, how="left", on="cost_center")
     .merge(poc_master, how="left", on="profit_center")
-    # .merge(pc_master, how="left", on="profit_center")
 )
 
 
