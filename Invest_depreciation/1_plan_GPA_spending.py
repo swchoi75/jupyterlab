@@ -35,21 +35,6 @@ df = pd.read_excel(
     dtype={"Investment type": str},
 )
 
-df_meta_coi = pd.read_excel(
-    meta_file, sheet_name="Sheet1", usecols="A:G", dtype=str
-).dropna()
-
-cc_master = pd.read_csv(meta_cc, dtype=str)
-
-poc_master = pd.read_excel(meta_poc, dtype=str)
-poc_master["plant_name"] = poc_master["plant_name"].str.replace("ICH ", "")
-poc_master = poc_master.rename(
-    columns={
-        "plant_name": "location_sender",
-        "outlet_name": "outlet_sender",
-    }
-)
-
 
 # Functions to clean column names
 def clean_new_lines(column_name):
@@ -80,7 +65,7 @@ df = df.rename(
 df.columns = df.columns.str.replace(GPA_version, "")
 
 
-# Select columns
+# Select key columns
 key_columns = [
     "location_sender",
     "outlet_sender",
@@ -110,19 +95,46 @@ df = df.dropna(subset=spending_total_col)
 df = df[df[spending_total_col] != 0]
 
 
-# Add meta data
-df = (
-    df.merge(df_meta_coi, how="left", on="category_of_investment")
-    .merge(cc_master, how="left", on="sub")
-    .merge(poc_master, how="left", on=["location_sender", "outlet_sender"])
-)
-
-
 # Create new column
 df["basic_or_project"] = np.where(
     df["master_description"].str.contains("Basic", case=False),
     "basic",
     "project",
+)
+
+
+# Read meta data
+def handle_poc_master(filename):
+    # read data
+    df = pd.read_excel(filename, dtype=str)
+    # string manipulation
+    df["plant_name"] = df["plant_name"].str.replace("ICH ", "")
+    # rename columns
+    df = df.rename(
+        columns={
+            "plant_name": "location_sender",
+            "outlet_name": "outlet_sender",
+        }
+    )
+    # select columns
+    df = df[["location_sender", "outlet_sender", "profit_center"]]
+
+    return df
+
+
+df_meta_coi = pd.read_excel(
+    meta_file, sheet_name="Sheet1", usecols="A:H", dtype=str
+).dropna()
+
+cc_master = pd.read_csv(meta_cc, dtype=str)
+poc_master = handle_poc_master(meta_poc)
+
+
+# Add meta data
+df = (
+    df.merge(df_meta_coi, how="left", on="category_of_investment")
+    .merge(cc_master, how="left", on="sub")
+    .merge(poc_master, how="left", on=["location_sender", "outlet_sender"])
 )
 
 

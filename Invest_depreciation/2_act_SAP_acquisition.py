@@ -120,14 +120,25 @@ cc_master = cc_master.select(columns=selected_columns)
 
 
 # Read POC (Plant Outlet Combination) master data
-poc_master = pd.read_excel(meta_poc, dtype=str)
-poc_master["plant_name"] = poc_master["plant_name"].str.replace("ICH ", "")
-poc_master = poc_master.rename(
-    columns={
-        "plant_name": "location_sender",
-        "outlet_name": "outlet_sender",
-    }
-)
+def handle_poc_master(filename):
+    # read data
+    df = pd.read_excel(filename, dtype=str)
+    # string manipulation
+    df["plant_name"] = df["plant_name"].str.replace("ICH ", "")
+    # rename columns
+    df = df.rename(
+        columns={
+            "plant_name": "location_sender",
+            "outlet_name": "outlet_sender",
+        }
+    )
+    # select columns
+    df = df[["location_sender", "outlet_sender", "profit_center"]]
+
+    return df
+
+
+poc_master = handle_poc_master(meta_poc)
 
 
 # Add meta data
