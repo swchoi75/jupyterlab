@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+import numpy as np
 from pathlib import Path
 from janitor import clean_names
 
@@ -16,6 +17,7 @@ except NameError:
 # Filenames
 input_file = path / "fc_output" / "fc_depreciation_combined.csv"
 meta_pc = path / "meta" / "2023_profit_center_master_KE5X.xlsx"
+meta_poc = path / "meta" / "POC_for_GPA.xlsx"
 output_file = path / "fc_output" / "fc_depreciation.csv"
 
 
@@ -35,7 +37,7 @@ df = pd.read_csv(
 )
 
 
-# Functions
+# Read Central Functions master data
 def cf_allocation_ratio(filename):
     # Read data
     df = pd.read_excel(filename).clean_names()
@@ -51,11 +53,11 @@ def cf_allocation_ratio(filename):
     return df
 
 
-pc_master = cf_allocation_ratio(meta_pc)
+cf_master = cf_allocation_ratio(meta_pc)
 
 
 # Add meta data
-df = df.merge(pc_master, how="left", on="profit_center")
+df = df.merge(cf_master, how="left", on="profit_center")
 
 
 # Select value columns
@@ -67,6 +69,28 @@ value_columns = monthly_depr_columns + ["acquisition", "previous", "current"]
 # Multiply percentage to value columns
 df["percentage"].fillna(1, inplace=True)
 df[value_columns] = df[value_columns].mul(df["percentage"], axis=0)
+
+
+# Read POC (Plant Outlet Combination) master data
+def handle_poc_master(filename):
+    # read data
+    df = pd.read_excel(filename, dtype=str)
+    # string manipulation
+    df["plant_name"] = df["plant_name"].str.replace("ICH ", "")
+    # rename columns
+    df = df.rename(columns={"profit_center": "rec_prctr"})
+
+    return df
+
+
+poc_master = handle_poc_master(meta_poc)
+
+
+# Add meta data
+df["rec_prctr"] = np.where(
+    pd.isna(df["rec_prctr"]), df["profit_center"], df["rec_prctr"]
+)
+df = df.merge(poc_master, how="left", on="rec_prctr")
 
 
 # Write data
