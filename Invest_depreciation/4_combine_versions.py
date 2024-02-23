@@ -22,10 +22,6 @@ output_file = path / "fc_output" / "fc_depreciation_combined.csv"
 df_1 = pd.read_csv(
     input_1,
     dtype={
-        "outlet_receiver": str,
-        "fire_outlet": str,
-        "fire_outlet_ny_receiver": str,
-        "fire_plant_receiver": str,
         "investment_type": str,
         "financial_statement_item": str,
     },
@@ -69,14 +65,14 @@ df_2["asset_category"] = "existing"
 
 
 # Add meta data (incl. dummy POC) to GPA data
-df_meta_1 = df_meta[["outlet", "bu", "division", "plant_name", "profit_center"]]
-df_meta_1 = df_meta_1.rename(
-    columns={
-        "outlet": "outlet_receiver",
-        "plant_name": "location_receiver",
-    }
-)
-df_1 = df_1.merge(df_meta_1, how="left", on=["outlet_receiver", "location_receiver"])
+# df_meta_1 = df_meta[["outlet", "bu", "division", "plant_name", "profit_center"]]
+# df_meta_1 = df_meta_1.rename(
+#     columns={
+#         "outlet": "outlet_receiver",
+#         "plant_name": "location_receiver",
+#     }
+# )
+# df_1 = df_1.merge(df_meta_1, how="left", on=["outlet_receiver", "location_receiver"])
 
 
 # Remove duplicate profit centers (i.e. remove dummy POC)
