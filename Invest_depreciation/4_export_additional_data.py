@@ -25,6 +25,7 @@ df = pd.read_csv(
         # GPA data
         "investment_type": str,
         "financial_statement_item": str,
+        "useful_life_year": int,
         # SAP data
         "asset_class": str,
         "cost_center": str,
@@ -58,6 +59,7 @@ selected_columns = [
     "basic_or_project",
     "cost_center",
     "fix_var",
+    "useful_life_year",
     # "acquisition",
 ]
 

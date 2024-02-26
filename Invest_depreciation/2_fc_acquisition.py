@@ -91,6 +91,17 @@ df["asset_category"] = np.where(
 )
 
 
+# New column "useful_life_year" with default values
+def add_useful_life_year(row):
+    if row["fix_var"] == "fix":
+        return 8
+    elif row["fix_var"] == "var":
+        return 4
+
+
+df["useful_life_year"] = df.apply(add_useful_life_year, axis="columns")
+
+
 # Overwrite existing values if Manual input value is available
 df["gl_account"] = np.where(
     pd.isna(df["input_gl_account"]), df["gl_account"], df["input_gl_account"]
@@ -98,8 +109,6 @@ df["gl_account"] = np.where(
 df["cost_center"] = np.where(
     pd.isna(df["input_cost_center"]), df["cost_center"], df["input_cost_center"]
 )
-
-df["useful_life_year"] = 8  # Default value
 df["useful_life_year"] = np.where(
     pd.isna(df["input_useful_life_year"]),
     df["useful_life_year"],
