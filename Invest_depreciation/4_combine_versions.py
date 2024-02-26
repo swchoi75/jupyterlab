@@ -73,7 +73,13 @@ def add_responsibilities(row):
         "PL CM PSS",
     ]
     outlet_rnd = ["DIV E Eng.", "PL DAC", "PL MES"]
-    outlet_shs = ["DIV E C", "DIV P C", "PT - Quality", "PT - DFP(frm.Div.Fun"]
+    outlet_shs = [
+        "DIV E C",
+        "DIV P C",
+        "PT - Quality",
+        "PT - DFP(frm.Div.Fun",
+        "Central Group Functions",
+    ]
     # If conditions
     if row["outlet_sender"] in outlet_cf:
         return "Central Functions"
