@@ -73,7 +73,7 @@ value_columns = monthly_depr_columns + [
 
 
 # Multiply percentage to value columns
-df["percentage"].fillna(1, inplace=True)
+df["percentage"] = df["percentage"].fillna(1)
 df[value_columns] = df[value_columns].mul(df["percentage"], axis=0)
 
 
