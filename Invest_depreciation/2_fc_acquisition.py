@@ -40,6 +40,10 @@ df_meta = pd.read_excel(
     meta_file,
     sheet_name="Manual input",
     skiprows=3,
+    dtype={
+        "input_cost_center": str,
+        # "input_useful_life_year": int,
+    },
     parse_dates=["PPAP"],
 )
 df_meta = df_meta[

@@ -33,6 +33,7 @@ df = pd.read_csv(
         "cost_center": str,
         "asset_no": str,
         "sub_no": str,
+        # "input_useful_life_year": int,
     },
     parse_dates=["acquisition_date", "start_of_depr"],
 )
