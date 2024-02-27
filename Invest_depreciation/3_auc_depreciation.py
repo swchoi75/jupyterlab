@@ -15,13 +15,14 @@ except NameError:
 
 
 # Variables
-period_start = "2023-01-31"
-period_end = "2024-01-01"
+period_start = "2024-01-31"
+period_end = "2025-01-01"
 
 
 # Filenames
 input_file = path / "fc_output" / "fc_acquisition_existing_assets.csv"
-output_file = path / "fc_output" / "fc_depreciation_existing_assets.csv"
+meta_file = path / "meta" / "fc_AUC_list.xlsx"
+output_file = path / "fc_output" / "fc_depreciation_asset_under_construction.csv"
 
 
 # Read data
@@ -32,14 +33,39 @@ df = pd.read_csv(
         "cost_center": str,
         "asset_no": str,
         "sub_no": str,
-        # "input_useful_life_year": int,
     },
     parse_dates=["acquisition_date", "start_of_depr"],
 )
+# Filter Asset Under Construction
+df = df[df["asset_class"].isin(["991", "997", "998"])]
+
+df_meta = pd.read_excel(
+    meta_file,
+    sheet_name="Manual input",
+    skiprows=3,
+    dtype={
+        "asset_class": str,
+        "cost_center": str,
+        "asset_no": str,
+        "sub_no": str,
+        # "input_useful_life_year": int,
+    },
+    parse_dates=["PPAP"],
+)
+df_meta = df_meta[["asset_no", "PPAP", "input_useful_life_year"]]
 
 
-# Exclude Asset Under Construction
-df = df[~df["asset_class"].isin(["991", "997", "998"])]
+# Join two dataframes
+df = df.merge(df_meta, how="left", on="asset_no")
+
+
+# Asset Under Construction: overwrite existing values if Manual input value is available
+df["useful_life_year"] = np.where(
+    pd.isna(df["input_useful_life_year"]),
+    df["useful_life_year"],
+    df["input_useful_life_year"],
+)
+df["start_of_depr"] = np.where(pd.isna(df["PPAP"]), df["start_of_depr"], df["PPAP"])
 
 
 # # Business Logic: Monthly deprecation # #
@@ -65,35 +91,7 @@ def calc_monthly_depr(row, period_start, period_end):
     monthly_depr = row["acquisition"] / (
         row["useful_life_year"] * 12 + row["useful_life_month"]
     )
-    alterative_monthly_depr = row["current"] * -1 / 12
-
-    # If the depreciation starts after period_start
-    if pd.to_datetime(period_start) < row["depr_start"]:
-        date1 = pd.to_datetime(period_start)
-        date2 = row["depr_start"]
-        months_difference = (date2.year - date1.year) * 12 + date2.month - date1.month
-        return row["current"] * -1 / (12 - months_difference)
-
-    # If the depreciation ends between period_start and period_end
-    elif pd.to_datetime(period_start) < row["depr_end"] and row[
-        "depr_end"
-    ] < pd.to_datetime(period_end):
-        date1 = row["depr_end"]
-        date2 = pd.to_datetime(period_end)
-        months_difference = (date2.year - date1.year) * 12 + date2.month - date1.month
-        return row["current"] * -1 / (12 - months_difference)
-
-    # If it is still depreciated even after depr_end date because usage is restarted
-    elif row["depr_end"] < pd.to_datetime(period_start) and abs(row["current"]) > 0:
-        return alterative_monthly_depr
-
-    # Yearly Depreciation is not equal to the expected value
-    # due to additional investment, ICO asset transfer, etc
-    elif abs(row["current"] + (monthly_depr * 12)) > 1:
-        return alterative_monthly_depr
-
-    else:
-        return monthly_depr
+    return monthly_depr
 
 
 def calc_depr_end(row):

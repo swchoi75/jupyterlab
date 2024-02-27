@@ -14,6 +14,7 @@ except NameError:
 # Filenames
 input_1 = path / "fc_output" / "fc_depreciation_future_assets.csv"
 input_2 = path / "fc_output" / "fc_depreciation_existing_assets.csv"
+input_3 = path / "fc_output" / "fc_depreciation_asset_under_construction.csv"
 output_file = path / "fc_output" / "fc_depreciation_combined.csv"
 
 
@@ -34,11 +35,21 @@ df_2 = pd.read_csv(
         "sub_no": str,
     },
 )
+df_3 = pd.read_csv(
+    input_3,
+    dtype={
+        "asset_class": str,
+        "cost_center": str,
+        "asset_no": str,
+        "sub_no": str,
+    },
+)
 
 
 # Add source column
 df_1["source"] = "GPA"
 df_2["source"] = "SAP"
+df_3["source"] = "SAP_AUC"
 
 
 # Add new columns
@@ -53,8 +64,8 @@ df_1["mv_type"] = df_1.apply(add_mv_type, axis="columns")
 df_2["asset_category"] = "existing"
 
 
-# Combine two dataframes
-df = pd.concat([df_1, df_2])
+# Combine three dataframes
+df = pd.concat([df_1, df_2, df_3])
 
 
 # Businss logic: Add a new column
