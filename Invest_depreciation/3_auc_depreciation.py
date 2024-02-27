@@ -15,8 +15,8 @@ except NameError:
 
 
 # Variables
-period_start = "2024-01-31"
-period_end = "2025-01-01"
+period_start = "2023-01-31"
+period_end = "2024-01-01"
 
 
 # Filenames
