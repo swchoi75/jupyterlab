@@ -43,7 +43,7 @@ df["acquisition"] = df["spend_amt"]
 
 # Dataframe for month end dates
 df_month_ends = pd.DataFrame(
-    {"month_ends": pd.date_range(period_start, period_end, freq="M")}
+    {"month_ends": pd.date_range(period_start, period_end, freq="ME")}
 )
 
 
