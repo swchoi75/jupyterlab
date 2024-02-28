@@ -6,21 +6,21 @@ from janitor import clean_names
 
 # Path
 try:
-    path = Path(__file__).parent
+    path = Path(__file__).parent.parent
 except NameError:
     import inspect
 
-    path = Path(inspect.getfile(lambda: None)).resolve().parent
+    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
 
 # Variables
-period_start = "2024-01-31"
-period_end = "2025-01-01"
+period_start = "2023-01-31"
+period_end = "2024-01-01"
 
 
 # Filenames
-input_file = path / "plan_output" / "plan_acquisition_future_assets.csv"
-output_file = path / "plan_output" / "plan_depreciation_future_assets.csv"
+input_file = path / "fc_output" / "fc_acquisition_future_assets.csv"
+output_file = path / "fc_output" / "fc_depreciation_future_assets.csv"
 
 
 # Read data

@@ -6,26 +6,26 @@ from janitor import clean_names
 
 # Path
 try:
-    path = Path(__file__).parent
+    path = Path(__file__).parent.parent
 except NameError:
     import inspect
 
-    path = Path(inspect.getfile(lambda: None)).resolve().parent
+    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
 
 # Variables
-GPA_version = "v380"
-spending_total_col = "spend_fc_2023"
-current_year = "2023"
+GPA_version = "v379"
+spending_total_col = "spend_plan_2024"
+current_year = "2024"
 current_year_end = pd.to_datetime(current_year + "-12-31")
 
 
 # Filenames
-input_file = path / "fc_data" / "2023-11_GPA_WMS - All data report_FC.xlsx"
+input_file = path / "plan_data" / "2023_GPA_WMS - All data report_Budget.xlsx"
 meta_file = path / "meta" / "category_of_investment.xlsx"
 meta_cc = path / "meta" / "cost_centers.csv"
 meta_poc = path / "meta" / "POC_for_GPA.xlsx"
-output_file = path / "fc_output" / "fc_monthly_spending.csv"
+output_file = path / "plan_output" / "plan_monthly_spending.csv"
 
 
 # Read data
