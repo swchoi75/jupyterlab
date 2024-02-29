@@ -21,7 +21,7 @@ period_end = "2024-01-01"
 
 # Filenames
 input_file = path / "fc_output" / "fc_acquisition_existing_assets.csv"
-meta_file = path / "meta" / "fc_AUC_list.xlsx"
+master_file = path / "fc_data" / "fc_AUC_list.xlsx"
 output_file = path / "fc_output" / "fc_depreciation_asset_under_construction.csv"
 
 
@@ -40,7 +40,7 @@ df = pd.read_csv(
 df = df[df["asset_class"].isin(["991", "997", "998"])]
 
 df_meta = pd.read_excel(
-    meta_file,
+    master_file,
     sheet_name="Manual input",
     skiprows=3,
     dtype={

@@ -22,7 +22,7 @@ actual_month_end = "2023-11-30"
 
 # Filenames
 input_file = path / "fc_output" / "fc_monthly_spending.csv"
-meta_file = path / "meta" / "fc_GPA_master.xlsx"
+master_file = path / "fc_data" / "fc_GPA_master.xlsx"
 output_file = path / "fc_output" / "fc_acquisition_future_assets.csv"
 
 
@@ -37,7 +37,7 @@ df = pd.read_csv(
 df = df.drop(columns=spending_total_col)
 
 df_meta = pd.read_excel(
-    meta_file,
+    master_file,
     sheet_name="Manual input",
     skiprows=3,
     dtype={
