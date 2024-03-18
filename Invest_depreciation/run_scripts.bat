@@ -1,22 +1,26 @@
 @REM Check python
 where python
 
-@REM Cost center information
-python script/0_derive_cost_centers.py
+@REM Preprocessing
+python src/0_derive_cc_and_prj.py
 
-@REM GPA
-python script/1_fc_GPA_spending.py
-python script/2_fc_acquisition.py
-python script/3_fc_depreciation.py
+@REM GPA spending
+python src/1_fc_GPA_spending.py
 
-@REM SAP
-python script/2_act_SAP_acquisition.py
-python script/3_act_depreciation.py
-python script/3_auc_depreciation.py
+@REM Acquisition
+python src/2_fc_acquisition.py
+python src/2_act_SAP_acquisition.py
 
-@REM GPA + SAP
-python script/4_combine_versions.py
-python script/4_export_additional_data.py
+@REM 
+python src/3_adjustment_manually.py
+python src/3_export_additional_data.py
+
+@REM Depreciation
+python src/4_fc_depreciation.py
+python src/4_act_depreciation.py
+python src/4_auc_depreciation.py
+python src/4_merge_versions.py
 
 @REM Central Function Allocation
-python script/5_central_function_allocation.py
+python src/5_central_function_allocation.py
+python src/5_reorder_columns.py
