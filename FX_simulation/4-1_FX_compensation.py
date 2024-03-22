@@ -23,7 +23,7 @@ def read_data(filename):
     df = pd.read_csv(filename).clean_names()
     # Filter data
     df = df[(df["attribute"] == "FX Compensation")]
-    df = df[(df["version"] == "Actual")]
+    df = df[(df["version"] == "Actual")]  # For the purpose of fool proof
     # Select columns
     df = df[["attribute", "version", "year", "product_hierarchy", "value"]]
     return df
@@ -38,6 +38,7 @@ df = (
         index=["version", "year", "product_hierarchy"],
         columns=["attribute"],
         values="value",
+        aggfunc="sum",
     )
     .reset_index()
     .rename(columns={"FX Compensation": "fx_compensation"})
