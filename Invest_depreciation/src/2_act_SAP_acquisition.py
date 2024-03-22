@@ -22,7 +22,7 @@ meta_file = path / "meta" / "0012_TABLE_MASTER_SAP-Fire mapping table.xlsx"
 meta_cc = path / "meta" / "0000_TABLE_MASTER_Cost center.xlsx"
 meta_poc = path / "meta" / "POC_for_GPA.xlsx"
 meta_prj = path / "meta" / "project_for_assets.csv"
-meta_gpa = path / "meta" / "GPA 920 Register of Subs.xlsx"
+meta_gpa = path / "data" / "920 GPA Register of Subs.xlsx"
 output_file = path / "output" / "2_fc_acquisition_existing_assets.csv"
 
 
