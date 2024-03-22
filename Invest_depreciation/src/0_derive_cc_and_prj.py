@@ -5,12 +5,7 @@ from janitor import clean_names
 
 
 # Path
-try:
-    path = Path(__file__).parent.parent
-except NameError:
-    import inspect
-
-    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
+path = Path(__file__).parent.parent
 
 
 # Filenames
@@ -65,18 +60,28 @@ df_4 = preprocess_dataframe(df_4)
 
 
 # Select columns
-df_1 = df_1[["POSID", "POSNR"]]  # "IMPR.XLS"
-df_2 = df_2[["POSNR", "OBJNR"]]  # "IMZO.XLS"
-df_3 = df_3[["OBJNR", "POSKI", "AKSTL"]]  # "PRPS.XLS"
+df_1 = df_1[["Position ID", "InvProgPos"]]  # "IMPR.XLS"
+df_2 = df_2[["InvProgPos", "OBJNR"]]  # "IMZO.XLS"
+df_3 = df_3[["Object number", "Short Identification", "Req. CC"]].dropna(
+    subset="Object number"
+)  # "PRPS.XLS"
 df_4 = df_4[["asset_no", "sub_no", "asset_description", "wbs_element", "amount"]]
 
 # Join dataframes
-df = df_1.merge(df_2, how="left", on="POSNR").merge(df_3, how="left", on="OBJNR")
+df = df_1.merge(df_2, how="left", on="InvProgPos").merge(
+    df_3, how="left", left_on="OBJNR", right_on="Object number"
+)
 
 
 # Select and Rename columns
-df = df[["POSID", "POSKI", "AKSTL"]]
-df = df.rename(columns={"POSID": "sub", "POSKI": "wbs_element", "AKSTL": "cost_center"})
+df = df[["Position ID", "Short Identification", "Req. CC"]]
+df = df.rename(
+    columns={
+        "Position ID": "sub",
+        "Short Identification": "wbs_element",
+        "Req. CC": "cost_center",
+    }
+)
 
 
 # Drop missing value & drop duplicates
