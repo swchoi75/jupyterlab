@@ -22,7 +22,8 @@ def read_data(filename):
     # Read data
     df = pd.read_csv(filename).clean_names()
     # Filter data
-    df = df[df["attribute"] == "FX Compensation"]
+    df = df[(df["attribute"] == "FX Compensation")]
+    df = df[(df["version"] == "Actual")]
     # Select columns
     df = df[["attribute", "version", "year", "product_hierarchy", "value"]]
     return df
@@ -31,11 +32,16 @@ def read_data(filename):
 df = read_data(input_file)
 
 
-# Summarize the data
-
-
-# Pivot table
-df = df.pivot_table()
+# Summarize the data by Pivot table
+df = (
+    df.pivot_table(
+        index=["version", "year", "product_hierarchy"],
+        columns=["attribute"],
+        values="value",
+    )
+    .reset_index()
+    .rename(columns={"FX Compensation": "fx_compensation"})
+)
 
 
 # Functions
@@ -59,7 +65,11 @@ def combine_id_cols(df, two_id_columns):
 
 # # Process data #
 two_id_columns = ["fy", "product_hierarchy"]
-df = df.groupby(["product_hierarchy", "year"]).agg({"react_fx": "sum"}).reset_index()
+df = (
+    df.groupby(["year", "product_hierarchy"])
+    .agg({"fx_compensation": "sum"})
+    .reset_index()
+)
 df = df.pipe(process_financial_year).pipe(combine_id_cols, two_id_columns)
 
 
