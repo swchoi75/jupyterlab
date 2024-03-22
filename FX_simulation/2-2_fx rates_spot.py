@@ -13,7 +13,7 @@ except NameError:
 
 
 # Filenames
-year = "2023"  # from 2019 to 2023 ytd
+year = "2024"  # from 2019 to 2024 ytd
 fx_type = "spot"
 input_file = path / "data" / "FX Rates" / "zf_rate.xlsx"
 output_file = path / "data" / "FX Rates" / f"FX {fx_type}_{year}.csv"

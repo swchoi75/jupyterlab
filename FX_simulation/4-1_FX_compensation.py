@@ -13,12 +13,29 @@ except NameError:
 
 
 # Filenames
-input_file = path / "data" / "React - FX compensation.csv"
+input_file = path / "data" / "P3 flat-data form(YTD).csv"
 output_file = path / "output" / "react_fx_compensation.csv"
 
 
-# Read data
-df = pd.read_csv(input_file).clean_names()
+# Read FX Compensation by year / product_hierarchy
+def read_data(filename):
+    # Read data
+    df = pd.read_csv(filename).clean_names()
+    # Filter data
+    df = df[df["attribute"] == "FX Compensation"]
+    # Select columns
+    df = df[["attribute", "version", "year", "product_hierarchy", "value"]]
+    return df
+
+
+df = read_data(input_file)
+
+
+# Summarize the data
+
+
+# Pivot table
+df = df.pivot_table()
 
 
 # Functions
