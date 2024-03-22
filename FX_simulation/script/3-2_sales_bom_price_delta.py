@@ -6,11 +6,11 @@ import os
 
 # Path
 try:
-    path = Path(__file__).parent
+    path = Path(__file__).parent.parent
 except NameError:
     import inspect
 
-    path = Path(inspect.getfile(lambda: None)).resolve().parent
+    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
 
 # Filenames

@@ -5,23 +5,23 @@ from pathlib import Path
 
 # Path
 try:
-    path = Path(__file__).parent
+    path = Path(__file__).parent.parent
 except NameError:
     import inspect
 
-    path = Path(inspect.getfile(lambda: None)).resolve().parent
+    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
 
 # Filenames
 year = "2024"  # from 2019 to 2024 ytd
-fx_type = "ytd"
+fx_type = "spot"
 input_file = path / "data" / "FX Rates" / "zf_rate.xlsx"
 output_file = path / "data" / "FX Rates" / f"FX {fx_type}_{year}.csv"
 
 
 # Read data
 df = pd.read_excel(
-    input_file, sheet_name=f"FY{year}", skiprows=7, nrows=7, usecols="A:N"
+    input_file, sheet_name=f"FY{year}", skiprows=18, nrows=7, usecols="A:N"
 )
 
 
