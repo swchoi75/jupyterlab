@@ -12,7 +12,11 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 data_path = path / "data"
-db_path = path / "db"
+
+
+# Filename
+output_file = path / "db" / "COPA_Sales_2024.parquet"
+
 
 # Input data: List of multiple text files
 txt_files = [
@@ -20,6 +24,7 @@ txt_files = [
 ]
 
 
+# Functions
 def read_multiple_files(list_of_files):
     dataframes = [
         pd.read_csv(
@@ -64,15 +69,11 @@ def remove_sub_total_rows(df):
 
 def merge_sales(list_of_files):
     df = read_multiple_files(list_of_files)
-    df = (df
-          .pipe(remove_first_two_columns)
-          .pipe(remove_sub_total_rows)
-          .pipe(clean_names)
-          )
+    df = df.pipe(remove_first_two_columns).pipe(remove_sub_total_rows).pipe(clean_names)
     return df
 
 
 # Write to Parquet file
 df = merge_sales(txt_files)
-df.to_parquet(db_path / "COPA_Sales_2023.parquet", index=False)
+df.to_parquet(output_file, index=False)
 print("A parquet file is created.")
