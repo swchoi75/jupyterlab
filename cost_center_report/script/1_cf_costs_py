@@ -1,0 +1,30 @@
+import pandas as pd
+from openpyxl import Workbook
+from pathlib import Path
+# from janitor import clean_names
+
+
+# Path
+try:
+    path = Path(__file__).parent.parent
+except NameError:
+    import inspect
+
+    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
+
+
+# filename
+input_file = path / "data" / "CF costs.csv"
+output_file = path / "output" / "cf_costs.csv"
+
+
+# Read data
+df = pd.read_csv(input_file)
+
+
+# Filter data
+df = df[["costctr", "gl_accounts", "actual", "plan", "target"]]
+
+
+# openpyxl
+wb = Workbook()
