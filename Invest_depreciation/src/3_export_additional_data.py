@@ -2,38 +2,39 @@ import pandas as pd
 from pathlib import Path
 from janitor import clean_names
 
-# from src.common_function import add_responsibilities
+# from script.common_function import add_responsibilities
 from common_function import add_responsibilities
-
 
 # Variables
 from common_variable import spending_total_col
 
 
 # Path
-try:
-    path = Path(__file__).parent.parent
-except NameError:
-    import inspect
-
-    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
+path = Path(__file__).parent.parent
 
 
 # Filenames
 input_gpa = path / "output" / "1_fc_monthly_spending.csv"
 input_sap = path / "output" / "2_fc_acquisition_existing_assets.csv"
+input_ppap = path / "output" / "2_fc_acquisition_future_assets.csv"
+
 output_gpa = path / "output" / "fc_GPA_master.csv"
 output_auc = path / "output" / "fc_SAP_AUC.csv"
 
 
 # Read data
-def read_data(filename):
-    df = pd.read_csv(filename, dtype={"asset_class": str})
-    return df
+# def read_data(filename):
+#     df = pd.read_csv(filename, dtype={"asset_class": str})
+#     return df
 
 
-df_gpa = read_data(input_gpa)
-df_sap = read_data(input_sap)
+df_gpa = pd.read_csv(input_gpa)
+df_sap = pd.read_csv(input_sap, dtype={"asset_class": str})
+df_ppap = (
+    pd.read_csv(input_ppap)[["sub", "PPAP"]]
+    .rename(columns={"PPAP": "info_PPAP"})
+    .drop_duplicates()
+)
 
 
 # Functions
@@ -57,6 +58,7 @@ df_gpa["useful_life_year"] = df_gpa.apply(add_useful_life_year, axis="columns")
 selected_columns = [
     "source",
     "responsibilities",
+    # GPA
     "outlet_sender",
     "status",
     "master",
@@ -65,6 +67,7 @@ selected_columns = [
     "sub_description",
     "category_of_investment",
     "category_description",
+    # Meta
     "fs_item_sub",
     "fs_item_description",
     "gl_account",
@@ -95,14 +98,23 @@ df_auc = df_filtered.reset_index()
 df_auc.loc[:, "source"] = "SAP_AUC"
 df_auc["responsibilities"] = df_auc.apply(add_responsibilities, axis="columns")
 
-
 # Fill missing values with 0
 df_auc["useful_life_year"] = df_auc["useful_life_year"].fillna(0)
+
+# Import PPAP
+df_auc = df_auc.merge(df_ppap, how="left", on="sub")
 
 # select columns
 selected_columns = [
     "source",
     "responsibilities",
+    # GPA
+    "outlet_sender",
+    "master",
+    "master_description",
+    "sub",
+    "sub_description",
+    # SAP
     "profit_center",
     "asset_class",
     "asset_class_name",
@@ -111,12 +123,14 @@ selected_columns = [
     "sub_no",
     "asset_description",
     "acquisition_date",
-    "start_of_depr",
+    # Meta
     "fs_item_sub",
     "fs_item_description",
     "gl_account",
     "gl_account_description",
     "fix_var",
+    # Key information
+    "info_PPAP",
     "useful_life_year",
     # "acquisition",
 ]
