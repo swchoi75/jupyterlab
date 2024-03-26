@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -15,7 +16,10 @@ except NameError:
 
 
 # FX Scenario
-fx_scenario_option = 1  # 1 to 8
+try:
+    fx_scenario_option = int(sys.argv[1])
+except NameError:
+    fx_scenario_option = 1  # 1 to 8
 
 
 # Filenames

@@ -13,9 +13,8 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
 
-# filename
+# Filename
 input_file = path / "data" / "CF costs.csv"
-output_file = path / "output" / "cf_costs.csv"
 
 
 # Read data
