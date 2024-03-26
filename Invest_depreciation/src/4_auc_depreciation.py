@@ -10,12 +10,7 @@ from common_variable import period_start, period_end
 
 
 # Path
-try:
-    path = Path(__file__).parent.parent
-except NameError:
-    import inspect
-
-    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
+path = Path(__file__).parent.parent
 
 
 # Filenames
@@ -156,20 +151,34 @@ conditions = [
     (df["useful_life_year"] > 0) & (df["useful_life_year"] <= 4),
 ]
 
+
 fs_item_values = ["122617100", "122622000", "122637000"]
-fs_item_descriptions = [
+fs_item_description_values = [
     "Buildings and land rights",
     "Technical equipment & machinery",
     "Molds / containers / tooling",
 ]
+gl_account_values = ["K413", "K413", "K432"]
+fix_var_values = ["fix", "fix", "var"]
+
 
 df["financial_statement_item"] = np.select(
     conditions, fs_item_values, default="122632000"
 )
 df["fs_item_description"] = np.select(
     conditions,
-    fs_item_descriptions,
+    fs_item_description_values,
     default="Assets under construction and advances to suppliers",
+)
+df["gl_account"] = np.select(
+    conditions,
+    gl_account_values,
+    default="K413",
+)
+df["fix_var"] = np.select(
+    conditions,
+    fix_var_values,
+    default="fix",
 )
 
 
