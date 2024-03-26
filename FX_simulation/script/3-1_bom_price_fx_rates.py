@@ -18,7 +18,7 @@ except NameError:
 # FX Scenario
 try:
     fx_scenario_option = int(sys.argv[1])
-except NameError:
+except:
     fx_scenario_option = 1  # 1 to 8
 
 
