@@ -13,7 +13,8 @@ except NameError:
 
 
 # Filenames
-input_file = path / "data" / "FX Rates" / "HMG 고시환율_20231113.xlsx"
+# input_file = path / "data" / "FX Rates" / "HMG 고시환율_20231113.xlsx"
+input_file = path / "data" / "FX Rates" / "HMG 고시환율 Y24.Q1.xlsx"
 output_1 = path / "data" / "fx_rates_HMG_actual.csv"
 output_2 = path / "data" / "fx_rates_HMG_plan.csv"
 
