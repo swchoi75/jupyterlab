@@ -24,7 +24,9 @@ except:
 
 # Filenames
 bom_file = path / "data" / "BOM_price.csv"
+mm_file = path / "data" / "Material_Master.xlsx"
 prj_file = path / "data" / "Sales high runner PN_survey with PSM.xlsx"
+
 fx_vt_plan_file = path / "data" / "fx_rates_VT_plan.csv"
 fx_vt_act_file = path / "data" / "fx_rates_VT_actual.csv"
 fx_hmg_act_file = path / "data" / "fx_rates_HMG_actual.csv"
@@ -33,7 +35,13 @@ fx_hmg_plan_file = path / "data" / "fx_rates_HMG_plan.csv"
 
 # Read data
 bom = pd.read_csv(bom_file)
+mm = (
+    pd.read_excel(mm_file)
+    .clean_names()[["material", "product_hierachy"]]
+    .rename(columns={"material": "product", "product_hierachy": "product_hierarchy"})
+)
 prj = pd.read_excel(prj_file, sheet_name="PSM entry", skiprows=3).clean_names()
+
 fx_vt_plan = pd.read_csv(fx_vt_plan_file)
 fx_vt_act = pd.read_csv(fx_vt_act_file)
 fx_hmg_act = pd.read_csv(fx_hmg_act_file)
@@ -86,7 +94,9 @@ def process_project_year(df):
     df["sop_year_month"] = df["sop_year_month"].str[:4].astype(int)
     df = df.rename(columns={"sop_year_month": "sop_year"})
     # select columns
-    df = df[["product", "hmg_pn", "quotation_year", "sop_year"]]
+    df = df[["product_hierarchy", "quotation_year", "sop_year"]]
+    # drop duplicates
+    df = df.drop_duplicates(subset="product_hierarchy")
     return df
 
 
@@ -125,9 +135,14 @@ def select_fx_act(fx_vt_act, fx_hmg_act, act_fx_source):
 def process_bom():
     df = pd.merge(
         bom,
+        mm,
+        how="inner",
+        on="product",  # dropna=True
+    )
+    df = df.merge(
         prj_year,
         how="inner",
-        on="product",  # dropna=True to exclude GM and KG Mobility
+        on="product_hierarchy",  # dropna=True to exclude GM and KG Mobility
     )
     return df
 
@@ -151,7 +166,7 @@ def process_fx_act(df, fx_act):  # fx_act: fx_act_vt or fx_act_hmg
 
 def krw_month_table():
     currencies = ["KRW"] * 12
-    months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+    months = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
     df = pd.DataFrame({"cur": currencies, "period": months})
     return df
 
@@ -198,6 +213,7 @@ df = process_fx_act(df, fx_act)
 krw_month = krw_month_table()
 df = df.merge(krw_month, how="left", on="cur")
 df["month"] = np.where(df["cur"] == "KRW", df["period"], df["month"])
+df["month"] = df["month"].fillna(0).astype(int)
 df = df.drop(columns=["period"])
 
 
