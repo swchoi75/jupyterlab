@@ -26,8 +26,10 @@ output_parquet = path / "output" / "sales with bom costs.parquet"
 
 
 # Read data
-sales = pd.read_csv(sales_file)
-bom = pd.concat([pd.read_csv(f) for f in bom_files])
+sales = pd.read_csv(
+    sales_file,
+)  # it already has the column "product_hierarchy"
+bom = pd.concat([pd.read_csv(f) for f in bom_files]).drop(columns="product_hierarchy")
 
 
 # Functions
@@ -95,6 +97,7 @@ sales = (
             "product_group",
             "productline",
             "representative_pn",
+            "HMG_PN",
         ],
         dropna=False,
     )
@@ -122,7 +125,7 @@ first_columns = [
     "plan_fx_from",
     "actual_fx_from",
 ]
-df = (
+result = (
     df.pipe(calc_delta_costs)
     .pipe(remove_duplacate_sales)
     .pipe(change_dtypes_year)
@@ -134,6 +137,6 @@ df = (
 
 
 # Write data
-df.to_csv(output_file, index=False)
-df.to_parquet(output_parquet)
+result.to_csv(output_file, index=False)
+result.to_parquet(output_parquet)
 print("Files are created")

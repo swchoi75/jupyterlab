@@ -48,7 +48,7 @@ df = (
 )
 
 
-# Filter data
+# Filter data for Representative PN
 df = df[df["recordtype"] == "F"]
 df = df[df["material_type"].isin(["FERT", "HALB"])]
 df = df[(df["totsaleslc"] > 5e7) | (df["totsaleslc"] < -5e7)]  # over +/- 50M KRW
@@ -65,10 +65,21 @@ result = df.groupby(["fy", "product_hierarchy"]).head(1)
 
 
 # Full sales data
-df_full = pd.read_csv(input_file)
-representative = result[["fy", "recordtype", "product_hierarchy", "product"]].rename(
-    columns={"product": "representative_pn"}
+df_full = pd.read_csv(input_file).drop(
+    columns="HMG_PN"  # to be replaced by HMG_PN of representative PN
 )
+
+representative = result[
+    [
+        # Key
+        "fy",
+        "recordtype",
+        "product_hierarchy",
+        # Representative PN and HMG_PN
+        "product",
+        "HMG_PN",
+    ]
+].rename(columns={"product": "representative_pn"})
 
 df_full = df_full.merge(
     representative, how="left", on=["fy", "recordtype", "product_hierarchy"]
