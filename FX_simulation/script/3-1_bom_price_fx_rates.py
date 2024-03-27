@@ -24,8 +24,8 @@ except:
 
 # Filenames
 bom_file = path / "data" / "BOM_price.csv"
-mm_file = path / "data" / "Material_Master.xlsx"
-prj_file = path / "data" / "Sales high runner PN_survey with PSM.xlsx"
+mm_file = path / "meta" / "Representative PN_Material_Master.xlsx"
+prj_file = path / "meta" / "Sales high runner PN_survey with PSM.xlsx"
 
 fx_vt_plan_file = path / "data" / "fx_rates_VT_plan.csv"
 fx_vt_act_file = path / "data" / "fx_rates_VT_actual.csv"
