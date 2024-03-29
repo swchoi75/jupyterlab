@@ -9,12 +9,7 @@ from common_variable import period_start, period_end
 
 
 # Path
-try:
-    path = Path(__file__).parent.parent
-except NameError:
-    import inspect
-
-    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
+path = Path(__file__).parent.parent
 
 
 # Filenames
@@ -45,6 +40,8 @@ df_month_ends = pd.DataFrame(
 
 # Functions
 def calc_monthly_depr(row):
+    if row["useful_life_year"] == 0:
+        return 0
     monthly_depr = row["acquisition"] / (row["useful_life_year"] * 12)
     return monthly_depr
 
