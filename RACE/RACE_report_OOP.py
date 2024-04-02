@@ -35,13 +35,13 @@ class Data:
         df = clean_names(df)
         return df
 
-    def process_currency(self, df, lc_gc):
+    def process_currency(self, df, lc_gc) -> pd.DataFrame:
         """Adds a currency column to the dataframe."""
         df = df.assign(currency=lc_gc)
         df = df[["currency"] + [col for col in df.columns if col != "currency"]]
         return df
 
-    def outlet_df(self, filename):
+    def outlet_df(self, filename) -> pd.DataFrame:
         """POC: Plant Outlet Combination"""
         col_poc = ["division", "bu", "new_outlet", "new_outlet_name"]
 
@@ -55,13 +55,13 @@ class Data:
 class Report:
     """Split P&L and Balance sheet"""
 
-    def profit_and_loss(self, df):
+    def profit_and_loss(self, df) -> pd.DataFrame:
         cols_to_drop = ["period_0"] + [f"ytd_{i}" for i in range(13)]
         df = df.drop(cols_to_drop, axis=1)
         df = df.loc[df["financial_statement_item"].str.contains("^3|^CO")]
         return df
 
-    def balance_sheet(self, df):
+    def balance_sheet(self, df) -> pd.DataFrame:
         cols_to_drop = [f"period_{i}" for i in range(13)]
         df = df.drop(cols_to_drop, axis=1)
         df = df.loc[df["financial_statement_item"].str.contains("^1|^2")]
