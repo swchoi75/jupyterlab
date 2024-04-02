@@ -95,11 +95,13 @@ except FileNotFoundError:
 # Combine data
 race = pd.concat([lc, gc])
 outlet = Data().outlet_df(input_meta)
-report = pd.merge(race, outlet, on="outlet", how="left")
+race_with_outlet = pd.merge(race, outlet, on="outlet", how="left")
+
 
 # Split data
-race_pnl = Report().profit_and_loss(report)
-race_bs = Report().balance_sheet(report)
+race_pnl = Report().profit_and_loss(race_with_outlet)
+race_bs = Report().balance_sheet(race_with_outlet)
+
 
 # Output data
 race_pnl.to_csv(output_pnl, index=False, na_rep="0")
