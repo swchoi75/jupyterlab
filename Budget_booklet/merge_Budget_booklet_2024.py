@@ -15,14 +15,14 @@ xls_files = [
 ]
 
 
-# Read multiple excel files
-def concat_fix_sheet(list_of_files):
+# Define a function to read multiple excel files and concatenate them into a single DataFrame
+def concat_sheet(list_of_files, sheet_name, usecols):
     # Use list comprehension to read .xlsm files into a list of DataFrames
     dataframes = [
         pd.read_excel(
             file,
-            sheet_name="4. Fix Cost (LC) ",
-            usecols="A:T",
+            sheet_name=sheet_name,
+            usecols=usecols,
             skiprows=4,
         )
         for file in list_of_files
@@ -38,70 +38,11 @@ def concat_fix_sheet(list_of_files):
     return df
 
 
-def concat_var_sheet(list_of_files):
-    # Use list comprehension to read .xlsm files into a list of DataFrames
-    dataframes = [
-        pd.read_excel(
-            file,
-            sheet_name="2. Variable (LC)",
-            usecols="A:O",
-            skiprows=4,
-        )
-        for file in list_of_files
-    ]
-
-    # Add a new column with filename to each DataFrame
-    for i, df in enumerate(dataframes):
-        df["source"] = list_of_files[i].stem
-
-    # Merge the list of DataFrames into a single DataFrame
-    df = pd.concat(dataframes)
-
-    return df
-
-
-def concat_hc_sheet(list_of_files):
-    # Use list comprehension to read .xlsm files into a list of DataFrames
-    dataframes = [
-        pd.read_excel(
-            file,
-            sheet_name="6. HC (LC)",
-            usecols="A:U",
-            skiprows=4,
-        )
-        for file in list_of_files
-    ]
-
-    # Add a new column with filename to each DataFrame
-    for i, df in enumerate(dataframes):
-        df["source"] = list_of_files[i].stem
-
-    # Merge the list of DataFrames into a single DataFrame
-    df = pd.concat(dataframes)
-
-    return df
-
-
-def concat_structure_sheet(list_of_files):
-    # Use list comprehension to read .xlsm files into a list of DataFrames
-    dataframes = [
-        pd.read_excel(
-            file,
-            sheet_name="1.1 Structural changes (LC)",
-            usecols="A:D",
-            skiprows=4,
-        )
-        for file in list_of_files
-    ]
-
-    # Add a new column with filename to each DataFrame
-    for i, df in enumerate(dataframes):
-        df["source"] = list_of_files[i].stem
-
-    # Merge the list of DataFrames into a single DataFrame
-    df = pd.concat(dataframes)
-
-    return df
+# Call the function for each sheet
+df_fix = concat_sheet(xls_files, "4. Fix Cost (LC) ", "A:T")
+df_var = concat_sheet(xls_files, "2. Variable (LC)", "A:O")
+df_hc = concat_sheet(xls_files, "6. HC (LC)", "A:U")
+df_structure = concat_sheet(xls_files, "1.1 Structural changes (LC)", "A:D")
 
 
 def extract_poc(df):
@@ -127,24 +68,21 @@ def reorder_columns(df):
 
 
 fix = (
-    concat_fix_sheet(xls_files)
-    .pipe(clean_names)
+    df_fix.pipe(clean_names)
     .pipe(extract_poc)
     .pipe(reorder_columns)
     .rename(columns={"unnamed_0": "items", "unnamed_19": "comments"})
     .dropna(subset="items")
 )
 var = (
-    concat_var_sheet(xls_files)
-    .pipe(clean_names)
+    df_var.pipe(clean_names)
     .pipe(extract_poc)
     .pipe(reorder_columns)
     .rename(columns={"unnamed_0": "items", "unnamed_14": "comments"})
     .dropna(subset="items")
 )
 hc = (
-    concat_hc_sheet(xls_files)
-    .pipe(clean_names)
+    df_hc.pipe(clean_names)
     .pipe(extract_poc)
     .pipe(reorder_columns)
     .rename(
@@ -157,8 +95,7 @@ hc = (
     .dropna(subset="items")
 )
 str = (
-    concat_structure_sheet(xls_files)
-    .pipe(clean_names)
+    df_structure.pipe(clean_names)
     .pipe(extract_poc)
     .pipe(reorder_columns)
     .rename(columns={"unnamed_0": "items"})
@@ -174,3 +111,4 @@ fix.to_csv(path / "output" / "2024 Fix cost.csv", index=False)
 var.to_csv(path / "output" / "2024 Var cost.csv", index=False)
 hc.to_csv(path / "output" / "2024 Headcount.csv", index=False)
 str.to_csv(path / "output" / "2024 Structural changes.csv", index=False)
+print("Files are created")
