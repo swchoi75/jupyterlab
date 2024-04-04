@@ -7,6 +7,9 @@ from janitor import clean_names
 class Data:
     """Class to handle data processing."""
 
+    def __init__(self):
+        self.df = pd.DataFrame()
+
     def race_df(
         self,
         filename: str,
@@ -56,6 +59,9 @@ class Data:
 
 class Report:
     """Split P&L and Balance sheet"""
+
+    def __init__(self):
+        self.df = pd.DataFrame()
 
     def profit_and_loss(self, df: pd.DataFrame) -> pd.DataFrame:
         cols_to_drop = ["period_0"] + [f"ytd_{i}" for i in range(13)]
