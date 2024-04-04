@@ -93,11 +93,11 @@ r = Report()
 # Read data
 df_LC = d.race_df(input_lc, lc_gc="LC")
 df_GC = d.race_df(input_lc, lc_gc="GC")
+df_outlet = d.outlet_df(input_meta)
 
 
 # Combine data
 df_race = pd.concat([df_LC, df_GC])
-df_outlet = d.outlet_df(input_meta)
 race_with_outlet = pd.merge(df_race, df_outlet, on="outlet", how="left")
 
 
