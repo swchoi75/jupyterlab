@@ -86,20 +86,18 @@ output_bs = path / "output" / "RACE Balance sheet.csv"
 
 
 # Create instances
-lc = Data()
-gc = Data()
-meta = Data()
+d = Data()
 r = Report()
 
 
 # Read data
-df_LC = lc.race_df(input_lc, lc_gc="LC")
-df_GC = gc.race_df(input_lc, lc_gc="GC")
+df_LC = d.race_df(input_lc, lc_gc="LC")
+df_GC = d.race_df(input_lc, lc_gc="GC")
 
 
 # Combine data
 df_race = pd.concat([df_LC, df_GC])
-df_outlet = meta.outlet_df(input_meta)
+df_outlet = d.outlet_df(input_meta)
 race_with_outlet = pd.merge(df_race, df_outlet, on="outlet", how="left")
 
 
