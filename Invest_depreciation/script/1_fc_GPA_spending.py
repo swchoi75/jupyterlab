@@ -14,9 +14,9 @@ except NameError:
 
 
 # Functions
-def read_data(input_file):
+def read_data(filename):
     df = pd.read_excel(
-        input_file,
+        filename,
         sheet_name="Sheet1",
         dtype={"Investment type": str},
     )
@@ -100,29 +100,6 @@ def basic_or_project(df):
     return df
 
 
-def read_poc_master(filename):
-    """Read meta data"""
-    # read data
-    df = pd.read_excel(filename, dtype=str)
-    # string manipulation
-    df["plant_name"] = df["plant_name"].str.replace("ICH ", "")
-    # rename columns
-    df = df.rename(
-        columns={
-            "plant_name": "location_sender",
-            "outlet_name": "outlet_sender",
-        }
-    )
-    df = df[["location_sender", "outlet_sender", "profit_center"]]
-    return df
-
-
-def read_cc_master(filename):
-    df = pd.read_csv(filename, dtype=str)
-    df = df[["sub", "cost_center"]]
-    return df
-
-
 def read_meta_coi(filename):
     df = pd.read_excel(filename, sheet_name="Sheet1", dtype=str)
     # Select columns explicitly for maintenance purpose
@@ -139,6 +116,29 @@ def read_meta_coi(filename):
             "mv_type",
         ]
     ].dropna()
+    return df
+
+
+def read_cc_master(filename):
+    df = pd.read_csv(filename, dtype=str)
+    df = df[["sub", "cost_center"]]
+    return df
+
+
+def read_poc_master(filename):
+    """Read meta data"""
+    # read data
+    df = pd.read_excel(filename, dtype=str)
+    # string manipulation
+    df["plant_name"] = df["plant_name"].str.replace("ICH ", "")
+    # rename columns
+    df = df.rename(
+        columns={
+            "plant_name": "location_sender",
+            "outlet_name": "outlet_sender",
+        }
+    )
+    df = df[["location_sender", "outlet_sender", "profit_center"]]
     return df
 
 
