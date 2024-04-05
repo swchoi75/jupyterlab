@@ -179,6 +179,7 @@ def main():
     poc_master = read_poc_master(meta_poc)
     cc_master = read_cc_master(meta_cc)
 
+    # Join data
     df = enrich_dataset(gpa, meta_coi, cc_master, poc_master)
 
     # Write data

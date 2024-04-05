@@ -220,12 +220,15 @@ def main():
         .pipe(drop_columns)
         .pipe(handle_missing_vals)
     )
+
+    # Read metadata
     df_meta = read_metadata(meta_file).pipe(process_metadata)
     cc_master = read_cc_master(meta_cc).pipe(process_cc_master)
     poc_master = read_poc_master(meta_poc).pipe(process_poc_master)
     prj_master = read_prj_master(meta_prj).pipe(process_prj_master)
     gpa_master = read_gpa_master(meta_gpa).pipe(process_gpa_master)
 
+    # Join data
     df = enrich_dataset(sap, df_meta, cc_master, poc_master, prj_master, gpa_master)
 
     # Write data
