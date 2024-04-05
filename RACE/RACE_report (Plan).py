@@ -14,7 +14,8 @@ except NameError:
 
 
 # Functions
-def read_excel_file(filename):
+def read_excel_file(filename, version):
+    """Read RACE data"""
     df = pd.read_excel(filename, sheet_name="Query", skiprows=11)
     # change data type
     df = df.astype({"ConsUnit": str, "Plant": str, "Outlet": str})
@@ -29,38 +30,38 @@ def read_excel_file(filename):
             "YTD - 1": "YTD PM",  # PM means Previous Month
         }
     )
-    df = df.rename(columns=lambda x: re.sub("\nPLAN", "", x))
+    df = df.rename(columns=lambda x: re.sub(version, "", x))
+    # clean column names
     df = clean_names(df)
     return df
 
 
 def process_currency(df, lc_gc):
+    """Add currency column"""
     df = df.assign(currency=lc_gc)
     df = df[["currency"] + [col for col in df.columns if col != "currency"]]
     return df
 
 
-def outlet():
-    # POC
-    col_poc = ["division", "bu", "new_outlet", "new_outlet_name"]
-
-    df = pd.read_excel(path / "meta" / "New outlet.xlsx", usecols="A:F", dtype="str")
+def outlet_df(path_meta):
+    """Read Plant Outlet Combination (=POC)"""
+    df = pd.read_excel(path_meta, usecols="A:F", dtype="str")
     df = clean_names(df)
     df = df.drop(columns=["outlet_name"])
+    # select columns
+    col_poc = ["division", "bu", "new_outlet", "new_outlet_name"]
     df = df[["outlet"] + col_poc]
     return df
 
 
-def join_with_outlet(df):
-    outlet_df = outlet()
-    df = df.merge(outlet_df, on="outlet", how="left")
-    # change column orders
-    # df = df[:8] + df[col_poc] + df[8:-4]
+def join_with_outlet(df, meta_df):
+    """Join RACE with POC data"""
+    df = df.merge(meta_df, on="outlet", how="left")
     return df
 
 
-# Split P&L and Balance sheet
 def profit_and_loss(df):
+    """Split P&L and Balance sheet"""
     cols_to_drop = ["period_0"] + [f"ytd_{i}" for i in range(13)]
     df = df.drop(cols_to_drop, axis=1)
     df = df.loc[df["financial_statement_item"].str.contains("^3|^CO")]
@@ -68,38 +69,55 @@ def profit_and_loss(df):
 
 
 def balance_sheet(df):
+    """Split P&L and Balance sheet"""
     cols_to_drop = [f"period_{i}" for i in range(13)]
     df = df.drop(cols_to_drop, axis=1)
     df = df.loc[df["financial_statement_item"].str.contains("^1|^2")]
     return df
 
 
-# Input data
-path_lc = path / "data" / "(Plan) Analysis FS Item Hierarchy for CU 698_LC.xlsx"
-path_gc = path / "data" / "(Plan) Analysis FS Item Hierarchy for CU 698_GC.xlsx"
+def race_df(path_lc, path_gc, version):
+    """Read and Combine RACE data"""
+    lc = read_excel_file(path_lc, version)
+    lc = process_currency(lc, "LC")
+
+    gc = read_excel_file(path_gc, version)
+    gc = process_currency(gc, "GC")
+
+    race = pd.concat([lc, gc])
+    return race
 
 
-# Combine data
-lc = read_excel_file(path_lc)
-lc = process_currency(lc, "LC")
-
-gc = read_excel_file(path_gc)
-gc = process_currency(gc, "GC")
-
-race = pd.concat([lc, gc])
-race = join_with_outlet(race)
+def report_df(df):
+    """Split RACE data into P&L and B/S"""
+    race_pnl = profit_and_loss(df)
+    race_bs = balance_sheet(df)
+    return race_pnl, race_bs
 
 
-# Split data
-race_pnl = profit_and_loss(race)
-race_bs = balance_sheet(race)
+def main():
+    # Variable
+    version = "\nPLAN"
+
+    # Filenames
+    input_lc = path / "data" / "(Plan) Analysis FS Item Hierarchy for CU 698_LC.xlsx"
+    input_gc = path / "data" / "(Plan) Analysis FS Item Hierarchy for CU 698_GC.xlsx"
+    input_meta = path / "meta" / "New outlet.xlsx"
+
+    output_pnl = path / "output" / "(Plan) RACE Profit and Loss.csv"
+    output_bs = path / "output" / "(Plan) RACE Balance sheet.csv"
+
+    # Process data
+    race = race_df(input_lc, input_gc, version)
+    outlet = outlet_df(input_meta)
+    race_with_outlet = join_with_outlet(race, outlet)
+    race_pnl, race_bs = report_df(race_with_outlet)
+
+    # Output data
+    race_pnl.to_csv(output_pnl, index=False, na_rep="0")
+    race_bs.to_csv(output_bs, index=False, na_rep="0")
+    print("Files are created")
 
 
-# Output data
-race_pnl.to_csv(
-    path / "output" / "(Plan) RACE Profit and Loss.csv", index=False, na_rep="0"
-)
-race_bs.to_csv(
-    path / "output" / "(Plan) RACE Balance sheet.csv", index=False, na_rep="0"
-)
-print("Files are created")
+if __name__ == "__main__":
+    main()
