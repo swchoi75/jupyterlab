@@ -162,10 +162,10 @@ def main():
 
     # Read data
     gpa_spending = read_data(input_file, spending_total_col)
-    gpa_master = read_metadata(master_file)
+    manual_input = read_metadata(master_file)
 
     # Join two dataframes
-    df = gpa_spending.merge(gpa_master, how="left", on="sub")
+    df = gpa_spending.merge(manual_input, how="left", on="sub")
 
     # Business Logic: Get "Acquisition date" based on the spending months
     df = (

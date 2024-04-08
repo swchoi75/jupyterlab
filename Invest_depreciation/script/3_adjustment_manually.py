@@ -11,36 +11,28 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
 
-# Filenames
-input_file = path / "output" / "2_fc_acquisition_future_assets.csv"
-output_file = path / "output" / "3_fc_acquisition_future_assets_adj.csv"
+# Functions
+def read_data(filename):
+    df = pd.read_csv(
+        filename,
+        dtype={
+            "investment_type": str,
+            "financial_statement_item": str,
+            "input_cost_center": str,
+        },
+    )
+    return df
 
 
-# Read data
-df = pd.read_csv(
-    input_file,
-    dtype={
-        "investment_type": str,
-        "financial_statement_item": str,
-        "input_cost_center": str,
-    },
-)
+def filter_by_val(df, values):
+    filter = df["sub"].isin(values)
+    df_filtered = df[filter].reset_index().drop(columns="index")
+    df_remaining = df[~filter].reset_index().drop(columns="index")
+    return df_filtered, df_remaining
 
 
-# Process data
-
-
-# HQ created sub, and we cannot change category of investment
-selected_sub = ["IF310241"]
-
-
-# Split dataframe
-df_prj = df[df["sub"].isin(selected_sub)].reset_index().drop(columns="index")
-df_remaining = df[~df["sub"].isin(selected_sub)].reset_index().drop(columns="index")
-
-
-# Manual adjustment
 def supplier_tooling(df):
+    """Manual adjustment"""
     df["category_of_investment"] = "8"
     df["category_description"] = "Tooling located at supplier"
     df["financial_statement_item"] = "122637000"
@@ -53,13 +45,29 @@ def supplier_tooling(df):
     return df
 
 
-df_prj = supplier_tooling(df_prj)
+def main():
+    # Filenames
+    input_file = path / "output" / "2_fc_acquisition_future_assets.csv"
+    output_file = path / "output" / "3_fc_acquisition_future_assets_adj.csv"
+
+    # Read data
+    df = read_data(input_file)
+
+    # Split data
+    df_filtered, df_remaining = filter_by_val(
+        df, ["IF310241"]
+    )  # HQ created sub master, and we cannot change category of investment
+
+    # Manual adjustment as supplier tooling
+    df_filtered = supplier_tooling(df_filtered)
+
+    # Concatenate dataframe
+    df = pd.concat([df_filtered, df_remaining])
+
+    # Write data
+    df.to_csv(output_file, index=False)
+    print("A file is created")
 
 
-# Concatenate dataframe
-df = pd.concat([df_prj, df_remaining])
-
-
-# Write data
-df.to_csv(output_file, index=False)
-print("A file is created")
+if __name__ == "__main__":
+    main()
