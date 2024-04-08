@@ -24,10 +24,10 @@ def read_data(filename):
     return df
 
 
-def filter_by_val(df, values):
-    filter = df["sub"].isin(values)
-    df_filtered = df[filter].reset_index().drop(columns="index")
-    df_remaining = df[~filter].reset_index().drop(columns="index")
+def filter_project(df, sub_master):
+    conditions = df["sub"].isin(sub_master)
+    df_filtered = df[conditions].reset_index().drop(columns="index")
+    df_remaining = df[~conditions].reset_index().drop(columns="index")
     return df_filtered, df_remaining
 
 
@@ -54,15 +54,15 @@ def main():
     df = read_data(input_file)
 
     # Split data
-    df_filtered, df_remaining = filter_by_val(
+    df_prj, df_remaining = filter_project(
         df, ["IF310241"]
     )  # HQ created sub master, and we cannot change category of investment
 
     # Manual adjustment as supplier tooling
-    df_filtered = supplier_tooling(df_filtered)
+    df_prj = supplier_tooling(df_prj)
 
     # Concatenate dataframe
-    df = pd.concat([df_filtered, df_remaining])
+    df = pd.concat([df_prj, df_remaining])
 
     # Write data
     df.to_csv(output_file, index=False)
