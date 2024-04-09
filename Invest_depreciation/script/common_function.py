@@ -1,13 +1,9 @@
-from pathlib import Path
-
-
-# Path
-try:
-    path = Path(__file__).parent.parent
-except NameError:
-    import inspect
-
-    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
+# Functions
+def add_useful_life_year(row):
+    if row["fix_var"] == "fix":
+        return 8
+    elif row["fix_var"] == "var":
+        return 4
 
 
 def add_responsibilities(row):
