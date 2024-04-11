@@ -39,6 +39,22 @@ def exclude_auc(df):
     return df
 
 
+def fill_missing_with_zero(df):
+    """Fill missing values with 0"""
+    df["useful_life_year"] = df["useful_life_year"].fillna(0)
+    df["useful_life_month"] = df["useful_life_month"].fillna(0)
+    return df
+
+
+def calc_depr_end(row):
+    years = row["useful_life_year"]
+    months = row["useful_life_month"]
+    row = (
+        row["start_of_depr"] + pd.DateOffset(years=years) + pd.DateOffset(months=months)
+    )
+    return row
+
+
 def calc_monthly_depr(row, period_start, period_end):
     if (
         # To avoid Division by zero error (e.g. Asset under construction)
@@ -81,22 +97,6 @@ def calc_monthly_depr(row, period_start, period_end):
 
     else:
         return monthly_depr
-
-
-def fill_missing_with_zero(df):
-    """Fill missing values with 0"""
-    df["useful_life_year"] = df["useful_life_year"].fillna(0)
-    df["useful_life_month"] = df["useful_life_month"].fillna(0)
-    return df
-
-
-def calc_depr_end(row):
-    years = row["useful_life_year"]
-    months = row["useful_life_month"]
-    row = (
-        row["start_of_depr"] + pd.DateOffset(years=years) + pd.DateOffset(months=months)
-    )
-    return row
 
 
 def add_col_monthly_depr(df):
