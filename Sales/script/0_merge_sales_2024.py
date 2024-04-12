@@ -11,18 +11,6 @@ except NameError:
 
     path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
-data_path = path / "data"
-
-
-# Filename
-output_file = path / "db" / "COPA_Sales_2024.parquet"
-
-
-# Input data: List of multiple text files
-txt_files = [
-    file for file in data_path.iterdir() if file.is_file() and file.suffix == ".TXT"
-]
-
 
 # Functions
 def read_multiple_files(list_of_files):
@@ -67,13 +55,25 @@ def remove_sub_total_rows(df):
     return df.loc[df["RecordType"].notna()]
 
 
-def merge_sales(list_of_files):
-    df = read_multiple_files(list_of_files)
+def main():
+
+    # Filenames
+    data_path = path / "data"
+    output_file = path / "db" / "COPA_Sales_2024.parquet"
+
+    # Input data: List of multiple text files
+    txt_files = [
+        file for file in data_path.iterdir() if file.is_file() and file.suffix == ".TXT"
+    ]
+
+    # Process data
+    df = read_multiple_files(txt_files)
     df = df.pipe(remove_first_two_columns).pipe(remove_sub_total_rows).pipe(clean_names)
-    return df
+
+    # Write to Parquet file
+    df.to_parquet(output_file, index=False)
+    print("A parquet file is created.")
 
 
-# Write to Parquet file
-df = merge_sales(txt_files)
-df.to_parquet(output_file, index=False)
-print("A parquet file is created.")
+if __name__ == "__main__":
+    main()
