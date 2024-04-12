@@ -3,6 +3,8 @@ import numpy as np
 from pathlib import Path
 from janitor import clean_names
 
+from common_function import add_useful_life_year
+
 
 # Path
 try:
@@ -104,14 +106,6 @@ def col_asset_category(df, actual_month_end):
         df["start_of_depr"] < pd.to_datetime(actual_month_end), "past fc", "future fc"
     )
     return df
-
-
-def add_useful_life_year(row):
-    """Helper function"""
-    if row["fix_var"] == "fix":
-        return 8
-    elif row["fix_var"] == "var":
-        return 4
 
 
 def col_useful_life_year(df):
