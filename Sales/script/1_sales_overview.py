@@ -87,8 +87,8 @@ def main():
     copa = pd.concat([df_1, df_2, df_3, df_4]).pipe(process_fy_month)
 
     # Sales overview
-    zsales = sales_overview(zsales)  # ZSales
-    copa = sales_overview(copa)  # COPA Sales
+    zsales = zsales.pipe(sales_overview)
+    copa = copa.pipe(sales_overview)
     df = pd.concat([zsales, copa])
 
     # Write data

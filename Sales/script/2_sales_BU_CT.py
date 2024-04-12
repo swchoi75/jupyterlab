@@ -47,13 +47,16 @@ def process_fy_month(df):
     return df
 
 
-def sales_overview(df):
+def filter_BU_CT(df):
     # Filter profit centers for BU CT: PL ENC, PL DTC, PL MTC
     df = df.loc[
         df["profit_ctr"].isin(["50803-003", "50803-010", "50803-049", "50803-051"])
     ]
+    return df
 
-    # Combine filtering and grouping
+
+def sales_overview(df):
+    """Generate Sales Overview"""
     df = (
         df.groupby(
             [
@@ -102,12 +105,12 @@ def main():
     copa = pd.concat([df_1, df_2, df_3, df_4]).pipe(process_fy_month)
 
     # Sales overview
-    zsales = sales_overview(zsales)  # ZSales
-    copa = sales_overview(copa)  # COPA Sales
+    zsales = zsales.pipe(filter_BU_CT).pipe(sales_overview)
+    copa = copa.pipe(filter_BU_CT).pipe(sales_overview)
 
     # Process period
-    zsales["period"] = zsales["period"].astype(str).str.zfill(2)  # ZSales
-    copa["period"] = copa["period"].str[6:]  # COPA_Sales
+    zsales["period"] = zsales["period"].astype(str).str.zfill(2)
+    copa["period"] = copa["period"].str[6:]
 
     df = pd.concat([zsales, copa])
 
