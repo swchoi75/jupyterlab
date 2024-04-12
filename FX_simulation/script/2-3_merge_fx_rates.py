@@ -11,16 +11,6 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
 
-data_path = path / "data" / "FX Rates"
-output_file = path / "data" / "fx_rates_VT_actual.csv"
-
-
-# Input data: List of multiple files
-csv_files = [
-    file for file in data_path.iterdir() if file.is_file() and file.suffix == ".csv"
-]
-
-
 # Functions
 def read_multiple_files(list_of_files):
     dataframes = [pd.read_csv(file) for file in list_of_files]
@@ -67,16 +57,32 @@ def month_to_number(df):
     return df
 
 
-# Process data
-df = read_multiple_files(csv_files)
-df = (
-    df.pipe(fill_missing_values)
-    .pipe(pivot_longer)
-    .pipe(sort_table)
-    .pipe(month_to_number)
-)
+def main():
+
+    # Filenames
+    data_path = path / "data" / "FX Rates"
+    output_file = path / "data" / "fx_rates_VT_actual.csv"
+
+    # Input data: List of multiple files
+    csv_files = [
+        file for file in data_path.iterdir() if file.is_file() and file.suffix == ".csv"
+    ]
+
+    # Read data
+    df = read_multiple_files(csv_files)
+
+    # Process data
+    df = (
+        df.pipe(fill_missing_values)
+        .pipe(pivot_longer)
+        .pipe(sort_table)
+        .pipe(month_to_number)
+    )
+
+    # Write data
+    df.to_csv(output_file, index=False)
+    print("A file is created")
 
 
-# Write data
-df.to_csv(output_file, index=False)
-print("A file is created")
+if __name__ == "__main__":
+    main()
