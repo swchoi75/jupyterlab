@@ -41,12 +41,6 @@ def add_recordtype(df):
     return df
 
 
-def concat_COPA(list_of_dfs):
-    # COPA Sales 2021-2024
-    df = pd.concat(list_of_dfs)
-    return df
-
-
 def process_fy_month(df):
     df[["fy", "month"]] = df["period"].str.split(".", expand=True)
     df["fy"] = (df["fy"].astype(int) - 1).astype(str)
@@ -90,7 +84,7 @@ def main():
         .pipe(filter_by_year, ["2019", "2020"])
         .pipe(add_recordtype)
     )
-    copa = concat_COPA([df_1, df_2, df_3, df_4]).pipe(process_fy_month)
+    copa = pd.concat([df_1, df_2, df_3, df_4]).pipe(process_fy_month)
 
     # Sales overview
     zsales = sales_overview(zsales)  # ZSales
