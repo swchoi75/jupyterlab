@@ -5,21 +5,15 @@ from janitor import clean_names
 
 
 # Path
-path = Path(__file__).parent.parent
+try:
+    path = Path(__file__).parent.parent
+except NameError:
+    import inspect
+
+    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
 
-# Filenames
-input_1 = path / "meta_cc" / "IMPR.XLS"
-input_2 = path / "meta_cc" / "IMZO.XLS"
-input_3 = path / "meta_cc" / "PRPS.XLS"
-input_4 = path / "meta_cc" / "OARP.XLS"
-
-output_1 = path / "meta" / "project_for_assets_temp.csv"
-output_2 = path / "meta" / "project_for_assets.csv"
-output_3 = path / "meta" / "cost_centers.csv"
-
-
-# Read data
+# Functions
 def read_tsv_file(filename, skiprows):
     df = pd.read_csv(
         filename,
@@ -33,14 +27,8 @@ def read_tsv_file(filename, skiprows):
     return df
 
 
-df_1 = read_tsv_file(input_1, skiprows=3)
-df_2 = read_tsv_file(input_2, skiprows=3)
-df_3 = read_tsv_file(input_3, skiprows=3)
-df_4 = read_tsv_file(input_4, skiprows=7)
-
-
-# Process further for OARP data
-def preprocess_dataframe(df):
+def preprocess_OARP(df):
+    """Process further for OARP data"""
     df = df.rename(
         columns={
             "Year": "asset_no",
@@ -56,89 +44,105 @@ def preprocess_dataframe(df):
     return df
 
 
-df_4 = preprocess_dataframe(df_4)
+def select_columns_dfs(df_1, df_2, df_3, df_4):
+    df_1 = df_1[["Position ID", "InvProgPos"]]  # "IMPR.XLS"
+    df_2 = df_2[["InvProgPos", "OBJNR"]]  # "IMZO.XLS"
+    df_3 = df_3[["Object number", "Short Identification", "Req. CC"]].dropna(
+        subset="Object number"
+    )  # "PRPS.XLS"
+    df_4 = df_4[["asset_no", "sub_no", "asset_description", "wbs_element", "amount"]]
+
+    return df_1, df_2, df_3, df_4
 
 
-# Select columns
-df_1 = df_1[["Position ID", "InvProgPos"]]  # "IMPR.XLS"
-df_2 = df_2[["InvProgPos", "OBJNR"]]  # "IMZO.XLS"
-df_3 = df_3[["Object number", "Short Identification", "Req. CC"]].dropna(
-    subset="Object number"
-)  # "PRPS.XLS"
-df_4 = df_4[["asset_no", "sub_no", "asset_description", "wbs_element", "amount"]]
-
-# Join dataframes
-df = df_1.merge(df_2, how="left", on="InvProgPos").merge(
-    df_3, how="left", left_on="OBJNR", right_on="Object number"
-)
+def join_dataframes(df_1, df_2, df_3):
+    df = df_1.merge(df_2, how="left", on="InvProgPos").merge(
+        df_3, how="left", left_on="OBJNR", right_on="Object number"
+    )
+    return df
 
 
-# Select and Rename columns
-df = df[["Position ID", "Short Identification", "Req. CC"]]
-df = df.rename(
-    columns={
-        "Position ID": "sub",
-        "Short Identification": "wbs_element",
-        "Req. CC": "cost_center",
-    }
-)
+def select_and_rename_cols(df):
+    df = df[["Position ID", "Short Identification", "Req. CC"]]
+    df = df.rename(
+        columns={
+            "Position ID": "sub",
+            "Short Identification": "wbs_element",
+            "Req. CC": "cost_center",
+        }
+    )
+    return df
 
 
-# Drop missing value & drop duplicates
-df = df.dropna(subset=["wbs_element"]).drop_duplicates()
+def validate_wbs_element(df):
+    """Drop missing value & drop duplicates"""
+    df = df.dropna(subset=["wbs_element"]).drop_duplicates()
+    return df
 
 
 # Process OARP to link asset no to GPA sub master
 
-# Create fallback scenarios
-df_4["fallback_wbs_element_1"] = df_4["wbs_element"].str[:-1] + "0"
-df_4["fallback_wbs_element_2"] = df_4["wbs_element"].str[:-2] + "00"
-df_4["fallback_wbs_element_3"] = df_4["wbs_element"].str[:-3] + "000"
 
-# Merge with fallback scenarios
-result0 = pd.merge(df, df_4, left_on="wbs_element", right_on="wbs_element", how="left")
-result1 = pd.merge(
-    df, df_4, left_on="wbs_element", right_on="fallback_wbs_element_1", how="left"
-)
-result2 = pd.merge(
-    df, df_4, left_on="wbs_element", right_on="fallback_wbs_element_2", how="left"
-)
-result3 = pd.merge(
-    df, df_4, left_on="wbs_element", right_on="fallback_wbs_element_3", how="left"
-)
+def fallback_wbs_elements(df):
+    """Create fallback scenarios for OARP"""
+    df["fallback_wbs_element_1"] = df["wbs_element"].str[:-1] + "0"
+    df["fallback_wbs_element_2"] = df["wbs_element"].str[:-2] + "00"
+    df["fallback_wbs_element_3"] = df["wbs_element"].str[:-3] + "000"
+    return df
 
-# Combine the results
-result = pd.concat([result0, result1, result2, result3], ignore_index=True)
-result = result.dropna(subset=["asset_no"])
 
-# Fill in missing values on column "wbs_element"
-result["wbs_element"] = np.where(
-    pd.isna(result["wbs_element"]), result["wbs_element_y"], result["wbs_element"]
-)
+def apply_fallback_scenarios(df, df_4):
+    # Merge with fallback scenarios
+    result0 = pd.merge(
+        df, df_4, left_on="wbs_element", right_on="wbs_element", how="left"
+    )
+    result1 = pd.merge(
+        df, df_4, left_on="wbs_element", right_on="fallback_wbs_element_1", how="left"
+    )
+    result2 = pd.merge(
+        df, df_4, left_on="wbs_element", right_on="fallback_wbs_element_2", how="left"
+    )
+    result3 = pd.merge(
+        df, df_4, left_on="wbs_element", right_on="fallback_wbs_element_3", how="left"
+    )
 
-# Select columns
-selected_columns = [
-    "sub",
-    "wbs_element",
-    # "cost_center",
-    "asset_no",
-    "sub_no",
-    "asset_description",
-    "amount",
-]
-df_prj = result[selected_columns]
+    # Combine the results
+    result = pd.concat([result0, result1, result2, result3], ignore_index=True)
+    result = result.dropna(subset=["asset_no"])
 
-# Drop duplicates
-df_prj = df_prj.drop_duplicates(
-    subset=[
-        # "sub",  # To remove several fallback scenarios are working
+    # Fill in missing values on column "wbs_element"
+    result["wbs_element"] = np.where(
+        pd.isna(result["wbs_element"]), result["wbs_element_y"], result["wbs_element"]
+    )
+    return result
+
+
+def select_columns(df):
+    selected_columns = [
+        "sub",
         "wbs_element",
+        # "cost_center",
         "asset_no",
         "sub_no",
         "asset_description",
         "amount",
     ]
-)
+    df = df[selected_columns]
+    return df
+
+
+def drop_duplicates(df):
+    df = df.drop_duplicates(
+        subset=[
+            # "sub",  # To remove several fallback scenarios are working
+            "wbs_element",
+            "asset_no",
+            "sub_no",
+            "asset_description",
+            "amount",
+        ]
+    )
+    return df
 
 
 # Business Logic : handle the multiple cost centers
@@ -154,18 +158,52 @@ def preprocess_dataframe(df):
     return df
 
 
-df = preprocess_dataframe(df)
+def handle_multiple_cc(df):
+    # Group by sub and join the values with a comma
+    df = (
+        df.groupby("sub")["cost_center"]
+        .apply(lambda x: ", ".join(x.astype(str)))
+        .reset_index()
+    )
+    return df
 
-# Group by sub and join the values with a comma
-df_cc = (
-    df.groupby("sub")["cost_center"]
-    .apply(lambda x: ", ".join(x.astype(str)))
-    .reset_index()
-)
+
+def main():
+
+    # Filenames
+    input_1 = path / "meta_cc" / "IMPR.XLS"
+    input_2 = path / "meta_cc" / "IMZO.XLS"
+    input_3 = path / "meta_cc" / "PRPS.XLS"
+    input_4 = path / "meta_cc" / "OARP.XLS"
+
+    output_prj = path / "meta" / "project_for_assets.csv"
+    output_cc = path / "meta" / "cost_centers.csv"
+
+    # Read data
+    df_1 = read_tsv_file(input_1, skiprows=3)
+    df_2 = read_tsv_file(input_2, skiprows=3)
+    df_3 = read_tsv_file(input_3, skiprows=3)
+    df_4 = read_tsv_file(input_4, skiprows=7)
+
+    # Process data
+    df_4 = preprocess_OARP(df_4)
+    df_1, df_2, df_3, df_4 = select_columns_dfs(df_1, df_2, df_3, df_4)
+    df = (
+        join_dataframes(df_1, df_2, df_3)
+        .pipe(select_and_rename_cols)
+        .pipe(validate_wbs_element)
+    )
+    df_oarp = fallback_wbs_elements(df_4)
+    df_prj = (
+        apply_fallback_scenarios(df, df_oarp).pipe(select_columns).pipe(drop_duplicates)
+    )
+    df_cc = df.pipe(preprocess_dataframe).pipe(handle_multiple_cc)
+
+    # Write data
+    df_prj.to_csv(output_prj, index=False)
+    df_cc.to_csv(output_cc, index=False)
+    print("Files are created")
 
 
-# Write data
-# result.to_csv(output_1, index=False)
-df_prj.to_csv(output_2, index=False)
-df_cc.to_csv(output_3, index=False)
-print("Files are created")
+if __name__ == "__main__":
+    main()
