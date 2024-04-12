@@ -4,26 +4,15 @@ from janitor import clean_names
 
 
 # Path
-path = Path(__file__).parent
-data_path = path / "data"
+try:
+    path = Path(__file__).parent
+except NameError:
+    import inspect
+
+    path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
-# Budget FX rate
-bud_fx = 1329  # Budget FX rate in 2023
-
-
-# Input data: List of multiple text files
-xls_files = [
-    file for file in data_path.iterdir() if file.is_file() and file.suffix == ".xlsm"
-]
-
-
-def merge_rcl(list_of_files):
-    df = read_multiple_files(list_of_files)
-    df = wrangle_dataframe(df)
-    return df
-
-
+# Functions
 def read_multiple_files(list_of_files):
     dataframes = [
         pd.read_excel(
@@ -44,19 +33,7 @@ def read_multiple_files(list_of_files):
 
     # reorder columns
     df = df[["source"] + [col for col in df.columns if col not in ["source"]]]
-    
-    return df
 
-
-def wrangle_dataframe(df):
-    df = (
-        df.pipe(rename_columns)
-        .pipe(clean_names)
-        .pipe(convert_currency)
-        .pipe(extract_poc)
-        .pipe(join_with_poc)
-        .pipe(add_key_column)
-    )
     return df
 
 
@@ -85,7 +62,7 @@ def rename_columns(df):
     return df
 
 
-def convert_currency(df):
+def convert_currency(df, bud_fx):
     # Change GC to LC
     # DataFrame.select_dtypes method
     df.loc[:, df.select_dtypes(include=[float]).columns] *= bud_fx
@@ -102,6 +79,12 @@ def extract_poc(df):
     return df
 
 
+def poc():
+    df = pd.read_csv(path / "meta" / "POC.csv", dtype="str").clean_names()
+    df = df.drop(columns=["cu", "profit_center"])
+    return df
+
+
 def join_with_poc(df):
     # Plant Outlet Combination
     poc_df = poc()
@@ -112,18 +95,46 @@ def join_with_poc(df):
     return df
 
 
-def poc():
-    df = pd.read_csv(path / "meta" / "POC.csv", dtype="str").clean_names()
-    df = df.drop(columns=["cu", "profit_center"])
-    return df
-
-
 def add_key_column(df):
     # Add key column for look up RCL comments
     df["key"] = df["outlet"] + "_" + df["plant"] + "_" + df["rcl_item_structure"]
     return df
 
 
-# Output data
-df = merge_rcl(xls_files)
-df.to_csv(path / "output" / "RCL.csv", index=False)
+def main():
+
+    # path
+    data_path = path / "data"
+
+    # variables
+    bud_fx = 1329  # Budget FX rate in 2023
+
+    # filenames
+    output_file = path / "output" / "RCL.csv"
+
+    # Input data: List of multiple text files
+    xls_files = [
+        file
+        for file in data_path.iterdir()
+        if file.is_file() and file.suffix == ".xlsm"
+    ]
+
+    # Read data
+    df = read_multiple_files(xls_files)
+
+    # Process data
+    df = (
+        df.pipe(rename_columns)
+        .pipe(clean_names)
+        .pipe(convert_currency, bud_fx)
+        .pipe(extract_poc)
+        .pipe(join_with_poc)
+        .pipe(add_key_column)
+    )
+
+    # Write data
+    df.to_csv(output_file, index=False)
+
+
+if __name__ == "__main__":
+    main()
