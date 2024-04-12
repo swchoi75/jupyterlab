@@ -39,7 +39,7 @@ def aggregate_data(df):
     return df
 
 
-def filter_data(df):
+def filter_high_runner(df):
     # Filter data for Representative PN
     df = df[df["recordtype"] == "F"]
     df = df[df["material_type"].isin(["FERT", "HALB"])]
@@ -60,15 +60,8 @@ def filter_first_occurrence(df):
     return df
 
 
-def full_data(df, filename):
-    # Full sales data
-    df = pd.read_csv(filename).drop(
-        columns="HMG_PN"  # to be replaced by HMG_PN of representative PN
-    )
-    return df
-
-
-def representative_df(df):
+def select_rename_cols(df):
+    # Select columns
     df = df[
         [
             # Key
@@ -79,7 +72,15 @@ def representative_df(df):
             "product",
             "HMG_PN",
         ]
-    ].rename(columns={"product": "representative_pn"})
+    ]
+    # Rename columns
+    df = df.rename(columns={"product": "representative_pn"})
+    return df
+
+
+def drop_HMG_PN(df):  # df: full sales data
+    # to be replaced by HMG_PN of representative PN
+    df = df.drop(columns="HMG_PN")
     return df
 
 
@@ -102,24 +103,34 @@ def main():
 
     # Filenames
     input_file = path / "output" / "Sales BU CT_with meta.csv"
-    output_file = path / "output" / "Sales high runner per PH.csv"
-    result_file = path / "output" / "Sales high runner PN.csv"
-    full_sales = path / "output" / "Sales with representative PN.csv"
+
+    output_1 = path / "output" / "Sales high runner per PH.csv"
+    output_2 = path / "output" / "Sales high runner PN.csv"
+    output_3 = path / "output" / "Sales with representative PN.csv"
 
     # Read data
     df = pd.read_csv(input_file)
-    df = df.pipe(aggregate_data).pipe(filter_data).pipe(sort_data)
-    result = df.pipe(filter_first_occurrence)
-    df_representative = representative_df(result)
-    df_full = df.pipe(full_data, input_file)
-    df_full = df_full.pipe(add_representative_pn, df_representative).pipe(
-        filter_material_type
+
+    # Process data
+    high_runner_sales = df.pipe(aggregate_data).pipe(filter_high_runner).pipe(sort_data)
+
+    high_runner_pn = high_runner_sales.pipe(filter_first_occurrence)
+
+    representative_pn = select_rename_cols(high_runner_pn)
+
+    sales_with_representative_pn = (
+        df.pipe(drop_HMG_PN)  # to be replaced by HMG_PN of representative PN
+        .pipe(add_representative_pn, representative_pn)
+        .pipe(
+            # Remove representative_pn if material type is HAWA or ROH
+            filter_material_type
+        )
     )
 
     # Write data
-    df.to_csv(output_file, index=False)
-    result.to_csv(result_file, index=False)
-    df_full.to_csv(full_sales, index=False)
+    high_runner_sales.to_csv(output_1, index=False)
+    high_runner_pn.to_csv(output_2, index=False)
+    sales_with_representative_pn.to_csv(output_3, index=False)
     print("files are created.")
 
 
