@@ -5,11 +5,16 @@ from janitor import clean_names
 
 
 # Path
-path = Path(__file__).parent
+try:
+    path = Path(__file__).parent
+except NameError:
+    import inspect
+
+    path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
 # Functions
-def read_excel_file(path):
+def read_data(path):
     df = pd.read_excel(path, sheet_name="Sheet1")
     df = clean_names(df)
     df = df.dropna(subset=["values"])  # Remove missing rows
@@ -69,7 +74,7 @@ def add_quarter(df):
     return df
 
 
-def process_numeric_columns(df):
+def process_numeric_columns(df, budget_fx, fc_fx):
     df = df.rename(columns={"values": "k_lc"})
     df["k_eur"] = np.where(
         df["version"] == "Budget",
@@ -80,44 +85,47 @@ def process_numeric_columns(df):
     return df
 
 
-def join_top_15_projects(df):
+def join_top_15_projects(df, top):
     df = df.merge(top, on="master_id", how="left")
     df["category"] = np.where(df["category"].isna(), "Other Projects", df["category"])
     return df
 
 
-def main(df):
+def main():
+
+    # Variables
+    budget_fx = 1329  # Budget FX rate in 2023
+    fc_fx = 1411.92300  # YTD October P&L rate (KRW / EUR)
+
+    # fc_version = "FC10+2"
+
+    # Filenames
+    fc_file = path / "data" / "GFW_ICH_V378 FC10+2_KRW.xlsx"
+    bud_file = path / "data" / "GFW_ICH_V359 Budget 2023_KRW.xlsx"
+    output_file = path / "output" / "Monthly Spending FC10+2.csv"
+
+    # Read data
+    fc = read_data(fc_file)
+    bud = read_data(bud_file)
+    top = pd.read_csv(
+        path / "data" / "top 15 projects.csv", usecols=[0, 1]
+    ).clean_names()
+
+    # Process data
+    df = pd.concat([fc, bud], axis="rows")
     df = (
         df.pipe(rename_columns)
         .pipe(add_version)
         .pipe(add_month)
         .pipe(add_quarter)
-        .pipe(process_numeric_columns)
-        .pipe(join_top_15_projects)
+        .pipe(process_numeric_columns, budget_fx, fc_fx)
+        .pipe(join_top_15_projects, top)
     )
-    return df
+
+    # Output data
+    df.to_csv(output_file, index=False)
+    print("A file is created")
 
 
-# Budget FX rate in 2023
-budget_fx = 1329
-fc_fx = 1411.92300  # YTD October P&L rate (KRW / EUR)
-
-# fc_version = "FC10+2"
-
-
-# Input data
-fc_path = path / "data" / "GFW_ICH_V378 FC10+2_KRW.xlsx"
-bud_path = path / "data" / "GFW_ICH_V359 Budget 2023_KRW.xlsx"
-top = pd.read_csv(path / "data" / "top 15 projects.csv", usecols=[0, 1]).clean_names()
-
-
-# Process data
-fc = read_excel_file(fc_path)
-bud = read_excel_file(bud_path)
-
-fc_bud = pd.concat([fc, bud], axis="rows")
-
-df = main(fc_bud)
-
-# Output data
-df.to_csv(path / "output" / "Monthly Spending FC10+2.csv", index=False)
+if __name__ == "__main__":
+    main()
