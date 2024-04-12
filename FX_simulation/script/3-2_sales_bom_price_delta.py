@@ -13,26 +13,60 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
 
-# Filenames
-sales_file = path / "data" / "Sales with representative PN.csv"
-input_dir = path / "output"
-bom_files = [
-    f for f in os.listdir(input_dir) if f.endswith("bom_price_fx rate_delta.csv")
-]
-bom_files = [input_dir / f for f in bom_files]
-
-output_file = path / "output" / "sales with bom costs.csv"
-output_parquet = path / "output" / "sales with bom costs.parquet"
-
-
-# Read data
-sales = pd.read_csv(
-    sales_file,
-)  # it already has the column "product_hierarchy"
-bom = pd.concat([pd.read_csv(f) for f in bom_files]).drop(columns="product_hierarchy")
-
-
 # Functions
+def read_multiple_files(list_of_files):
+    df = pd.concat([pd.read_csv(f) for f in list_of_files])
+    return df
+
+
+def drop_product_hierarchy(df):
+    df = df.drop(
+        #  sales already has the column "product_hierarchy"
+        columns="product_hierarchy"
+    )
+    return df
+
+
+def aggregate_sales_data(df):
+    df = (
+        df.groupby(
+            [
+                "fy",
+                "period",
+                "recordtype",
+                "customer_group",
+                "material_type",
+                "product_hierarchy",
+                "PH_description",
+                "customer_engines",
+                "customer_products",
+                "product_group",
+                "productline",
+                "representative_pn",
+                "HMG_PN",
+            ],
+            dropna=False,
+        )
+        .agg({"quantity": "sum", "totsaleslc": "sum"})
+        .reset_index()
+    )
+    return df
+
+
+def sales_with_bom(sales, bom):
+    # Join dataframes
+    df = pd.merge(
+        sales,
+        bom,
+        how="left",
+        left_on=["fy", "period", "representative_pn"],
+        right_on=["year", "month", "product"],
+    ).drop(  # post-processing
+        columns=["year", "month", "product"]
+    )
+    return df
+
+
 def calc_delta_costs(df):
     # # Sign logic for costs: * -1
     df["delta_costs_to_plan_fx"] = df["quantity"] * df["delta_price_to_plan_fx"] * -1
@@ -80,63 +114,51 @@ def reorder_columns(df, first_columns):
     return df
 
 
-# Process data
-# Aggregate data
-sales = (
-    sales.groupby(
-        [
-            "fy",
-            "period",
-            "recordtype",
-            "customer_group",
-            "material_type",
-            "product_hierarchy",
-            "PH_description",
-            "customer_engines",
-            "customer_products",
-            "product_group",
-            "productline",
-            "representative_pn",
-            "HMG_PN",
-        ],
-        dropna=False,
+def main():
+
+    # Filenames
+    sales_file = path / "data" / "Sales with representative PN.csv"
+    input_dir = path / "output"
+    bom_files = [
+        f for f in os.listdir(input_dir) if f.endswith("bom_price_fx rate_delta.csv")
+    ]
+    bom_files = [input_dir / f for f in bom_files]
+
+    output_file = path / "output" / "sales with bom costs.csv"
+    output_parquet = path / "output" / "sales with bom costs.parquet"
+
+    # Read data
+    sales = pd.read_csv(sales_file)
+    bom = read_multiple_files(bom_files)
+
+    # Process data
+    sales = sales.pipe(aggregate_sales_data)
+    bom = bom.pipe(drop_product_hierarchy)
+    df = sales_with_bom(sales, bom)
+
+    df = (
+        df.pipe(calc_delta_costs)
+        .pipe(remove_duplacate_sales)
+        .pipe(change_dtypes_year)
+        .pipe(sort_by_fx_scenario)
+        .pipe(process_sales_year)
     )
-    .agg({"quantity": "sum", "totsaleslc": "sum"})
-    .reset_index()
-)
 
-# Join dataframes
-df = pd.merge(
-    sales,
-    bom,
-    how="left",
-    left_on=["fy", "period", "representative_pn"],
-    right_on=["year", "month", "product"],
-).drop(  # post-processing
-    columns=["year", "month", "product"]
-)
+    two_id_columns = ["fy", "product_hierarchy"]
+    first_columns = [
+        "key_id",
+        "fx_scenario",
+        "plan_fx_on",
+        "plan_fx_from",
+        "actual_fx_from",
+    ]
+    df = df.pipe(combine_id_cols, two_id_columns).pipe(reorder_columns, first_columns)
 
-
-two_id_columns = ["fy", "product_hierarchy"]
-first_columns = [
-    "key_id",
-    "fx_scenario",
-    "plan_fx_on",
-    "plan_fx_from",
-    "actual_fx_from",
-]
-result = (
-    df.pipe(calc_delta_costs)
-    .pipe(remove_duplacate_sales)
-    .pipe(change_dtypes_year)
-    .pipe(sort_by_fx_scenario)
-    .pipe(process_sales_year)
-    .pipe(combine_id_cols, two_id_columns)
-    .pipe(reorder_columns, first_columns)
-)
+    # Write data
+    df.to_csv(output_file, index=False)
+    df.to_parquet(output_parquet)
+    print("Files are created")
 
 
-# Write data
-result.to_csv(output_file, index=False)
-result.to_parquet(output_parquet)
-print("Files are created")
+if __name__ == "__main__":
+    main()

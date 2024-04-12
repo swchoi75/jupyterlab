@@ -12,17 +12,6 @@ except NameError:
     path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
 
 
-# Filenames
-# input_file = path / "data" / "FX Rates" / "HMG 고시환율_20231113.xlsx"
-input_file = path / "data" / "FX Rates" / "HMG 고시환율 Y24.Q1.xlsx"
-output_1 = path / "data" / "fx_rates_HMG_actual.csv"
-output_2 = path / "data" / "fx_rates_HMG_plan.csv"
-
-
-# Read data
-df = pd.read_excel(input_file)
-
-
 # Functions
 def filter_columns(df):
     df = df[["년도", "차수", "화폐", "환율"]]
@@ -69,37 +58,55 @@ def add_fx_type(df):
     return df
 
 
-def quarter_month_table():
+def quarter_to_month_table():
     quarters = ["1Q", "1Q", "1Q", "2Q", "2Q", "2Q", "3Q", "3Q", "3Q", "4Q", "4Q", "4Q"]
     months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
     df = pd.DataFrame({"quarter": quarters, "month": months})
     return df
 
 
-# Process data
-df = (
-    df.pipe(filter_columns)
-    .pipe(rename_columns)
-    .pipe(reorder_columns)
-    .pipe(filter_rows)
-    .pipe(sort_table)
-    .pipe(add_q_letter)
-    .pipe(add_fx_type)
-)
+def plan_fx(df):
+    """Yearly average of Quartely FX rates from HMG"""
+    df = df.groupby(["cur", "year"]).agg({"fx_HMG": "mean"}).reset_index()
+    df = df.rename(columns={"fx_HMG": "fx_plan", "year": "plan_year"})
+    return df
 
 
-# Merge two tables
-month = quarter_month_table()
-df = df.merge(month, how="left", on="quarter")
-df = df[["fx_type", "cur", "year", "quarter", "month", "fx_HMG"]]
+def main():
+
+    # Filenames
+    # input_file = path / "data" / "FX Rates" / "HMG 고시환율_20231113.xlsx"
+    input_file = path / "data" / "FX Rates" / "HMG 고시환율 Y24.Q1.xlsx"
+    output_1 = path / "data" / "fx_rates_HMG_actual.csv"
+    output_2 = path / "data" / "fx_rates_HMG_plan.csv"
+
+    # Read data
+    df = pd.read_excel(input_file)
+
+    # Process data
+    df = (
+        df.pipe(filter_columns)
+        .pipe(rename_columns)
+        .pipe(reorder_columns)
+        .pipe(filter_rows)
+        .pipe(sort_table)
+        .pipe(add_q_letter)  # Add Q letter in Quarter column
+        .pipe(add_fx_type)  # 3 Months Average FX rates
+    )
+
+    # Merge two tables
+    month = quarter_to_month_table()
+    df = df.merge(month, how="left", on="quarter")
+    df = df[["fx_type", "cur", "year", "quarter", "month", "fx_HMG"]]
+
+    # Plan FX rates
+    df_plan = plan_fx(df)  # Yearly average of Quartely FX rates from HMG
+
+    # Write data
+    df.to_csv(output_1, index=False)
+    df_plan.to_csv(output_2, index=False)
+    print("Files are created")
 
 
-# Yearly Average
-df_avg = df.groupby(["cur", "year"]).agg({"fx_HMG": "mean"}).reset_index()
-df_avg = df_avg.rename(columns={"fx_HMG": "fx_plan", "year": "plan_year"})
-
-
-# Write data
-df.to_csv(output_1, index=False)
-df_avg.to_csv(output_2, index=False)
-print("Files are created")
+if __name__ == "__main__":
+    main()

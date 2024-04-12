@@ -22,32 +22,6 @@ except:
     fx_scenario_option = 1  # 1 to 8
 
 
-# Filenames
-bom_file = path / "data" / "BOM_price.csv"
-mm_file = path / "meta" / "Representative PN_Material_Master.xlsx"
-prj_file = path / "meta" / "Sales high runner PN_survey with PSM.xlsx"
-
-fx_vt_plan_file = path / "data" / "fx_rates_VT_plan.csv"
-fx_vt_act_file = path / "data" / "fx_rates_VT_actual.csv"
-fx_hmg_act_file = path / "data" / "fx_rates_HMG_actual.csv"
-fx_hmg_plan_file = path / "data" / "fx_rates_HMG_plan.csv"
-
-
-# Read data
-bom = pd.read_csv(bom_file)
-mm = (
-    pd.read_excel(mm_file)
-    .clean_names()[["material", "product_hierachy"]]
-    .rename(columns={"material": "product", "product_hierachy": "product_hierarchy"})
-)
-prj = pd.read_excel(prj_file, sheet_name="PSM entry", skiprows=3).clean_names()
-
-fx_vt_plan = pd.read_csv(fx_vt_plan_file)
-fx_vt_act = pd.read_csv(fx_vt_act_file)
-fx_hmg_act = pd.read_csv(fx_hmg_act_file)
-fx_hmg_plan = pd.read_csv(fx_hmg_plan_file)
-
-
 class Option(Enum):
     ONE = 1
     TWO = 2
@@ -132,7 +106,7 @@ def select_fx_act(fx_vt_act, fx_hmg_act, act_fx_source):
     return df
 
 
-def process_bom():
+def process_bom(bom, mm, prj_year):
     df = pd.merge(
         bom,
         mm,
@@ -171,6 +145,23 @@ def krw_month_table():
     return df
 
 
+def add_KRW_monthly(df):
+    # Add KRW for 12 months
+    krw_month = krw_month_table()
+    df = df.merge(krw_month, how="left", on="cur")
+    df["month"] = np.where(df["cur"] == "KRW", df["period"], df["month"])
+    df["month"] = df["month"].fillna(0).astype(int)
+    df = df.drop(columns=["period"])
+    return df
+
+
+def set_KRW_fx_rates(df):
+    # Set 1 KRW = 1 KRW
+    df["fx_plan"] = df["fx_plan"].where(df["cur"] != "KRW", 1)
+    df["fx_act"] = df["fx_act"].where(df["cur"] != "KRW", 1)
+    return df
+
+
 def calc_delta_price(df):
     df["fx_diff_to_plan"] = df["fx_act"] - df["fx_plan"]
     df["delta_price_to_plan_fx"] = df["fx_diff_to_plan"] * df["total_amount_org_cur_"]
@@ -185,48 +176,70 @@ def add_col_fx_scenario(df, text, anchor_year, plan_fx_source, act_fx_source):
     return df
 
 
-# Process data
-# Pre-processing
-(
-    vt_fx_type,
-    anchor_year,
-    plan_fx_source,
-    act_fx_source,
-    scenario_txt,
-    output_file,
-) = fx_scenario(Option(fx_scenario_option))
+def main():
 
-prj_year = process_project_year(prj)
-fx_vt_act = process_fx_vt_act(fx_vt_act, vt_fx_type)
-fx_hmg_act = process_fx_hmg_act(fx_hmg_act)
-fx_plan = select_fx_plan(fx_vt_plan, fx_hmg_plan, plan_fx_source)
-fx_act = select_fx_act(fx_vt_act, fx_hmg_act, act_fx_source)
+    # Filenames
+    bom_file = path / "data" / "BOM_price.csv"
+    mm_file = path / "meta" / "Representative PN_Material_Master.xlsx"
+    prj_file = path / "meta" / "Sales high runner PN_survey with PSM.xlsx"
+
+    fx_vt_plan_file = path / "data" / "fx_rates_VT_plan.csv"
+    fx_vt_act_file = path / "data" / "fx_rates_VT_actual.csv"
+    fx_hmg_act_file = path / "data" / "fx_rates_HMG_actual.csv"
+    fx_hmg_plan_file = path / "data" / "fx_rates_HMG_plan.csv"
+
+    # Read data
+    bom = pd.read_csv(bom_file)
+    mm = (
+        pd.read_excel(mm_file)
+        .clean_names()[["material", "product_hierachy"]]
+        .rename(
+            columns={"material": "product", "product_hierachy": "product_hierarchy"}
+        )
+    )
+    prj = pd.read_excel(prj_file, sheet_name="PSM entry", skiprows=3).clean_names()
+
+    fx_vt_plan = pd.read_csv(fx_vt_plan_file)
+    fx_vt_act = pd.read_csv(fx_vt_act_file)
+    fx_hmg_act = pd.read_csv(fx_hmg_act_file)
+    fx_hmg_plan = pd.read_csv(fx_hmg_plan_file)
+
+    # Process data
+    # Pre-processing
+    (
+        vt_fx_type,
+        anchor_year,
+        plan_fx_source,
+        act_fx_source,
+        scenario_txt,
+        output_file,
+    ) = fx_scenario(Option(fx_scenario_option))
+
+    prj_year = process_project_year(prj)
+    fx_vt_act = process_fx_vt_act(fx_vt_act, vt_fx_type)
+    fx_hmg_act = process_fx_hmg_act(fx_hmg_act)
+    fx_plan = select_fx_plan(fx_vt_plan, fx_hmg_plan, plan_fx_source)
+    fx_act = select_fx_act(fx_vt_act, fx_hmg_act, act_fx_source)
+
+    # Join dataframes: bom, project_year, fx_plan, fx_act
+    df = process_bom(bom, mm, prj_year)
+    df = process_fx_plan(df, fx_plan, anchor_year)
+    df = process_fx_act(df, fx_act)
+
+    # Handle KRW
+    df = df.pipe(add_KRW_monthly).pipe(set_KRW_fx_rates)
+
+    # Calculate delta price
+    df = calc_delta_price(df)
+    df = add_col_fx_scenario(
+        df, scenario_txt, anchor_year, plan_fx_source, act_fx_source
+    )
+
+    # Write data
+    df.to_csv(output_file, index=False)
+    print("A file is created")
+    print(scenario_txt)
 
 
-# Join dataframes: bom, project_year, fx_plan, fx_act
-df = process_bom()
-df = process_fx_plan(df, fx_plan, anchor_year)
-df = process_fx_act(df, fx_act)
-
-
-# Add KRW for 12 months
-krw_month = krw_month_table()
-df = df.merge(krw_month, how="left", on="cur")
-df["month"] = np.where(df["cur"] == "KRW", df["period"], df["month"])
-df["month"] = df["month"].fillna(0).astype(int)
-df = df.drop(columns=["period"])
-
-
-# Set 1 KRW = 1 KRW
-df["fx_plan"] = df["fx_plan"].where(df["cur"] != "KRW", 1)
-df["fx_act"] = df["fx_act"].where(df["cur"] != "KRW", 1)
-
-
-df = calc_delta_price(df)
-df = add_col_fx_scenario(df, scenario_txt, anchor_year, plan_fx_source, act_fx_source)
-
-
-# Write data
-df.to_csv(output_file, index=False)
-print("A file is created")
-print(scenario_txt)
+if __name__ == "__main__":
+    main()
