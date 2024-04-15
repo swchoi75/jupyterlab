@@ -4,19 +4,18 @@ from janitor import clean_names
 
 
 # Path
-# path = Path('datasets/home-dataset/')
-path = Path(__file__).parent
-data_path = path / "data/"
+try:
+    path = Path(__file__).parent
+except NameError:
+    import inspect
+
+    path = Path(inspect.getfile(lambda: None)).resolve().parent
 
 
-# List of multiple excel files
-xls_files = [
-    file for file in data_path.iterdir() if file.is_file() and file.suffix == ".xlsx"
-]
-
-
-# Define a function to read multiple excel files and concatenate them into a single DataFrame
+# Functions
 def concat_sheet(list_of_files, sheet_name, usecols):
+    """Define a function to read multiple excel files and concatenate them into a single DataFrame"""
+
     # Use list comprehension to read .xlsm files into a list of DataFrames
     dataframes = [
         pd.read_excel(
@@ -38,15 +37,8 @@ def concat_sheet(list_of_files, sheet_name, usecols):
     return df
 
 
-# Call the function for each sheet
-df_fix = concat_sheet(xls_files, "4. Fix Cost (LC) ", "A:T")
-df_var = concat_sheet(xls_files, "2. Variable (LC)", "A:O")
-df_hc = concat_sheet(xls_files, "6. HC (LC)", "A:U")
-df_structure = concat_sheet(xls_files, "1.1 Structural changes (LC)", "A:D")
-
-
 def extract_poc(df):
-    # Extract CU / Outlet / Plant information
+    """Extract CU / Outlet / Plant information"""
     return df.assign(source=df["source"].str.extract(r"_([0-9]\w+)")).assign(
         year=lambda row: row["source"].str.split(r"_").str.get(0),
         cu=lambda row: row["source"].str.split(r"_").str.get(1),
@@ -67,48 +59,76 @@ def reorder_columns(df):
     return df
 
 
-fix = (
-    df_fix.pipe(clean_names)
-    .pipe(extract_poc)
-    .pipe(reorder_columns)
-    .rename(columns={"unnamed_0": "items", "unnamed_19": "comments"})
-    .dropna(subset="items")
-)
-var = (
-    df_var.pipe(clean_names)
-    .pipe(extract_poc)
-    .pipe(reorder_columns)
-    .rename(columns={"unnamed_0": "items", "unnamed_14": "comments"})
-    .dropna(subset="items")
-)
-hc = (
-    df_hc.pipe(clean_names)
-    .pipe(extract_poc)
-    .pipe(reorder_columns)
-    .rename(
-        columns={
-            "unnamed_0": "items",
-            "unnamed_1": "var_fix",
-            "unnamed_20": "comments",
-        }
-    )
-    .dropna(subset="items")
-)
-str = (
-    df_structure.pipe(clean_names)
-    .pipe(extract_poc)
-    .pipe(reorder_columns)
-    .rename(columns={"unnamed_0": "items"})
-    .dropna(subset="items")
-    .assign(
-        Var_Fix=lambda row: row["items"]
-        .str.extract(r"(Variable|Fix|Total)")
-        .ffill()  # .fillna(method="ffill"),
-    )
-)
+def main():
 
-fix.to_csv(path / "output" / "2024 Fix cost.csv", index=False)
-var.to_csv(path / "output" / "2024 Var cost.csv", index=False)
-hc.to_csv(path / "output" / "2024 Headcount.csv", index=False)
-str.to_csv(path / "output" / "2024 Structural changes.csv", index=False)
-print("Files are created")
+    # path
+    data_path = path / "data/"
+    output_fix = path / "output" / "2024 Fix cost.csv"
+    output_var = path / "output" / "2024 Var cost.csv"
+    output_hc = path / "output" / "2024 Headcount.csv"
+    output_str = path / "output" / "2024 Structural changes.csv"
+
+    # List of multiple excel files
+    xls_files = [
+        file
+        for file in data_path.iterdir()
+        if file.is_file() and file.suffix == ".xlsx"
+    ]
+
+    # Read data
+    df_fix = concat_sheet(xls_files, "4. Fix Cost (LC) ", "A:T")
+    df_var = concat_sheet(xls_files, "2. Variable (LC)", "A:O")
+    df_hc = concat_sheet(xls_files, "6. HC (LC)", "A:U")
+    df_structure = concat_sheet(xls_files, "1.1 Structural changes (LC)", "A:D")
+
+    # Process data
+    fix = (
+        df_fix.pipe(clean_names)
+        .pipe(extract_poc)
+        .pipe(reorder_columns)
+        .rename(columns={"unnamed_0": "items", "unnamed_19": "comments"})
+        .dropna(subset="items")
+    )
+    var = (
+        df_var.pipe(clean_names)
+        .pipe(extract_poc)
+        .pipe(reorder_columns)
+        .rename(columns={"unnamed_0": "items", "unnamed_14": "comments"})
+        .dropna(subset="items")
+    )
+    hc = (
+        df_hc.pipe(clean_names)
+        .pipe(extract_poc)
+        .pipe(reorder_columns)
+        .rename(
+            columns={
+                "unnamed_0": "items",
+                "unnamed_1": "var_fix",
+                "unnamed_20": "comments",
+            }
+        )
+        .dropna(subset="items")
+    )
+    str = (
+        df_structure.pipe(clean_names)
+        .pipe(extract_poc)
+        .pipe(reorder_columns)
+        .rename(columns={"unnamed_0": "items"})
+        .dropna(subset="items")
+        .assign(
+            Var_Fix=lambda row: row["items"]
+            .str.extract(r"(Variable|Fix|Total)")
+            .ffill()  # .fillna(method="ffill"),
+        )
+    )
+
+    # Write data
+    fix.to_csv(output_fix, index=False)
+    var.to_csv(output_var, index=False)
+    hc.to_csv(output_hc, index=False)
+    str.to_csv(output_str, index=False)
+    print("Files are created")
+
+
+if __name__ == "__main__":
+    main()
