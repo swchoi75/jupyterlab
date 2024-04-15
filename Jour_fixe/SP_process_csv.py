@@ -50,11 +50,6 @@ sp.write_file_local(file_data, path / "data" / "download_jour_fixe.csv")
 ########## Sharepoint connection ##########
 
 
-# Input file & Output file
-input_file = path / "data" / "download_jour_fixe.csv"
-output_file = path / "output" / "output_jour_fixe.csv"
-
-
 # Functions
 def load_and_clean_data(file_path):
     df = pd.read_csv(file_path).clean_names()
@@ -108,7 +103,13 @@ def extract_email(df, column_name):
     return df
 
 
-def main(input_file):
+def main():
+
+    # Input file & Output file
+    input_file = path / "data" / "download_jour_fixe.csv"
+    output_file = path / "output" / "output_jour_fixe.csv"
+    output_into_excel = path / "data" / "download_jour_fixe.xlsx"
+
     df = (
         load_and_clean_data(input_file)
         .pipe(
@@ -190,34 +191,31 @@ def main(input_file):
         )
     )
 
-    return df
+    # Output data
+    df.to_csv(output_file, index=False)
+
+    # Part II: convert from CSV to Excel
+    df = pd.read_csv(input_file).clean_names()
+
+    selected_columns = [
+        "id",
+        "year",
+        "calendarweek",
+        "title",
+        "description",
+        "originator",
+        "information_x002f_action_x002f_d",
+        "responsible_x002f_report#claims",
+        "duedate",
+        "delegate",
+    ]
+
+    df = df[selected_columns]
+
+    df.to_excel(output_into_excel, index=False)
+
+    print("Files are created")
 
 
-resulting_df = main(input_file)
-
-
-# Output data
-resulting_df.to_csv(output_file, index=False)
-
-
-# Part II: convert from CSV to Excel
-df = pd.read_csv(input_file).clean_names()
-
-selected_columns = [
-    "id",
-    "year",
-    "calendarweek",
-    "title",
-    "description",
-    "originator",
-    "information_x002f_action_x002f_d",
-    "responsible_x002f_report#claims",
-    "duedate",
-    "delegate",
-]
-
-df = df[selected_columns]
-
-df.to_excel(path / "data" / "download_jour_fixe.xlsx", index=False)
-
-print("Files are created")
+if __name__ == "__main__":
+    main()
