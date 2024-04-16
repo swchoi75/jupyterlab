@@ -37,6 +37,26 @@ def read_excel_file(path, version):
     return df
 
 
+def profit_and_loss(tbl):
+    """Split P&L and Balance sheet"""
+    tbl = tbl.filter(
+        _.financial_statement_item.startswith("3")
+        | _.financial_statement_item.startswith("CO")
+    )
+    tbl = tbl.drop("period_0", s.matches(r"ytd_\d+"))
+    return tbl
+
+
+def balance_sheet(tbl):
+    """Split P&L and Balance sheet"""
+    tbl = tbl.filter(
+        _["financial_statement_item"].startswith("1")
+        | _["financial_statement_item"].startswith("2")
+    )
+    tbl = tbl.drop(s.matches(r"period_\d+"))
+    return tbl
+
+
 def main():
 
     # Variables
@@ -45,14 +65,15 @@ def main():
     # Filenames
     input_lc = path / "data" / "Analysis FS Item Hierarchy for CU 698_LC.xlsx"
     input_gc = path / "data" / "Analysis FS Item Hierarchy for CU 698_GC.xlsx"
-    meta_file = path / "meta" / "New outlet.xlsx"
+    input_meta = path / "meta" / "New outlet.xlsx"
+
     output_bs = path / "output" / "RACE Balance sheet.csv"
     output_pnl = path / "output" / "RACE Profit and Loss.csv"
 
     # Read data
     lc = read_excel_file(input_lc, version)
     gc = read_excel_file(input_gc, version)
-    lookup_df = pd.read_excel(meta_file, usecols="A:F", dtype="str").clean_names()
+    lookup_df = pd.read_excel(input_meta, usecols="A:F", dtype="str").clean_names()
 
     LC = ibis.memtable(lc, name="LC")
     GC = ibis.memtable(gc, name="GC")
@@ -69,27 +90,17 @@ def main():
 
     l = l.select("outlet", "division", "bu", "new_outlet", "new_outlet_name")
 
-    joined = race.join(l, "outlet", how="left")
-    joined = joined.drop(s.endswith("_right"))
+    joined = race.join(l, "outlet", how="left").drop(s.endswith("_right"))
 
-    bs = joined.filter(
-        _["financial_statement_item"].startswith("1")
-        | _["financial_statement_item"].startswith("2")
-    )
-    bs = bs.drop(s.matches(r"period_\d+"))
-
-    pnl = joined.filter(
-        _.financial_statement_item.startswith("3")
-        | _.financial_statement_item.startswith("CO")
-    )
-    pnl = pnl.drop("period_0", s.matches(r"ytd_\d+"))
+    pnl = profit_and_loss(joined)
+    bs = balance_sheet(joined)
 
     # Write data
-    race_bs = bs.to_pandas()
-    race_bs.to_csv(output_bs, index=False, na_rep="0")
-
     race_pnl = pnl.to_pandas()
     race_pnl.to_csv(output_pnl, index=False, na_rep="0")
+
+    race_bs = bs.to_pandas()
+    race_bs.to_csv(output_bs, index=False, na_rep="0")
 
     print("Files are created")
 
