@@ -6,11 +6,11 @@ from janitor import clean_names
 
 # Path
 try:
-    path = Path(__file__).parent
+    path = Path(__file__).parent.parent.parent
 except NameError:
     import inspect
 
-    path = Path(inspect.getfile(lambda: None)).resolve().parent
+    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent.parent
 
 
 # Functions
@@ -97,15 +97,15 @@ def report_df(df):
 
 def main():
     # Variable
-    version = "\nACT"
+    version = "\nPLAN"
 
     # Filenames
-    input_lc = path / "data" / "Analysis FS Item Hierarchy for CU 698_LC.xlsx"
-    input_gc = path / "data" / "Analysis FS Item Hierarchy for CU 698_GC.xlsx"
+    input_lc = path / "data" / "(Plan) Analysis FS Item Hierarchy for CU 698_LC.xlsx"
+    input_gc = path / "data" / "(Plan) Analysis FS Item Hierarchy for CU 698_GC.xlsx"
     input_meta = path / "meta" / "New outlet.xlsx"
 
-    output_pnl = path / "output" / "RACE Profit and Loss.csv"
-    output_bs = path / "output" / "RACE Balance sheet.csv"
+    output_pnl = path / "output" / "(Plan) RACE Profit and Loss.csv"
+    output_bs = path / "output" / "(Plan) RACE Balance sheet.csv"
 
     # Process data
     race = race_df(input_lc, input_gc, version)
