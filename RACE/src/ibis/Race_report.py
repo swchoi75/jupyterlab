@@ -42,12 +42,9 @@ def main():
     # Variables
     version = "\nACT"
 
-    # Path
-    data_path = path / "data" / "RACE"
-
     # Filenames
-    input_lc = data_path / "Analysis FS Item Hierarchy for CU 698_LC.xlsx"
-    input_gc = data_path / "Analysis FS Item Hierarchy for CU 698_GC.xlsx"
+    input_lc = path / "data" / "Analysis FS Item Hierarchy for CU 698_LC.xlsx"
+    input_gc = path / "data" / "Analysis FS Item Hierarchy for CU 698_GC.xlsx"
     meta_file = path / "meta" / "New outlet.xlsx"
     output_bs = path / "output" / "RACE Balance sheet.csv"
     output_pnl = path / "output" / "RACE Profit and Loss.csv"
