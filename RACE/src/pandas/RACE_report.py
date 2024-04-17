@@ -107,10 +107,12 @@ def main():
     output_pnl = path / "output" / "RACE Profit and Loss.csv"
     output_bs = path / "output" / "RACE Balance sheet.csv"
 
+    # Read data
+    df_race = race_df(input_lc, input_gc, version)
+    df_outlet = outlet_df(input_meta)
+
     # Process data
-    race = race_df(input_lc, input_gc, version)
-    outlet = outlet_df(input_meta)
-    race_with_outlet = join_with_outlet(race, outlet)
+    race_with_outlet = join_with_outlet(df_race, df_outlet)
     race_pnl, race_bs = report_df(race_with_outlet)
 
     # Output data
