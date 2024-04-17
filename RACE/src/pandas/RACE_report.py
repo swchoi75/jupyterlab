@@ -43,6 +43,18 @@ def process_currency(df, lc_gc):
     return df
 
 
+def race_df(path_lc, path_gc, version):
+    """Read and Combine RACE data"""
+    lc = read_excel_file(path_lc, version)
+    lc = process_currency(lc, "LC")
+
+    gc = read_excel_file(path_gc, version)
+    gc = process_currency(gc, "GC")
+
+    race = pd.concat([lc, gc])
+    return race
+
+
 def outlet_df(path_meta):
     """Read Plant Outlet Combination (=POC)"""
     df = pd.read_excel(path_meta, usecols="A:F", dtype="str")
@@ -74,18 +86,6 @@ def balance_sheet(df):
     df = df.drop(cols_to_drop, axis=1)
     df = df.loc[df["financial_statement_item"].str.contains("^1|^2")]
     return df
-
-
-def race_df(path_lc, path_gc, version):
-    """Read and Combine RACE data"""
-    lc = read_excel_file(path_lc, version)
-    lc = process_currency(lc, "LC")
-
-    gc = read_excel_file(path_gc, version)
-    gc = process_currency(gc, "GC")
-
-    race = pd.concat([lc, gc])
-    return race
 
 
 def report_df(df):
