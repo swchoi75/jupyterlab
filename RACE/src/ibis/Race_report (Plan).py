@@ -3,7 +3,7 @@ import ibis
 from ibis import selectors as s
 from ibis import _
 
-ibis.options.interactive = True
+# ibis.options.interactive = True
 import re
 from pathlib import Path
 from janitor import clean_names
@@ -37,6 +37,40 @@ def read_excel_file(path, version):
     return df
 
 
+def race_tbl(path_lc, path_gc, version):
+    """Read and Combine RACE data"""
+    # Read excel file
+    df_lc = read_excel_file(path_lc, version)
+    df_gc = read_excel_file(path_gc, version)
+    # Convert from dataframe to ibis table
+    tbl_lc = ibis.memtable(df_lc, name="tbl_lc")
+    tbl_gc = ibis.memtable(df_gc, name="tbl_gc")
+    # add currency column
+    tbl_lc = tbl_lc.mutate(currency="LC")
+    tbl_gc = tbl_gc.mutate(currency="GC")
+    # combine two tables
+    tbl = tbl_lc.union(tbl_gc)
+    # reorder columns
+    tbl = tbl.projection(
+        ["currency"] + [col for col in tbl.columns if col != "currency"]
+    )
+    return tbl
+
+
+def outlet_tbl(filename):
+    """Read Plant Outlet Combination (=POC)"""
+    df = pd.read_excel(filename, usecols="A:F", dtype="str").clean_names()
+    tbl = ibis.memtable(df, name="tbl_outlet")
+    tbl = tbl.select("outlet", "division", "bu", "new_outlet", "new_outlet_name")
+    return tbl
+
+
+def join_with_outlet(tbl, meta_tbl):
+    """Join RACE with POC data"""
+    tbl = tbl.join(meta_tbl, "outlet", how="left").drop(s.endswith("_right"))
+    return tbl
+
+
 def profit_and_loss(tbl):
     """Split P&L and Balance sheet"""
     tbl = tbl.filter(
@@ -57,6 +91,13 @@ def balance_sheet(tbl):
     return tbl
 
 
+def report_tbl(tbl):
+    """Split RACE data into P&L and B/S"""
+    race_pnl = profit_and_loss(tbl)
+    race_bs = balance_sheet(tbl)
+    return race_pnl, race_bs
+
+
 def main():
 
     # Variables
@@ -71,37 +112,16 @@ def main():
     output_pnl = path / "output" / "(Plan) RACE Profit and Loss.csv"
 
     # Read data
-    lc = read_excel_file(input_lc, version)
-    gc = read_excel_file(input_gc, version)
-    lookup_df = pd.read_excel(input_meta, usecols="A:F", dtype="str").clean_names()
-
-    LC = ibis.memtable(lc, name="LC")
-    GC = ibis.memtable(gc, name="GC")
-    l = ibis.memtable(lookup_df, name="l")
+    tbl_race = race_tbl(input_lc, input_gc, version)
+    tbl_outlet = outlet_tbl(input_meta)
 
     # Process data
-    LC = LC.mutate(currency="LC")
-    LC = LC.projection(["currency"] + [col for col in LC.columns if col != "currency"])
-
-    GC = GC.mutate(currency="GC")
-    GC = GC.projection(["currency"] + [col for col in GC.columns if col != "currency"])
-
-    race = LC.union(GC)
-
-    l = l.select("outlet", "division", "bu", "new_outlet", "new_outlet_name")
-
-    joined = race.join(l, "outlet", how="left").drop(s.endswith("_right"))
-
-    pnl = profit_and_loss(joined)
-    bs = balance_sheet(joined)
+    race_with_outlet = join_with_outlet(tbl_race, tbl_outlet)
+    race_pnl, race_bs = report_tbl(race_with_outlet)
 
     # Write data
-    race_pnl = pnl.to_pandas()
-    race_pnl.to_csv(output_pnl, index=False, na_rep="0")
-
-    race_bs = bs.to_pandas()
-    race_bs.to_csv(output_bs, index=False, na_rep="0")
-
+    race_pnl.to_pandas().to_csv(output_pnl, index=False, na_rep="0")
+    race_bs.to_pandas().to_csv(output_bs, index=False, na_rep="0")
     print("Files are created")
 
 
