@@ -12,11 +12,11 @@ ECHO ============================
 ECHO ============================
 ECHO Python script.py
 ECHO ============================
-python "C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe\process_csv.py"
+python "C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe\script\process_csv.py"
 
 TIMEOUT /t 5
 
-python "C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe\produce_excel.py"
+python "C:\Users\uid98421\OneDrive - Vitesco Technologies\GitHub\jupyterlab\Jour_fixe\script\produce_excel.py"
 
 
 ECHO ============================
