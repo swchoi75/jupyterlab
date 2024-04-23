@@ -67,8 +67,8 @@ def filter_depr_periods(df):
     df["monthly_depr"] = df["monthly_depr"].where(depr_periods, 0)
 
     # Additional filter for the scenario that spending occurs after PPAP
-    spending_periods = df["acquisition_date"] < df["month_ends"]
-    df["monthly_depr"] = df["monthly_depr"].where(spending_periods, 0)
+    depr_periods_2 = df["acquisition_date"] < df["month_ends"]
+    df["monthly_depr"] = df["monthly_depr"].where(depr_periods_2, 0)
 
     return df
 
