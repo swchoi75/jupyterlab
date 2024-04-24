@@ -1,11 +1,12 @@
 import pandas as pd
+from pathlib import Path
 
-db_path = "db/COPA_2023.csv"
+# Path
+path = Path(__file__).parent.parent
 
 
-def db_delete(path):
-    # Read a data file in CSV format
-    df = pd.read_csv(path)
+# Functions
+def db_delete_last_month(df):
 
     # last_month = df["Period"].iloc[-1] # Find the last row
     last_month = df["Period"].max()  # Find the biggest value
@@ -16,8 +17,21 @@ def db_delete(path):
     return df
 
 
-# Write a data file in CSV format
+def main():
+
+    # Filename
+    db_file = path / "db" / "COPA_2023.csv"
+
+    # Read data
+    df = pd.read_csv(db_file)
+
+    # Process data
+    df = db_delete_last_month(df)
+
+    # Write a data file in CSV format
+    df.to_csv(db_file, index=False)
+    print("A file is updated")
 
 
-df_filtered = db_delete(db_path)
-df_filtered.to_csv(db_path, index=False)
+if __name__ == "__main__":
+    main()

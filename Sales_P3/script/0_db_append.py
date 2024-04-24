@@ -1,16 +1,12 @@
 import pandas as pd
+from pathlib import Path
 
 
-input_file = "data/Actual/COPA_2023_03.TXT"  # Update monthly
+# Path
+path = Path(__file__).parent.parent
 
 
-def db_append(filename):
-    df = read_txt_file(filename)
-    df = remove_first_two_columns(df)
-    df = remove_sub_total_rows(df)
-    return df
-
-
+# Functions
 def read_txt_file(filename):
     # Read a tab-delimited file
     df = pd.read_csv(
@@ -34,5 +30,21 @@ def remove_sub_total_rows(df):
     return df.loc[df["RecordType"].notna()]
 
 
-# Write to CSV file
-db_append(input_file).to_csv("db/COPA_2023.csv", mode="a", header=False, index=False)
+def main():
+    # Filenames
+    input_file = "data/Actual/COPA_2024_03.TXT"  # Update monthly
+    output_file = path / "db" / "COPA_2024.csv"
+
+    # Read data
+    df = read_txt_file(input_file)
+
+    # Process data
+    df = df.pipe(remove_first_two_columns).pipe(remove_sub_total_rows)
+
+    # Write data
+    df.to_csv(output_file, mode="a", header=False, index=False)
+    print("A file is updated")
+
+
+if __name__ == "__main__":
+    main()
