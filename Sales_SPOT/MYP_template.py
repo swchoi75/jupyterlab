@@ -1,30 +1,44 @@
+import csv
 import xlsxwriter
 
 
-# Create a workbook and add a worksheet.
-workbook = xlsxwriter.Workbook("Expenses01.xlsx")
-worksheet = workbook.add_worksheet()
+def convert_csv_to_excel(csv_file, excel_file):
+    """
+    Reads a CSV file with a single column and writes the data to an Excel file,
+    handling empty lines.
 
-# Some data we want to write to the worksheet.
-expenses = (
-    ["Rent", 1000],
-    ["Gas", 100],
-    ["Food", 300],
-    ["Gym", 50],
-)
+    Args:
+        csv_file (str): Path to the CSV file.
+        excel_file (str): Path to the output Excel file.
+    """
+    # Open the CSV file for reading
+    # Create an Excel workbook and worksheet
+    workbook = xlsxwriter.Workbook(excel_file)
+    worksheet = workbook.add_worksheet()
 
-# Start from the first cell. Rows and columns are zero indexed.
-row = 0
-col = 0
+    with open(csv_file, "r", encoding="utf-8") as f:
+        csv_reader = csv.reader(f)
 
-# Iterate over the data and write it out row by row.
-for item, cost in expenses:
-    worksheet.write(row, col, item)
-    worksheet.write(row, col + 1, cost)
-    row += 1
+        # Write the data from the CSV file, handling empty lines
+        row = 3
+        for data in csv_reader:
+            # Check if the row is not empty before accessing data[0]
+            if data:
+                worksheet.write(row, 3, data[0])
+            row += 1
 
-# Write a total using a formula.
-worksheet.write(row, 0, "Total")
-worksheet.write(row, 1, "=SUM(B1:B4)")
+    # Close the workbook
+    workbook.close()
 
-workbook.close()
+
+def main():
+
+    csv_file = "items.csv"
+    excel_file = "MYP_template.xlsx"
+    convert_csv_to_excel(csv_file, excel_file)
+
+    print(f"Successfully converted {csv_file} to {excel_file}")
+
+
+if __name__ == "__main__":
+    main()
