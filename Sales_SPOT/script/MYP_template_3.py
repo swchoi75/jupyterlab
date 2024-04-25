@@ -61,6 +61,16 @@ def add_years(list_of_data, worksheet):
         col += 1
 
 
+def add_zero(list_of_data, worksheet):
+    # Start from the cell. Rows and columns are zero indexed.
+    row = 7
+    col = 4
+
+    for data in list_of_data:
+        worksheet.write(row, col, data)
+        col += 1
+
+
 def main():
     # Filenames
     input_items = path / "data" / "items.csv"
@@ -80,6 +90,9 @@ def main():
     # Year data
     fy = [2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, ""] * 27  # no. of section
 
+    # Zero values
+    zero = [0, 0, 0, 0, 0, 0, 0, 0, ""] * 27  # no. of section
+
     # Create an Excel workbook
     with xlsxwriter.Workbook(output_file) as workbook:
         worksheets = [workbook.add_worksheet(name) for name in sheet_names]
@@ -90,6 +103,7 @@ def main():
             add_bu(data, worksheet)
             add_pl(data, worksheet)
             add_years(fy, worksheet)
+            add_zero(zero, worksheet)
 
     print("A file is created")
 
