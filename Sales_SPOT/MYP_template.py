@@ -30,7 +30,7 @@ def convert_csv_to_excel(csv_file, worksheet):
 def main():
     csv_file = "items.csv"
     excel_file = "MYP_template.xlsx"
-    sheet_names = ["Korea"]
+    sheet_names = ["Korea", "India", "Japan", "Thailand"]
 
     # Create an Excel workbook
     with xlsxwriter.Workbook(excel_file) as workbook:
