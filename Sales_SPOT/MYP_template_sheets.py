@@ -11,16 +11,19 @@ def convert_csv_to_excel(csv_file, worksheet):
         csv_file (str): Path to the CSV file.
         worksheet (str): sheet name of an excel file
     """
+    # Start from the cell. Rows and columns are zero indexed.
+    row = 3
+    col = 3
+
     # Open the CSV file for reading
     with open(csv_file, "r", encoding="utf-8") as f:
         csv_reader = csv.reader(f)
 
         # Write the data from the CSV file, handling empty lines
-        row = 3
         for data in csv_reader:
             # Check if the row is not empty before accessing data[0]
             if data:
-                worksheet.write(row, 3, data[0])
+                worksheet.write(row, col, data[0])
             row += 1
 
 
