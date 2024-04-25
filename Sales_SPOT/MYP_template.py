@@ -33,16 +33,11 @@ def main():
     sheet_names = ["Korea"]
 
     # Create an Excel workbook
-    workbook = xlsxwriter.Workbook(excel_file)
+    with xlsxwriter.Workbook(excel_file) as workbook:
+        worksheets = [workbook.add_worksheet(name) for name in sheet_names]
 
-    # Create worksheets with specified names
-    worksheets = [workbook.add_worksheet(name) for name in sheet_names]
-
-    for worksheet in worksheets:
-        convert_csv_to_excel(csv_file, worksheet)
-
-    # Close the workbook
-    workbook.close()
+        for worksheet in worksheets:
+            convert_csv_to_excel(csv_file, worksheet)
 
     print(f"Successfully converted {csv_file} to {excel_file}")
 

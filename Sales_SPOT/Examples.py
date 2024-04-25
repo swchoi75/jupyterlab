@@ -29,12 +29,10 @@ def main():
     excel_file = "Expenses01.xlsx"
 
     # Create a workbook and add a worksheet.
-    workbook = xlsxwriter.Workbook(excel_file)
-    worksheet = workbook.add_worksheet()
+    with xlsxwriter.Workbook(excel_file) as workbook:
+        worksheet = workbook.add_worksheet()
 
-    write_data(worksheet)
-
-    workbook.close()
+        write_data(worksheet)
 
     print(f"{excel_file} is created")
 
