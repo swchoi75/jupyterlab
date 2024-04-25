@@ -53,22 +53,30 @@ def add_pl(list_of_data, worksheet):
 
 def add_years(list_of_data, worksheet):
     # Start from the cell. Rows and columns are zero indexed.
-    row = 5
-    col = 4
+    rows = [5, 47, 76, 104, 122, 134, 143]
 
-    for data in list_of_data:
-        worksheet.write(row, col, data)
-        col += 1
+    for row in rows:
+        col = 4
+        for data in list_of_data:
+            worksheet.write(row, col, data)
+            col += 1
 
 
 def add_zero(list_of_data, worksheet):
     # Start from the cell. Rows and columns are zero indexed.
-    row = 7
-    col = 4
+    rows = (
+        list(range(7, 45))
+        + list(range(105, 113))
+        + list(range(123, 130))
+        + list(range(135, 138))
+        + list(range(144, 147))
+    )
 
-    for data in list_of_data:
-        worksheet.write(row, col, data)
-        col += 1
+    for row in rows:
+        col = 4
+        for data in list_of_data:
+            worksheet.write(row, col, data)
+            col += 1
 
 
 def main():
