@@ -25,15 +25,18 @@ def convert_csv_to_excel(csv_file, worksheet):
 
 
 def main():
-
     csv_file = "items.csv"
     excel_file = "MYP_template.xlsx"
+    sheet_names = ["Korea"]
 
-    # Create an Excel workbook and worksheet
+    # Create an Excel workbook
     workbook = xlsxwriter.Workbook(excel_file)
-    worksheet = workbook.add_worksheet()
 
-    convert_csv_to_excel(csv_file, worksheet)
+    # Create worksheets with specified names
+    worksheets = [workbook.add_worksheet(name) for name in sheet_names]
+
+    for worksheet in worksheets:
+        convert_csv_to_excel(csv_file, worksheet)
 
     # Close the workbook
     workbook.close()
