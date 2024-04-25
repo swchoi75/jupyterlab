@@ -1,7 +1,13 @@
 import csv
 import xlsxwriter
+from pathlib import Path
 
 
+# Path
+path = Path(__file__).parent.parent
+
+
+# Functions
 def add_items(list_of_data, worksheet):
     # Start from the cell. Rows and columns are zero indexed.
     row = 3
@@ -57,9 +63,9 @@ def add_years(list_of_data, worksheet):
 
 def main():
     # Filenames
-    input_items = "items.csv"
-    input_pl = "PLs.csv"
-    output_file = "MYP_template.xlsx"
+    input_items = path / "data" / "items.csv"
+    input_pl = path / "data" / "PLs.csv"
+    output_file = path / "output" / "MYP_template.xlsx"
     sheet_names = ["Korea", "India", "Japan", "Thailand"]
 
     # Read data

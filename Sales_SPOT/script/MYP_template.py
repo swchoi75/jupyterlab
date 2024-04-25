@@ -1,7 +1,13 @@
 import csv
 import xlsxwriter
+from pathlib import Path
 
 
+# Path
+path = Path(__file__).parent.parent
+
+
+# Functions
 def convert_csv_to_excel(csv_file, worksheet):
     """
     Reads a CSV file with a single column and writes the data to an Excel sheet,
@@ -28,18 +34,19 @@ def convert_csv_to_excel(csv_file, worksheet):
 
 
 def main():
-    csv_file = "items.csv"
-    excel_file = "MYP_template.xlsx"
+    # Filenames
+    input_file = path / "data" / "items.csv"
+    output_file = path / "output" / "MYP_template.xlsx"
     sheet_names = ["Korea", "India", "Japan", "Thailand"]
 
     # Create an Excel workbook
-    with xlsxwriter.Workbook(excel_file) as workbook:
+    with xlsxwriter.Workbook(output_file) as workbook:
         worksheets = [workbook.add_worksheet(name) for name in sheet_names]
 
         for worksheet in worksheets:
-            convert_csv_to_excel(csv_file, worksheet)
+            convert_csv_to_excel(input_file, worksheet)
 
-    print(f"Successfully converted {csv_file} to {excel_file}")
+    print("A file is created")
 
 
 if __name__ == "__main__":

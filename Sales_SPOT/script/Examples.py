@@ -1,6 +1,12 @@
 import xlsxwriter
+from pathlib import Path
 
 
+# Path
+path = Path(__file__).parent.parent
+
+
+# Functions
 def write_data(worksheet):
     # Some data we want to write to the worksheet.
     expenses = (
@@ -26,15 +32,15 @@ def write_data(worksheet):
 
 
 def main():
-    excel_file = "Expenses01.xlsx"
+    output_file = path / "output" / "Expenses01.xlsx"
 
     # Create a workbook and add a worksheet.
-    with xlsxwriter.Workbook(excel_file) as workbook:
+    with xlsxwriter.Workbook(output_file) as workbook:
         worksheet = workbook.add_worksheet()
 
         write_data(worksheet)
 
-    print(f"{excel_file} is created")
+    print("A file is created")
 
 
 if __name__ == "__main__":
