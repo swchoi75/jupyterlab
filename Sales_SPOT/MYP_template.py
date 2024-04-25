@@ -2,20 +2,16 @@ import csv
 import xlsxwriter
 
 
-def convert_csv_to_excel(csv_file, excel_file):
+def convert_csv_to_excel(csv_file, worksheet):
     """
-    Reads a CSV file with a single column and writes the data to an Excel file,
+    Reads a CSV file with a single column and writes the data to an Excel sheet,
     handling empty lines.
 
     Args:
         csv_file (str): Path to the CSV file.
-        excel_file (str): Path to the output Excel file.
+        worksheet (str): sheet name of an excel file
     """
     # Open the CSV file for reading
-    # Create an Excel workbook and worksheet
-    workbook = xlsxwriter.Workbook(excel_file)
-    worksheet = workbook.add_worksheet()
-
     with open(csv_file, "r", encoding="utf-8") as f:
         csv_reader = csv.reader(f)
 
@@ -27,15 +23,20 @@ def convert_csv_to_excel(csv_file, excel_file):
                 worksheet.write(row, 3, data[0])
             row += 1
 
-    # Close the workbook
-    workbook.close()
-
 
 def main():
 
     csv_file = "items.csv"
     excel_file = "MYP_template.xlsx"
-    convert_csv_to_excel(csv_file, excel_file)
+
+    # Create an Excel workbook and worksheet
+    workbook = xlsxwriter.Workbook(excel_file)
+    worksheet = workbook.add_worksheet()
+
+    convert_csv_to_excel(csv_file, worksheet)
+
+    # Close the workbook
+    workbook.close()
 
     print(f"Successfully converted {csv_file} to {excel_file}")
 
