@@ -1,11 +1,7 @@
 import xlsxwriter
 
 
-def main():
-    # Create a workbook and add a worksheet.
-    workbook = xlsxwriter.Workbook("Expenses01.xlsx")
-    worksheet = workbook.add_worksheet()
-
+def write_data(worksheet):
     # Some data we want to write to the worksheet.
     expenses = (
         ["Rent", 1000],
@@ -28,7 +24,19 @@ def main():
     worksheet.write(row, 0, "Total")
     worksheet.write(row, 1, "=SUM(B1:B4)")
 
+
+def main():
+    excel_file = "Expenses01.xlsx"
+
+    # Create a workbook and add a worksheet.
+    workbook = xlsxwriter.Workbook(excel_file)
+    worksheet = workbook.add_worksheet()
+
+    write_data(worksheet)
+
     workbook.close()
+
+    print(f"{excel_file} is created")
 
 
 if __name__ == "__main__":
