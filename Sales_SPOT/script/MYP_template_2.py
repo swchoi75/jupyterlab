@@ -1,5 +1,6 @@
 import csv
 import openpyxl as op
+from openpyxl.worksheet.formula import ArrayFormula
 from pathlib import Path
 
 
@@ -80,6 +81,14 @@ def add_zero(worksheet, list_of_data):
             col += 1
 
 
+def add_formula_sg(worksheet):
+    # Dynamic array
+    worksheet["E79"] = ArrayFormula("E79:L79", "=E50:L50-E51:L51-E52:L52")
+    # worksheet["E79"] = ArrayFormula(
+    #     "E79:L79", "(E10:L10+E12:L12+E13:L13+E16:L16+E22:L22+E30:L30+E31:L31)*-1"
+    # )
+
+
 def main():
     # Filenames
     input_items = path / "data" / "items.csv"
@@ -112,6 +121,8 @@ def main():
     add_poc(ws, data)
     add_years(ws, fy)
     add_zero(ws, zero)
+    # add_formula_vt(ws)
+    add_formula_sg(ws)
 
     wb.save(output_file)
 

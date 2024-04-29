@@ -117,7 +117,7 @@ def add_formula_vt(worksheet):
     )  # % of sales
 
 
-def add_formula_sa(worksheet):
+def add_formula_sg(worksheet):
     # Dynamic array
     worksheet.write_dynamic_array_formula("E79:L79", "=E50:L50-E51:L51-E52:L52")
     worksheet.write_dynamic_array_formula(
@@ -158,7 +158,7 @@ def main():
             add_years(ws, fy)
             add_zero(ws, zero)
             add_formula_vt(ws)
-            add_formula_sa(ws)
+            add_formula_sg(ws)
 
     print("A file is created")
 
