@@ -88,7 +88,6 @@ def main():
     # Filenames
     input_items = path / "data" / "items.csv"
     input_pl = path / "data" / "PLs.csv"
-    input_file = path / "data" / "MYP consolidation template.xlsx"
     output_file = path / "output" / "MYP_template_op.xlsx"
     sheet_names = ["Korea", "India", "Japan", "Thailand"]
 
