@@ -3,21 +3,16 @@ from pathlib import Path
 
 
 # Path
-try:
-    path = Path(__file__).parent
-except NameError:
-    import inspect
-
-    path = Path(inspect.getfile(lambda: None)).resolve().parent
+path = Path(__file__).parent
 
 
 # Functions
-def add_col(df):
+def add_column(df):
     df["m_eur"] = df["k_eur"] / 1000
     return df
 
 
-def rename_cols(df):
+def rename_column(df):
     df = df.rename(
         columns={
             "division_receiver": "division",
@@ -28,13 +23,31 @@ def rename_cols(df):
     return df
 
 
-def select_cols(df, key_columns):
-    df = df[key_columns + ["quarter", "version", "m_eur"]]
+def filter_data(df):
+    df = df[(df["category"] == "Top 15 projects") & (df["version"] != "Actual")]
+
+    pl = df[(df["assignment"] == "DIV E") | (df["assignment"] == "DIV P")]
+    cf = df[df["assignment"] == "Central function"]
+    npf = df[df["assignment"] == "NPF"]
+
+    df = pd.concat([pl, cf, npf])
     return df
 
 
-def sort_by_vals(df):
-    # Sort by values, but this sort does not show up in the excel report.
+def select_columns(df, list_of_columns):
+    df = df[
+        list_of_columns
+        + [
+            "quarter",
+            "version",
+            "m_eur",
+        ]
+    ]
+    return df
+
+
+def sort_by_values(df):
+    """Sort by values, but this sort does not show up in the excel report."""
     df = df.sort_values(
         ["assignment", "bu", "outlet", "version", "quarter"],
         ascending=[True, True, True, True, False],
@@ -42,34 +55,34 @@ def sort_by_vals(df):
     return df
 
 
-def pivot_wider_by_ver(df, key_columns):
+def pivot_wider_by_version(df, list_of_columns):
     df = (
         df.pivot_table(
             values="m_eur",
-            index=key_columns + ["quarter"],
+            index=list_of_columns,
             columns="version",
             aggfunc="sum",
         )
-        .fillna(0)  # Fill NA with zero for version: Budget & FC
+        .fillna(0)  # Fill NA with zero for quarter: Q1, Q2, Q3, Q4
         .reset_index()
     )
     return df
 
 
-def pivot_longer(df, key_columns):
+def pivot_longer(df, list_of_columns):
     df = df.melt(
-        id_vars=key_columns + ["quarter"],
+        id_vars=list_of_columns,
         value_vars=["Budget", "FC"],
         value_name="m_eur",
     )
     return df
 
 
-def pivot_wider_by_qtr(df, key_columns):
+def pivot_wider_by_quarter(df, list_of_columns):
     df = (
         df.pivot_table(
             values="m_eur",
-            index=key_columns + ["version"],
+            index=list_of_columns,
             columns="quarter",
             aggfunc="sum",
         )
@@ -80,8 +93,7 @@ def pivot_wider_by_qtr(df, key_columns):
 
 
 def main():
-
-    # Input file
+    # Filenames
     input_file = path / "output" / "Monthly Spending FC10+2.csv"
     meta_file = path / "data" / "top 15 projects.csv"
     output_file = path / "report" / "Quarterly Charts.xlsx"
@@ -89,19 +101,9 @@ def main():
     # Read data
     df_1 = pd.read_csv(input_file)
     df_2 = pd.read_csv(meta_file, usecols=[0, 2])
+    df = pd.merge(df_1, df_2, on="master_id")
 
     # Process data
-    df = pd.merge(df_1, df_2, on="master_id").pipe(add_col).pipe(rename_cols)
-
-    # Filter data
-    df = df[(df["category"] == "Top 15 projects") & (df["version"] != "Actual")]
-
-    pl = df[(df["assignment"] == "DIV E") | (df["assignment"] == "DIV P")]
-    cf = df[df["assignment"] == "Central function"]
-    npf = df[df["assignment"] == "NPF"]
-
-    df = pd.concat([pl, cf, npf])
-
     key_columns = [
         "master_id",
         "master",
@@ -113,12 +115,18 @@ def main():
     ]
 
     df = (
-        df.pipe(select_cols, key_columns)
-        .pipe(sort_by_vals)
-        .pipe(pivot_wider_by_ver, key_columns)
-        .pipe(pivot_longer, key_columns)
-        .pipe(pivot_wider_by_qtr, key_columns)
+        df.pipe(add_column)
+        .pipe(rename_column)
+        .pipe(filter_data)
+        .pipe(select_columns, key_columns)
+        .pipe(sort_by_values)
+        .pipe(pivot_wider_by_version, key_columns + ["quarter"])
+        .pipe(pivot_longer, key_columns + ["quarter"])
+        .pipe(pivot_wider_by_quarter, key_columns + ["version"])
     )
+
+    # # Get the dimensions of the dataframe.
+    # (max_row, max_col) = df.shape
 
     # Unique values
     unique_categories = df["master_id"].unique()
