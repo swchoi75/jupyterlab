@@ -57,6 +57,29 @@ def select_columns(df):
     ]
 
 
+def format_excel_table(workbook, worksheet):
+    # Specify row heights
+    worksheet.set_row(0, 20)
+
+    # Specify column widths
+    worksheet.set_column("C:C", 50)  # Title
+    worksheet.set_column("D:D", 100)  # Description
+    worksheet.set_column("E:F", 11)  # Status, Due_date
+
+    # Enable text wrapping for an entire column
+    column_format = workbook.add_format()
+    column_format.set_text_wrap()
+    worksheet.set_column("C:C", 50, column_format)  # Title
+
+    # Freeze panes
+    worksheet.freeze_panes(1, 0)
+
+    # Set zoom
+    worksheet.set_zoom(100)
+
+    # You can apply additional formatting to cells as needed
+
+
 def main():
 
     # Variables
@@ -114,7 +137,7 @@ def main():
                 },
             )
 
-            # Add your formatting options, for example, bold headers
+            # Add header format
             header_format = workbook.add_format(
                 {
                     "bold": True,
@@ -129,26 +152,7 @@ def main():
             for col_num, value in enumerate(category_df.columns.values):
                 worksheet.write(0, col_num, value, header_format)
 
-            # Specify row heights
-            worksheet.set_row(0, 20)
-
-            # Specify column widths
-            worksheet.set_column("C:C", 50)  # Title
-            worksheet.set_column("D:D", 100)  # Description
-            worksheet.set_column("E:F", 11)  # Status, Due_date
-
-            # Enable text wrapping for an entire column
-            column_format = workbook.add_format()
-            column_format.set_text_wrap()
-            worksheet.set_column("C:C", 50, column_format)  # Title
-
-            # Freeze panes
-            worksheet.freeze_panes(1, 0)
-
-            # Set zoom
-            worksheet.set_zoom(100)
-
-            # You can apply additional formatting to cells as needed
+            format_excel_table(workbook, worksheet)
 
     print("A file is created")
 
