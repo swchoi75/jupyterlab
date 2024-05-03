@@ -28,6 +28,7 @@ __pycache__/
 *.xls
 *.xlsx
 *.xlsm
+*.xlsb
 
 *.pptx
 *.html
