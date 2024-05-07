@@ -12,7 +12,7 @@ def main():
     input_1 = path / "output" / "BP_2025+9 Division E.csv"
     input_2 = path / "output" / "BP_2024+9 Division P.csv"
     input_3 = path / "output" / "BP_2025+9 Division P.csv"
-    output_file = path / "output" / "BP_2025+9 Division E and P.csv"
+    output_file = path / "output" / "2024-04-24_BP_2025+9 Division E and P.csv"
 
     # Read data
     df_1 = pd.read_csv(input_1)
