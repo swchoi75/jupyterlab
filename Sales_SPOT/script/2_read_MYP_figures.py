@@ -117,6 +117,7 @@ def main():
         .pipe(remove_empty_col, "empty")
     )
 
+    ## Reshape data
     key_cols = ["source", "currency", "row_number", "items"]
     value_cols = [col for col in df.columns if col not in key_cols]
 
