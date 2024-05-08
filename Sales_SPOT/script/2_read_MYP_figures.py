@@ -100,15 +100,15 @@ def main():
 
     # Process data
     list_of_currency = [
-        ["Korea", "LC"],
-        ["India", "LC"],
-        ["Japan", "LC"],
-        ["Thailand", "LC"],
-        ["KR", "GC"],
-        ["IN", "GC"],
-        ["JP", "GC"],
-        ["TH", "GC"],
-        ["AP", "GC"],
+        ["Korea", "mn KRW"],
+        ["India", "mn INR"],
+        ["Japan", "mn JPY"],
+        ["Thailand", "mn THB"],
+        ["KR", "mn EUR"],
+        ["IN", "mn EUR"],
+        ["JP", "mn EUR"],
+        ["TH", "mn EUR"],
+        ["AP", "mn EUR"],
     ]
     df = (
         df.pipe(add_col_currency, list_of_currency)
