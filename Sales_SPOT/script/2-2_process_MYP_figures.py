@@ -84,7 +84,7 @@ def main():
         .pipe(reorder_columns, id_cols)
     )
 
-    df_sales = df[(df["items"] == "Sales (w/o ICO)") & (df["currency"] != "mn EUR")]
+    df_sales = df[(df["items"] == "Sales (w/o ICO)")]  # & (df["currency"] != "mn EUR")]
 
     # Write data
     df.to_csv(output_1, index=False)
