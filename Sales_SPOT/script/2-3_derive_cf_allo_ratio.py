@@ -97,8 +97,7 @@ def main():
     # Write data
     df.to_csv(output_1, index=False)
     df_meta.to_csv(output_2, index=False)
-
-    print("A file is created")
+    print("Files are created")
 
 
 if __name__ == "__main__":

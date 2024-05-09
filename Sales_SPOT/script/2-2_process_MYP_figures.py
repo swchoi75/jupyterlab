@@ -87,9 +87,9 @@ def main():
     df_sales = df[(df["items"] == "Sales (w/o ICO)") & (df["currency"] != "mn EUR")]
 
     # Write data
-    # df.to_csv(output_1, index=False)
+    df.to_csv(output_1, index=False)
     df_sales.to_csv(output_2, index=False)
-    print("A file is created")
+    print("Files are created")
 
 
 if __name__ == "__main__":
