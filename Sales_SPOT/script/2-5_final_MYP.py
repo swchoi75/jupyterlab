@@ -7,6 +7,16 @@ path = Path(__file__).parent.parent
 
 
 # Functions
+def remove_blank_rows(df, numeric_cols):
+    # add "check" column that adds the specified numeric columns
+    df["check"] = df[numeric_cols].sum(axis="columns")
+    # remove blank rows
+    df = df[df["check"] != 0]
+    # remove the temporary "check" column
+    df = df.drop(columns=["check"])
+    return df
+
+
 def main():
     # Filenames
     input_1 = path / "output" / "MYP_2025-2030_v2.csv"
@@ -22,7 +32,6 @@ def main():
     df = pd.concat([df_1, df_2])  # Add Plant 9 after allocation
 
     df = df.rename(columns={"source": "country"})
-    df = df[df["country"] != "AP"]  # Remove AP(=Asia Pacific) data
     df["country"] = df["country"].replace(
         {
             "KR": "Korea",
@@ -31,6 +40,24 @@ def main():
             "TH": "Thailand",
         }
     )
+    df = df[df["country"] != "AP"]  # Remove AP(=Asia Pacific) data
+    df = df[
+        ~df["items"].isin(
+            ["% of sales", "Reinvestment rate", "CAPEX in % of external Sales"]
+        )
+    ]
+
+    numeric_cols = [
+        "2023",
+        "2024",
+        "2025",
+        "2026",
+        "2027",
+        "2028",
+        "2029",
+        "2030",
+    ]
+    df = df.pipe(remove_blank_rows, numeric_cols)
 
     # Write data
     df.to_csv(output_file, index=False)
