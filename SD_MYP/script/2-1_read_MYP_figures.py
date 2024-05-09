@@ -81,7 +81,7 @@ def main():
     # Filenames
     input_file = path / "data" / "MYP consolidation template.xlsx"
     meta_file = path / "meta" / "MYP_column_names.csv"
-    output_file = path / "output" / "MYP_2025-2030.csv"
+    output_file = path / "output" / "MYP" / "MYP_2025-2030.csv"
 
     # Read data
     list_of_sheets = [

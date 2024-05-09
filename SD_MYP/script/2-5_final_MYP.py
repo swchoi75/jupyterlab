@@ -19,9 +19,9 @@ def remove_blank_rows(df, numeric_cols):
 
 def main():
     # Filenames
-    input_1 = path / "output" / "MYP_2025-2030_v2.csv"
-    input_2 = path / "output" / "MYP_2025-2030_plant 9.csv"
-    output_file = path / "output" / "MYP_2025-2030_final.csv"
+    input_1 = path / "output" / "MYP" / "MYP_2025-2030_v2.csv"
+    input_2 = path / "output" / "MYP" / "MYP_2025-2030_plant 9.csv"
+    output_file = path / "output" / "MYP" / "MYP_2025-2030_final.csv"
 
     # Read data
     df_1 = pd.read_csv(input_1)

@@ -58,9 +58,9 @@ def drop_unnecessary_rows(df, col_name="cf_allo_ratio"):
 
 def main():
     # Filenames
-    input_file = path / "output" / "MYP_2025-2030_sales.csv"
+    input_file = path / "output" / "MYP" / "MYP_2025-2030_sales.csv"
 
-    output_1 = path / "output" / "MYP_2025-2030_cf_allo_ratio.csv"
+    output_1 = path / "output" / "MYP" / "MYP_2025-2030_cf_allo_ratio.csv"
     output_2 = path / "meta" / "MYP_cf_allo_ratio.csv"
 
     # Read data

@@ -45,10 +45,10 @@ def add_poc(df, df_meta):
 
 def main():
     # Filenames
-    input_file = path / "output" / "MYP_2025-2030_v2.csv"
+    input_file = path / "output" / "MYP" / "MYP_2025-2030_v2.csv"
     meta_ratio = path / "meta" / "MYP_cf_allo_ratio.csv"
     meta_poc = path / "meta" / "MYP_POC.csv"
-    output_file = path / "output" / "MYP_2025-2030_plant 9.csv"
+    output_file = path / "output" / "MYP" / "MYP_2025-2030_plant 9.csv"
 
     # Read data
     df = pd.read_csv(input_file).drop(columns=["Div", "BU", "PL"])

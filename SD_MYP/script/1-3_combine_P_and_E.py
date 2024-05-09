@@ -9,10 +9,10 @@ path = Path(__file__).parent.parent
 # Functions
 def main():
     # Filenames
-    input_1 = path / "output" / "BP_2025+9 Division E.csv"
-    input_2 = path / "output" / "BP_2024+9 Division P.csv"
-    input_3 = path / "output" / "BP_2025+9 Division P.csv"
-    output_file = path / "output" / "2024-04-24_BP_2025+9 Division E and P.csv"
+    input_1 = path / "output" / "SPOT" / "BP_2025+9 Division E.csv"
+    input_2 = path / "output" / "SPOT" / "BP_2024+9 Division P.csv"
+    input_3 = path / "output" / "SPOT" / "BP_2025+9 Division P.csv"
+    output_file = path / "output" / "SPOT" / "2024-04-24_BP_2025+9 Division E and P.csv"
 
     # Read data
     df_1 = pd.read_csv(input_1)

@@ -42,11 +42,11 @@ def reorder_columns(df, first_columns):
 
 def main():
     # Filenames
-    input_file = path / "output" / "MYP_2025-2030.csv"
+    input_file = path / "output" / "MYP" / "MYP_2025-2030.csv"
     meta_poc = path / "meta" / "MYP_POC.csv"
     meta_section = path / "meta" / "MYP_item_sections.csv"
-    output_1 = path / "output" / "MYP_2025-2030_v2.csv"
-    output_2 = path / "output" / "MYP_2025-2030_sales.csv"
+    output_1 = path / "output" / "MYP" / "MYP_2025-2030_v2.csv"
+    output_2 = path / "output" / "MYP" / "MYP_2025-2030_sales.csv"
 
     # Read data
     df = pd.read_csv(input_file)

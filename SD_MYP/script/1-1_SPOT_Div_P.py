@@ -54,8 +54,8 @@ def main():
         / "2024-04-09 SPOT Overview 2025+9 vs. 2024+9_Legal view (AP).xlsb"
     )
     meta_file = path / "meta" / "column_mapping.csv"
-    output_1 = path / "output" / "BP_2024+9 Division P.csv"
-    output_2 = path / "output" / "BP_2025+9 Division P.csv"
+    output_1 = path / "output" / "SPOT" / "BP_2024+9 Division P.csv"
+    output_2 = path / "output" / "SPOT" / "BP_2025+9 Division P.csv"
 
     # Read data
     df = pd.read_excel(input_file, sheet_name="2025+9 vs 2024+9", skiprows=9)

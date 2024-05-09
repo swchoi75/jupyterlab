@@ -15,7 +15,7 @@ def main():
         / "data"
         / "DIV E_Sales Early View 2025+9_status_24.04.2024_Legal view (AP).xlsx"
     )
-    output_file = path / "output" / "BP_2025+9 Division E.csv"
+    output_file = path / "output" / "SPOT" / "BP_2025+9 Division E.csv"
 
     # Read data
     df = pd.read_excel(input_file, sheet_name="Database", skiprows=4)
