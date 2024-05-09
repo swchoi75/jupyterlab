@@ -50,7 +50,7 @@ def main():
 
     # Read data
     df = pd.read_csv(input_file)
-    df_poc = pd.read_csv(meta_poc)[["DIV", "BU", "PL"]]
+    df_poc = pd.read_csv(meta_poc)[["Div", "BU", "PL"]]
     df_section = pd.read_csv(meta_section)[["row_number", "section"]]
 
     # Process data
@@ -60,7 +60,7 @@ def main():
         "row_number",
         "section",
         "items",
-        "DIV",
+        "Div",
         "BU",
         "PL",
         "outlets",
