@@ -65,6 +65,7 @@ def main():
 
     # Read data
     df = pd.read_csv(input_file)
+
     # Process data
     cols_to_drop = ["Div", "BU", "PL", "row_number", "section"]
     df = df.drop(columns=cols_to_drop)
