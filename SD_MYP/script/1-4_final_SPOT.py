@@ -40,6 +40,17 @@ def pivot_data_wider(df, list_of_columns):
     return df
 
 
+def pivot_data_wider_2(df, list_of_columns):
+    df = df.pivot_table(
+        index=list_of_columns,
+        values="sales",
+        columns="source",
+        aggfunc="sum",
+        # dropna=False,
+    ).reset_index()
+    return df
+
+
 def remove_zero_na(df):
     # Remove zero values
     df = df.drop(df[(df["sales"] == 0.0) & (df["volume"] == 0.0)].index)
@@ -50,9 +61,8 @@ def main():
     # Filenames
     input_file = path / "output" / "SPOT" / "2024-04-24_BP_2025+9 Division E and P.csv"
     meta_file = path / "meta" / "column_group.csv"
-    output_file = (
-        path / "output" / "SPOT" / "2024-04-24_BP_2025+9 Division E and P_final.csv"
-    )
+    output_1 = path / "output" / "SPOT" / "2024-04-24_BP_2025+9 Div E and P_v1.csv"
+    output_2 = path / "output" / "SPOT" / "2024-04-24_BP_2025+9 Div E and P_v2.csv"
 
     # Read data
     df = pd.read_csv(input_file)
@@ -89,8 +99,22 @@ def main():
         .pipe(remove_zero_na)
     )
 
+    ## Further reshape data for Excel pivot report
+    items_to_remove = ["price", "volume", "sales", "source"]
+    cols_list = df.columns.to_list()
+    id_cols_2 = [item for item in cols_list if item not in items_to_remove]
+
+    df_2 = df.pipe(drop_columns, ["price", "volume"]).pipe(
+        pivot_data_wider_2, id_cols_2
+    )
+
+    ## Filter years
+    years_to_keep = ["2025", "2026", "2027", "2028", "2029", "2030"]
+    df_2 = df_2[df_2["year"].isin(years_to_keep)]
+
     # Write data
-    df.to_csv(output_file, index=False)
+    df.to_csv(output_1, index=False)
+    df_2.to_csv(output_2, index=False)
     print("A file is created")
 
 
