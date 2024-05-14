@@ -1,6 +1,5 @@
 import pandas as pd
 from pathlib import Path
-from common_function import clean_column_names
 
 
 # Path
@@ -55,6 +54,17 @@ def pivot_data_wider_2(df, list_of_columns):
 def remove_zero_na(df):
     # Remove zero values
     df = df.drop(df[(df["sales"] == 0.0) & (df["volume"] == 0.0)].index)
+    return df
+
+
+def clean_trailing_underscore(column_name):
+    """Functions to clean column names"""
+    return column_name.rstrip("_")
+
+
+def clean_column_names(df):
+    """Apply the cleaning function to all column names"""
+    df.columns = df.columns.map(clean_trailing_underscore)
     return df
 
 
