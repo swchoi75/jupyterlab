@@ -1,5 +1,6 @@
 import pandas as pd
 from pathlib import Path
+from common_function import clean_column_names
 
 
 # Path
@@ -43,7 +44,7 @@ def pivot_data_wider(df, list_of_columns):
 def pivot_data_wider_2(df, list_of_columns):
     df = df.pivot_table(
         index=list_of_columns,
-        values="sales",
+        values=["sales", "volume"],
         columns="source",
         aggfunc="sum",
         # dropna=False,
@@ -100,13 +101,15 @@ def main():
     )
 
     ## Further reshape data for Excel pivot report
-    items_to_remove = ["price", "volume", "sales", "source"]
-    cols_list = df.columns.to_list()
-    id_cols_2 = [item for item in cols_list if item not in items_to_remove]
+    id_cols_2 = id_cols
+    id_cols_2.append("year")
+    id_cols_2.remove("source")
+    df_2 = df.pipe(drop_columns, ["price"]).pipe(pivot_data_wider_2, id_cols_2)
 
-    df_2 = df.pipe(drop_columns, ["price", "volume"]).pipe(
-        pivot_data_wider_2, id_cols_2
-    )
+    ## Flatten the multi-index
+    df_2.columns = df_2.columns.to_flat_index()
+    df_2.columns = ["_".join(col).strip() for col in df_2.columns]
+    df_2 = clean_column_names(df_2)
 
     ## Filter years
     years_to_keep = ["2025", "2026", "2027", "2028", "2029", "2030"]
