@@ -73,6 +73,18 @@ def clean_column_names(df):
     return df
 
 
+def flatten_multi_index(df):
+    df.columns = df.columns.to_flat_index()
+    df.columns = ["_".join(col).strip() for col in df.columns]
+    df = clean_column_names(df)
+    return df
+
+
+def filter_sales_years(df, list_of_years):
+    df = df[df["year"].isin(list_of_years)]
+    return df
+
+
 def main():
     # Filenames
     input_file = path / "output" / "SPOT" / "2024-04-24_BP_2025+9 Division E and P.csv"
@@ -120,16 +132,13 @@ def main():
     id_cols_2 = id_cols
     id_cols_2.append("year")
     id_cols_2.remove("source")
-    df_2 = df.pipe(drop_columns, ["price"]).pipe(pivot_data_wider_2, id_cols_2)
-
-    ## Flatten the multi-index
-    df_2.columns = df_2.columns.to_flat_index()
-    df_2.columns = ["_".join(col).strip() for col in df_2.columns]
-    df_2 = clean_column_names(df_2)
-
-    ## Filter years
-    years_to_keep = ["2025", "2026", "2027", "2028", "2029", "2030"]
-    df_2 = df_2[df_2["year"].isin(years_to_keep)]
+    list_of_years = ["2025", "2026", "2027", "2028", "2029", "2030"]
+    df_2 = (
+        df.pipe(drop_columns, ["price"])
+        .pipe(pivot_data_wider_2, id_cols_2)
+        .pipe(flatten_multi_index)
+        .pipe(filter_sales_years, list_of_years)
+    )
 
     # Write data
     df.to_csv(output_1, index=False)
