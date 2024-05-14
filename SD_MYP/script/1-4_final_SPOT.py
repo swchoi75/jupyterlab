@@ -40,6 +40,11 @@ def pivot_data_wider(df, list_of_columns):
     return df
 
 
+def volume_in_k_unit(df):
+    df["volume"] = df["volume"] / 1000
+    return df
+
+
 def pivot_data_wider_2(df, list_of_columns):
     df = df.pivot_table(
         index=list_of_columns,
@@ -108,6 +113,7 @@ def main():
         .pipe(pivot_data_longer, id_cols)
         .pipe(pivot_data_wider, id_cols + ["year"])
         .pipe(remove_zero_na)
+        .pipe(volume_in_k_unit)
     )
 
     ## Further reshape data for Excel pivot report
@@ -128,7 +134,7 @@ def main():
     # Write data
     df.to_csv(output_1, index=False)
     df_2.to_csv(output_2, index=False)
-    print("A file is created")
+    print("Files are created")
 
 
 if __name__ == "__main__":
