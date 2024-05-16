@@ -97,7 +97,7 @@ def filter_material_type(df):
 def main():
 
     # Filenames
-    input_file = path / "output" / "Sales BU CT_with meta.csv"
+    input_file = path / "output" / "Sales Div E_with meta.csv"
 
     output_1 = path / "output" / "Sales high runner per PH.csv"
     output_2 = path / "output" / "Sales high runner PN.csv"

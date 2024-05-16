@@ -9,12 +9,12 @@ path = Path(__file__).parent.parent
 
 def main():
     # Filenames
-    input_file = path / "output" / "Sales BU CT.csv"
-    mm_file = path / "meta" / "material_master_BU CT.xlsx"
+    input_file = path / "output" / "Sales Div E.csv"
+    mm_file = path / "meta" / "material_master_Div E.xlsx"
     cg_file = path / "meta" / "customer_group.xlsx"
-    ph_file = path / "meta" / "product_hierarchy_BU CT.xlsx"
-    pg_file = path / "meta" / "product_group_BU CT.xlsx"
-    output_file = path / "output" / "Sales BU CT_with meta.csv"
+    ph_file = path / "meta" / "product_hierarchy_Div E.xlsx"
+    pg_file = path / "meta" / "product_group_Div E.xlsx"
+    output_file = path / "output" / "Sales Div E_with meta.csv"
 
     # Read data
     df = pd.read_csv(input_file)

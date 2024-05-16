@@ -70,12 +70,12 @@ def missing_product_hierarchy(df, df_meta):
 def main():
 
     # Filenames
-    input_file = path / "output" / "Sales BU CT_with meta.csv"
+    input_file = path / "output" / "Sales Div E_with meta.csv"
 
     meta_1 = path / "meta" / "customer_group.xlsx"
-    meta_2 = path / "meta" / "material_master_BU CT.xlsx"
-    meta_3 = path / "meta" / "product_group_BU CT.xlsx"
-    meta_4 = path / "meta" / "product_hierarchy_BU CT.xlsx"
+    meta_2 = path / "meta" / "material_master_Div E.xlsx"
+    meta_3 = path / "meta" / "product_group_Div E.xlsx"
+    meta_4 = path / "meta" / "product_hierarchy_Div E.xlsx"
 
     output_1 = path / "meta" / "test_customer_master_missing.csv"
     output_2 = path / "meta" / "test_material_master_missing.csv"

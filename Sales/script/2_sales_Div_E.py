@@ -42,10 +42,19 @@ def process_fy_month(df):
     return df
 
 
-def filter_BU_CT(df):
-    # Filter profit centers for BU CT: PL ENC, PL DTC, PL MTC
+def filter_Div_E(df):
+    # Filter profit centers for Div E: PL ENC, PL DTC, PL MTC, PL VBC, PL HVD
     df = df.loc[
-        df["profit_ctr"].isin(["50803-003", "50803-010", "50803-049", "50803-051"])
+        df["profit_ctr"].isin(
+            [
+                "50803-003",  # PL ENC (old)
+                "50803-049",  # PL ENC
+                "50803-010",  # PL DTC
+                "50803-051",  # PL MTC
+                "50803-050",  # PL VBC
+                "50803-047",  # PL HVD
+            ]
+        )
     ]
     return df
 
@@ -82,7 +91,7 @@ def main():
     input_file_3 = path / "db" / "COPA_Sales_2023.parquet"
     input_file_4 = path / "db" / "COPA_Sales_2024.parquet"
 
-    output_file = path / "output" / "Sales BU CT.csv"
+    output_file = path / "output" / "Sales Div E.csv"
 
     # Read data
     df_0 = pd.read_parquet(input_file_0)
@@ -100,8 +109,8 @@ def main():
     copa = pd.concat([df_1, df_2, df_3, df_4]).pipe(process_fy_month)
 
     # Sales overview
-    zsales = zsales.pipe(filter_BU_CT).pipe(sales_overview)
-    copa = copa.pipe(filter_BU_CT).pipe(sales_overview)
+    zsales = zsales.pipe(filter_Div_E).pipe(sales_overview)
+    copa = copa.pipe(filter_Div_E).pipe(sales_overview)
 
     # Process period
     zsales["period"] = zsales["period"].astype(str).str.zfill(2)
