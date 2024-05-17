@@ -2,6 +2,7 @@
 where python
 
 @REM BOM
+python script/1-0_representative_pn_2024.py
 python script/1-1_bom_csv_to_parquet.py
 python script/1-2_merge_bom.py
 python script/1-3_bom_price.py
@@ -28,3 +29,6 @@ python script/3-2_sales_bom_price_delta.py
 @REM Power BI
 python script/4-1_FX_compensation.py
 python script/4-2_Power_BI.py
+
+@REM Test script
+python script/5-1_test_missing_meta.py
