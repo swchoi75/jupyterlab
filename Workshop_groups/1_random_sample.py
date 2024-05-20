@@ -27,7 +27,7 @@ def main():
     df_1 = pd.DataFrame(list_of_groups)
     df_2 = pd.DataFrame(random_list)
     result = pd.concat([df_1, df_2], axis="columns")
-    result.columns = ["Group", "Names"]
+    result.columns = ["Groups", "Names"]
 
     # Write data
     result.to_csv(output_file, index=False)
