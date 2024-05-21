@@ -68,7 +68,7 @@ def drop_missing_or_zero_values(df):
 
 
 def add_col_in_EUR(df):
-    df["k_GC"] = df["k_LC"] / df["fx_rate"]
+    df["k_GC"] = df["k_LC"] / df["SG_fx_rate"]
     return df
 
 
@@ -99,14 +99,16 @@ def main():
     df = (
         concat_sheet(input_file, list_of_sheets)
         .clean_names()
-        .rename(columns={"loc_": "loc", "rou": "RoU"})
+        .rename(
+            columns={"loc_": "loc", "rou": "RoU", "act_2023": "2023", "fc_2024": "2024"}
+        )
     )
-    df_meta = pd.read_csv(meta_file)
+    df_meta = pd.read_csv(meta_file, dtype={"year": str})
 
     # Process data
     numeric_cols = [
-        "act_2023",
-        "fc_2024",
+        "2023",
+        "2024",
         "2025",
         "2026",
         "2027",
