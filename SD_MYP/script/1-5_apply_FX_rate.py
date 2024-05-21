@@ -22,11 +22,14 @@ def change_country_name(df):
 
 
 def change_fx_rate(df):
-    """Change FX rate from VT to SG"""
+    """
+    Change FX rate from VT to SG and
+    change from k EUR to mn EUR
+    """
     columns_to_update = ["sales_BP 2024+9", "sales_Early View 2025+9"]
 
     for column in columns_to_update:
-        df[column] = df[column] * df["VT_fx_rate"] / df["SG_fx_rate"]
+        df[column] = df[column] * df["VT_fx_rate"] / df["SG_fx_rate"] / 1000
 
     return df
 
