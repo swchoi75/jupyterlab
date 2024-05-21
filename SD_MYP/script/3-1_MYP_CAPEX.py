@@ -123,7 +123,7 @@ def main():
         .pipe(remove_blank_rows, numeric_cols)
         .pipe(pivot_longer, id_cols, numeric_cols)
         .pipe(drop_missing_or_zero_values)
-        .merge(df_meta, on=["currency", "year"])
+        .merge(df_meta, on=["country", "currency", "year"])
         .pipe(add_col_in_EUR)
         .pipe(reorder_columns)
     )
