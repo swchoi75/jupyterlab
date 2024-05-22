@@ -1,6 +1,5 @@
 import pandas as pd
 from pathlib import Path
-from janitor import clean_names
 
 
 # Path
@@ -67,14 +66,14 @@ def drop_missing_or_zero_values(df):
     return df
 
 
-def add_col_in_EUR(df):
-    df["k_GC"] = df["k_LC"] / df["SG_fx_rate"]
+def add_col_in_mn_EUR(df):
+    df["mn_EUR"] = df["k_LC"] / df["SG_fx_rate"] / 1000
     return df
 
 
 def reorder_columns(df):
     first_columns = ["country", "currency"]
-    last_columns = ["k_LC", "k_GC"]
+    last_columns = ["k_LC", "mn_EUR"]
     df = df[
         first_columns
         + [col for col in df.columns if col not in first_columns + last_columns]
@@ -92,16 +91,12 @@ def main():
     # Read data
     list_of_sheets = [
         "Korea",
-        # "India",
+        "India",
         "Japan",
         "Thailand",
     ]
-    df = (
-        concat_sheet(input_file, list_of_sheets)
-        .clean_names()
-        .rename(
-            columns={"loc_": "loc", "rou": "RoU", "act_2023": "2023", "fc_2024": "2024"}
-        )
+    df = concat_sheet(input_file, list_of_sheets).rename(
+        columns={"Currency": "currency", "Act 2023": "2023", "FC 2024": "2024"}
     )
     df_meta = pd.read_csv(meta_file, dtype={"year": str})
 
@@ -124,7 +119,7 @@ def main():
         .pipe(pivot_longer, id_cols, numeric_cols)
         .pipe(drop_missing_or_zero_values)
         .merge(df_meta, on=["country", "currency", "year"])
-        .pipe(add_col_in_EUR)
+        .pipe(add_col_in_mn_EUR)
         .pipe(reorder_columns)
     )
 
