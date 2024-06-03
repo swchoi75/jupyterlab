@@ -65,8 +65,8 @@ def reorder_columns(df):
 def main():
 
     # Variables
-    year = "2023"
-    month = "10"  # Monthly to be updated
+    year = "2024"
+    month = "01"  # Monthly to be updated
 
     # Filnames
     input_file_cf = path / "data" / "CF_2024_01.dat"  # Monthly to be updated
