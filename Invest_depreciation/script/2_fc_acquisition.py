@@ -84,9 +84,9 @@ def str_to_month_ends(series):
     return series
 
 
-def col_acquisition_date(df):
+def col_acquisition_date(df, text_to_remove):
     """New column: "Acquisition date" based on the spending months"""
-    s = df["spend_month"].str.replace("spend_fc_", "")
+    s = df["spend_month"].str.replace(text_to_remove, "")
     s = str_to_month_ends(s)
     df["acquisition_date"] = s
     return df
@@ -147,7 +147,12 @@ def reclassfy_fs_item(df, current_year_end):
 def main():
 
     # Variables
-    from common_variable import spending_total_col, current_year_end, actual_month_end
+    from common_variable import (
+        spending_total_col,
+        text_to_remove,
+        current_year_end,
+        actual_month_end,
+    )
 
     # Filenames
     input_file = path / "output" / "1_fc_monthly_spending.csv"
@@ -165,7 +170,7 @@ def main():
     df = (
         df.pipe(pivot_longer)
         .pipe(col_acquisition)
-        .pipe(col_acquisition_date)  # based on the spending months
+        .pipe(col_acquisition_date, text_to_remove)  # based on the spending months
         .pipe(col_start_of_depr)
         .pipe(col_asset_category, actual_month_end)
         .pipe(col_useful_life_year)

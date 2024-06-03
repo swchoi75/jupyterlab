@@ -11,6 +11,7 @@ actual_month_end = "2023-11-30"  # 완료된 월 마감
 asset_filename = "2023-11_Asset History Leger_20231130.xlsx"
 GPA_filename = "2023-11_GPA_WMS - All data report_FC.xlsx"
 spending_total_col = "spend_fc_2023"
+text_to_remove = "spend_fc_"
 current_year = "2023"
 current_year_end = pd.to_datetime(current_year + "-12-31")
 period_start = "2023-01-31"  # 1월말, 즉 yyyy-01-31
