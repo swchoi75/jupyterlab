@@ -58,7 +58,7 @@ def main():
     )
 
     # Write data
-    # df.to_csv(output_file, index=False)
+    df.to_csv(output_file, index=False)
     print("A file is created")
 
 
