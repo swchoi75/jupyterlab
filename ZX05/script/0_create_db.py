@@ -114,8 +114,8 @@ def main():
         .pipe(filter_columns)
         .pipe(reorder_columns)
     )
-    df_cf = df[df["cc_group"] == "CF"]
-    df_pl = df[df["cc_group"] == "PL"]
+    df_cf = df[df["cc_group"] == "CF"].drop(columns="cc_group")
+    df_pl = df[df["cc_group"] == "PL"].drop(columns="cc_group")
 
     # Write data
     df_cf.to_csv(output_file_cf, index=False)
