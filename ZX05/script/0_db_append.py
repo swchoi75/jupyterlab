@@ -69,11 +69,11 @@ def main():
     month = "10"  # Monthly to be updated
 
     # Filnames
-    input_file_cf = path / "data" / "CF_2023_10.dat"  # Monthly to be updated
-    input_file_pl = path / "data" / "PL_2023_10.dat"  # Monthly to be updated
+    input_file_cf = path / "data" / "CF_2024_01.dat"  # Monthly to be updated
+    input_file_pl = path / "data" / "PL_2024_01.dat"  # Monthly to be updated
 
-    output_file_cf = path / "db" / "CF_2023.csv"
-    output_file_pl = path / "db" / "PL_2023.csv"
+    output_file_cf = path / "db" / "CF_2024.csv"
+    output_file_pl = path / "db" / "PL_2024.csv"
 
     # Read data
     df_cf = read_txt_file(input_file_cf)
