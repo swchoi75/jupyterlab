@@ -12,9 +12,12 @@ except NameError:
 
 
 def main():
+    # Variables
+    from common_variable import result_filename
+
     # Filenames
     input_file = path / "output" / "5_fc_depreciation_cf_allocation.csv"
-    output_file = path / "output" / "fc_depreciation.csv"
+    output_file = path / "output" / result_filename
 
     # Read data
     df = pd.read_csv(input_file, dtype=str)  # no calculation is needed
