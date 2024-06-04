@@ -13,7 +13,7 @@ from commonfunctions import (
     get_cc_function,
     remove_s90xxx_accounts,
 )
-from plvarcosts import filter_var_cost, filter_fgk_p, add_ldc_mdc, add_ce_text
+from plvarcosts import filter_var_cost, filter_scm, add_ldc_mdc, add_ce_text
 
 
 # Path
@@ -29,7 +29,7 @@ def main():
     meta_cc_hierarchy = path / "meta" / "0000_TABLE_MASTER_Cost center_hierarchy.csv"
     meta_coom = path / "meta" / "0004_TABLE_MASTER_COOM_2024.csv"
     meta_poc = path / "meta" / "POC.csv"
-    output_file = path / "output" / "PL var costs.csv"
+    output_file = path / "output" / "PL var SCM costs.csv"
 
     # Read data
     df = read_db(db_file)
@@ -48,7 +48,7 @@ def main():
         .pipe(split_fix_var)
         .pipe(get_cc_function)
         .pipe(filter_var_cost)
-        .pipe(filter_fgk_p)
+        .pipe(filter_scm)
         .pipe(remove_s90xxx_accounts)
         .pipe(add_ldc_mdc)
         .pipe(add_ce_text)

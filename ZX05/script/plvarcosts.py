@@ -11,6 +11,13 @@ def filter_fgk_p(df):
     return df
 
 
+def filter_scm(df):
+    """filter out cost center group FGK-S"""
+    # df = df.dropna(subset=["department"])
+    df = df[df["department"].str.endswith("SCM")]
+    return df
+
+
 def add_ldc_mdc(df):
     # Var costs : Add LDC / MDC information
     df["ldc_mdc"] = df.apply(helper_add_ldc_mdc, axis="columns")
