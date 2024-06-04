@@ -13,7 +13,7 @@ from commonfunctions import (
     get_cc_function,
     remove_s90xxx_accounts,
 )
-from plvarcosts import filter_var_cost, add_ldc_mdc, add_ce_text
+from plvarcosts import filter_var_cost, filter_fgk_p, add_ldc_mdc, add_ce_text
 
 
 # Path
@@ -48,6 +48,7 @@ def main():
         .pipe(split_fix_var)
         .pipe(get_cc_function)
         .pipe(filter_var_cost)
+        .pipe(filter_fgk_p)
         .pipe(remove_s90xxx_accounts)
         .pipe(add_ldc_mdc)
         .pipe(add_ce_text)

@@ -4,6 +4,13 @@ def filter_var_cost(df):
     return df
 
 
+def filter_fgk_p(df):
+    """filter out cost center group FGK-S"""
+    df = df.dropna(subset=["lv4"])
+    df = df[df["lv4"].str.endswith("FGK-P")]
+    return df
+
+
 def add_ldc_mdc(df):
     # Var costs : Add LDC / MDC information
     df["ldc_mdc"] = df.apply(helper_add_ldc_mdc, axis="columns")
@@ -22,7 +29,13 @@ def helper_add_ldc_mdc(row):
     elif row["function_2"] == "FGK":
         if row["acc_lv2"] == "299 Total Labor Costs":
             return "LDC"
+        elif row["gl_accounts"] == "K4503":
+            return "LDC"
         elif row["acc_lv2"] == "465 Cost of materials":
+            return "MDC"
+        elif row["gl_accounts"] == "S87413":  # Maintenance technician from 2024
+            return "MDC"
+        elif row["gl_accounts"] == "S99116":
             return "MDC"
 
     # "else:" is NOT needed after nested if statement
