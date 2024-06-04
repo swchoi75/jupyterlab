@@ -22,7 +22,7 @@ path = Path(__file__).parent.parent
 def main():
 
     # Filenames
-    input_file = path / "data" / "FC_2023/CF_FC7.dat"
+    input_file = path / "data" / "FC_2024/CF_FC2.dat"
     meta_acc = path / "meta" / "0000_TABLE_MASTER_Acc level.csv"
     meta_cc_general = path / "meta" / "0000_TABLE_MASTER_Cost center_general.csv"
     meta_cc_hierarchy = path / "meta" / "0000_TABLE_MASTER_Cost center_hierarchy.csv"
