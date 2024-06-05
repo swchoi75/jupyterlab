@@ -42,7 +42,9 @@ def helper_add_ldc_mdc(row):
             return "MDC"
         elif row["gl_accounts"] == "S87413":  # Maintenance technician from 2024
             return "MDC"
-        elif row["gl_accounts"] == "S99116":
+        elif row["gl_accounts"] == "S99116":  # ast-hours (order)
+            return "MDC"
+        elif row["gl_accounts"] == "S99122":  # Engineering working hours
             return "MDC"
 
     # "else:" is NOT needed after nested if statement
