@@ -15,7 +15,7 @@ def concat_sheet(input_file, list_of_sheets):
         pd.read_excel(
             input_file,
             sheet_name=sheet_name,
-            usecols="A:T",
+            usecols="A:U",
             dtype={
                 "Act 2023": float,
                 "FC 2024": float,
