@@ -14,7 +14,7 @@ def main():
     # Filenames
     input_file = path / "db" / "ZVAR.parquet"
     # input_file = path / "db" / f"ZVAR_{year}.parquet"
-    output_file = path / "db" / f"ZVAR_{year}_new.parquet"
+    # output_file = path / "db" / f"ZVAR_{year}_new.parquet"
 
     # Read data
     df = pd.read_parquet(input_file)
