@@ -3,13 +3,14 @@ from janitor import clean_names
 from pathlib import Path
 
 
+# Path
+path = Path(__file__).parent.parent
+
+
 def main():
 
     # Variables
     year = "2022"
-
-    # Path
-    path = Path(__file__).parent.parent
 
     # Filenames
     input_file = path / "db" / "ZVAR.parquet"

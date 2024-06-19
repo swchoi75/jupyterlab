@@ -2,6 +2,10 @@ import pandas as pd
 from pathlib import Path
 
 
+# Path
+path = Path(__file__).parent.parent
+
+
 # Functions
 def merge_dataframes(list_of_files):
     dataframes = [pd.read_parquet(file) for file in list_of_files]
@@ -12,7 +16,6 @@ def merge_dataframes(list_of_files):
 def main():
 
     # Path
-    path = Path(__file__).parent.parent
     data_path = path / "db"
 
     # Filenames
