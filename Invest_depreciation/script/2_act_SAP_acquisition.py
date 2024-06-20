@@ -14,9 +14,13 @@ except NameError:
 
 # Functions
 def read_data(filename):
-    df = pd.read_excel(
+    df = pd.read_csv(
         filename,
-        header=3,
+        sep="\t",
+        skiprows=3,
+        encoding="UTF-16LE",
+        skipinitialspace=True,
+        thousands=",",
         dtype={
             "Asset Clas": str,
             "Cost Cente": str,
