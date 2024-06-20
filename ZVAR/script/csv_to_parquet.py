@@ -50,7 +50,7 @@ def rename_columns(df):
 def main():
 
     # Variable
-    year = "2021"
+    from variable_year import year
 
     # Filenames
     input_file = path / "db" / f"ZVAR_{year}.csv"

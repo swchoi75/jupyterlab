@@ -64,10 +64,10 @@ def clean_column_names(df):
 def main():
 
     # Variable
-    year = "2021"
+    from variable_year import year
 
-    # Path
-    data_path = path / "data" / year
+    # path
+    data_path = path / "data"
 
     # Filnames
     output_file = path / "db" / f"ZVAR_{year}.csv"

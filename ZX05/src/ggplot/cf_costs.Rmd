@@ -1,0 +1,64 @@
+---
+title: "Central Function costs 2023 YTD May"
+date: "2023-06-29"
+output:
+  html_document:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include=FALSE}
+library(knitr)
+library(kableExtra)
+source("cf_costs.R")
+```
+
+
+- Others: 2022 Incentive accrual adjustment by -241 Mio KRW in March
+
+```{r Delta Chart, echo=FALSE}
+p1 <- delta_chart(df, "department") +
+  labs(x = "Delta to Plan in M KRW", y = "Departments")
+
+p2 <- delta_chart(df, "cost_ctr") +
+  labs(x = "Delta to Plan in M KRW", y = "Cost centers")
+
+p1 + theme_minimal()
+p2 + theme_classic()
+```
+
+
+```{r top-10-negative, echo=FALSE}
+opts <- options(knitr.kable.NA = "")
+knitr::kable(bind_rows(top_10_negative, df_sum),
+  caption = "Top 10 Negative variations",
+  format.args = list(big.mark = ",", scientific = FALSE)
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  row_spec(nrow(top_10_negative) + 1, bold = TRUE)
+```
+
+
+```{r top-10-positive, echo=FALSE}
+opts <- options(knitr.kable.NA = "")
+knitr::kable(bind_rows(top_10_positive, df_sum),
+  caption = "Top 10 Positive variations",
+  format.args = list(big.mark = ",", scientific = FALSE)
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  row_spec(nrow(top_10_positive) + 1, bold = TRUE)
+```
+
+
+```{r, include=FALSE}
+opts <- options(knitr.kable.NA = "")
+knitr::kable(bind_rows(df, df_sum),
+  caption = "Central Function costs 2023 YTD May",
+  format.args = list(big.mark = ",", scientific = FALSE)
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  row_spec(nrow(df) + 1, bold = TRUE)
+```

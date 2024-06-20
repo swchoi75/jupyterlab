@@ -7,7 +7,7 @@ from forecastfiles import (
     reorder_columns,
     process_fc_numeric_columns,
 )
-from commonfunctions import (
+from common_function import (
     remove_unnecessary_columns,
     read_master_data,
     master_cc,
@@ -30,12 +30,15 @@ path = Path(__file__).parent.parent
 
 def main():
 
+    # Variables
+    from common_variable import year, fc_version
+
     # Filenames
-    input_file = path / "data" / "FC_2024/PL_FC2.dat"
+    input_file = path / "data" / f"FC_{year}/PL_{fc_version}.dat"
     meta_acc = path / "meta" / "0000_TABLE_MASTER_Acc level.csv"
     meta_cc_general = path / "meta" / "0000_TABLE_MASTER_Cost center_general.csv"
     meta_cc_hierarchy = path / "meta" / "0000_TABLE_MASTER_Cost center_hierarchy.csv"
-    meta_coom = path / "meta" / "0004_TABLE_MASTER_COOM_2024.csv"
+    meta_coom = path / "meta" / f"0004_TABLE_MASTER_COOM_{year}.csv"
     meta_poc = path / "meta" / "POC.csv"
     output_file = path / "output" / "PL fix costs FC.csv"
 

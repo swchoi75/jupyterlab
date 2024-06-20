@@ -92,12 +92,15 @@ def reorder_columns(df):
 
 def main():
 
+    # Variables
+    from common_variable import year
+
     # path
     data_path = path / "data"
 
     # Filnames
-    output_file_cf = path / "db" / "CF_2024.csv"
-    output_file_pl = path / "db" / "PL_2024.csv"
+    output_file_cf = path / "db" / f"CF_{year}.csv"
+    output_file_pl = path / "db" / f"PL_{year}.csv"
 
     # List of multiple files
     dat_files = [

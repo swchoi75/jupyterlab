@@ -1,6 +1,6 @@
 import pandas as pd
 from pathlib import Path
-from commonfunctions import (
+from common_function import (
     process_numeric_columns,
     remove_unnecessary_columns,
     read_master_data,
@@ -40,6 +40,9 @@ def filter_overtime_costs(df):
 
 def main():
 
+    # Variables
+    from common_variable import year
+
     # Filenames
     db_file_2020 = path / "db" / "PL_2020.csv"
     db_file_2021 = path / "db" / "PL_2021.csv"
@@ -50,7 +53,7 @@ def main():
     meta_acc = path / "meta" / "0000_TABLE_MASTER_Acc level.csv"
     meta_cc_general = path / "meta" / "0000_TABLE_MASTER_Cost center_general.csv"
     meta_cc_hierarchy = path / "meta" / "0000_TABLE_MASTER_Cost center_hierarchy.csv"
-    meta_coom = path / "meta" / "0004_TABLE_MASTER_COOM_2024.csv"
+    meta_coom = path / "meta" / f"0004_TABLE_MASTER_COOM_{year}.csv"
     meta_poc = path / "meta" / "POC.csv"
 
     output_file = path / "output" / "PL var OT costs 2020-2024 YTD.csv"

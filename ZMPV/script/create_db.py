@@ -85,7 +85,7 @@ def clean_column_names(df):
 def main():
 
     # Variable
-    year = "2024"
+    from variable_year import year
 
     # path
     data_path = path / "data"

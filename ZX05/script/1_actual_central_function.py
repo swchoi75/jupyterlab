@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 from janitor import clean_names
-from commonfunctions import (
+from common_function import (
     read_db,
     process_numeric_columns,
     remove_unnecessary_columns,
@@ -18,8 +18,12 @@ path = Path(__file__).parent.parent
 
 # Functions
 def main():
+
+    # Variables
+    from common_variable import year
+
     # Filenames
-    db_file = path / "db" / "CF_2024.csv"
+    db_file = path / "db" / f"CF_{year}.csv"
     meta_acc = path / "meta" / "0000_TABLE_MASTER_Acc level.csv"
     meta_cc_general = path / "meta" / "0000_TABLE_MASTER_Cost center_general.csv"
     meta_cc_hierarchy = path / "meta" / "0000_TABLE_MASTER_Cost center_hierarchy.csv"
