@@ -86,7 +86,7 @@ def handle_missing_vals(df, column_name):
     """Filter out missing or zero value"""
     df = df.dropna(subset="master")
     df = df.dropna(subset=column_name)
-    df = df[df[column_name] != 0]
+    # df = df[df[column_name] != 0]  # Not valid for Plan year
     return df
 
 
