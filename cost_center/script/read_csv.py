@@ -7,18 +7,34 @@ from janitor import clean_names
 path = Path(__file__).parent.parent
 
 
-# Filenames
-input_file = path / "data" / "0004_TABLE_OUTPUT_Cctr report common.csv"
-output_file = path / "output" / "cost_center_report.csv"
+# Functions
+def read_data(filename):
+    df = pd.read_csv(filename, dtype={"Cctr": str}).clean_names()
+    df["period"] = pd.to_datetime(df["period"])
+    return df
 
 
-# Read data
-# df = pd.read_excel(excel_file)
-df = pd.read_csv(input_file, dtype={"Cctr": str}).clean_names()
+def filter_by_year(df, year):
+    df = df[df["period"].dt.year == year]
+    return df
 
 
-# Process data
+def main():
+
+    # Filenames
+    input_file = path / "data" / "0004_TABLE_OUTPUT_Cctr report common.csv"
+    output_file = path / "output" / "cost_center_report.csv"
+
+    # Read data
+    df = read_data(input_file)
+
+    # Process data
+    df = df.pipe(filter_by_year, 2024)
+
+    # Write data
+    df.to_csv(output_file, index=False)
+    print("A file is created")
 
 
-# Write data
-df.to_csv(output_file, index=False)
+if __name__ == "__main__":
+    main()
