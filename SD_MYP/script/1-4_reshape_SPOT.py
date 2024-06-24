@@ -132,7 +132,7 @@ def main():
     id_cols_2 = id_cols
     id_cols_2.append("year")
     id_cols_2.remove("source")
-    list_of_years = ["2025", "2026", "2027", "2028", "2029", "2030"]
+    list_of_years = ["2024", "2025", "2026", "2027", "2028", "2029", "2030"]
     df_2 = (
         df.pipe(drop_columns, ["price"])
         .pipe(pivot_data_wider_2, id_cols_2)
