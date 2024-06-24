@@ -91,11 +91,14 @@ def main():
 
     # Process data
     df = (
+        # Add master data
         df.merge(df_acc, on="account_no", how="left")
         .merge(df_cc, on="cctr", how="left")
+        # Filter data
         .pipe(filter_primary_costs)
         .pipe(filter_by_year, report_year)
         .pipe(filter_by_responsible, responsible_name)
+        # Reshape data
         .pipe(pivot_wider)
         .pipe(sort_data)
     )
@@ -109,8 +112,11 @@ def main():
 
     colums_to_reorder = ["target", "actual", "plan", "fc"]
 
-    df = df.pipe(rename_columns, columns_to_rename).pipe(
-        reorder_columns, colums_to_reorder
+    df = (
+        # Rename and Reorder value columns
+        df.pipe(rename_columns, columns_to_rename).pipe(
+            reorder_columns, colums_to_reorder
+        )
     )
 
     # Write data
