@@ -15,6 +15,13 @@ def read_data(filename):
     return df
 
 
+def read_acc_master(filename):
+    df = pd.read_csv(filename).clean_names()
+    df = df.rename(columns={"account_no_": "account_no"})
+    df = df[["account_no", "account_name", "acc_lv1", "acc_lv2", "acc_lv3"]]
+    return df
+
+
 def read_cc_master(filename):
     df = pd.read_csv(filename, dtype={"Cctr": str}).clean_names()
     df = df[["cctr", "responsible"]]
@@ -22,7 +29,7 @@ def read_cc_master(filename):
 
 
 def filter_primary_costs(df):
-    df = df[df["account_no"].str[0] == "K"]
+    df = df[df["acc_lv3"] == "500 Dir.cost centre costs"]
     return df
 
 
@@ -38,7 +45,7 @@ def filter_by_responsible(df, responsible):
 
 def pivot_wider(df):
     df = df.pivot_table(
-        index=["cctr", "account_no", "period", "pctr", "f_v_cost", "responsible"],
+        index=[col for col in df.columns if col not in ["filter", "amt"]],
         columns=["filter"],
         values="amt",
         aggfunc="sum",
@@ -48,6 +55,18 @@ def pivot_wider(df):
 
 def rename_columns(df, columns_to_rename):
     df = df.rename(columns=columns_to_rename)
+    return df
+
+
+def reorder_columns(df, colums_to_reorder):
+    df = df[
+        [col for col in df.columns if col not in colums_to_reorder] + colums_to_reorder
+    ]
+    return df
+
+
+def sort_data(df):
+    df = df.sort_values(by=["period", "cctr", "account_no"])
     return df
 
 
@@ -62,12 +81,12 @@ def main():
     meta_acc = path / "meta" / "0000_TABLE_MASTER_Acc level.csv"
     meta_cc = path / "meta" / "0000_TABLE_MASTER_Cost center_general.csv"
     meta_poc = path / "meta" / "POC.csv"
-    output_file = path / "output" / "cost_center_report.csv"
+    output_file = path / "output" / "primary_cc_report.csv"
 
     # Read data
     df = read_data(input_file)
     df_cc = read_cc_master(meta_cc)
-    df_acc = pd.read_csv(meta_acc).clean_names()
+    df_acc = read_acc_master(meta_acc)
     df_poc = pd.read_csv(meta_poc).clean_names()
 
     # Process data
@@ -78,13 +97,18 @@ def main():
         "Period Target": "target",
     }
 
+    colums_to_reorder = ["target", "actual", "plan", "fc"]
+
     df = (
-        df.merge(df_cc, on="cctr", how="left")
+        df.merge(df_acc, on="account_no", how="left")
+        .merge(df_cc, on="cctr", how="left")
         .pipe(filter_primary_costs)
         .pipe(filter_by_year, report_year)
         .pipe(filter_by_responsible, responsible_name)
         .pipe(pivot_wider)
         .pipe(rename_columns, columns_to_rename)
+        .pipe(reorder_columns, colums_to_reorder)
+        .pipe(sort_data)
     )
 
     # Write data
