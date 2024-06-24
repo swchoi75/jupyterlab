@@ -53,6 +53,11 @@ def pivot_wider(df):
     return df
 
 
+def sort_data(df):
+    df = df.sort_values(by=["period", "cctr", "account_no"])
+    return df
+
+
 def rename_columns(df, columns_to_rename):
     df = df.rename(columns=columns_to_rename)
     return df
@@ -62,11 +67,6 @@ def reorder_columns(df, colums_to_reorder):
     df = df[
         [col for col in df.columns if col not in colums_to_reorder] + colums_to_reorder
     ]
-    return df
-
-
-def sort_data(df):
-    df = df.sort_values(by=["period", "cctr", "account_no"])
     return df
 
 
@@ -90,6 +90,16 @@ def main():
     df_poc = pd.read_csv(meta_poc).clean_names()
 
     # Process data
+    df = (
+        df.merge(df_acc, on="account_no", how="left")
+        .merge(df_cc, on="cctr", how="left")
+        .pipe(filter_primary_costs)
+        .pipe(filter_by_year, report_year)
+        .pipe(filter_by_responsible, responsible_name)
+        .pipe(pivot_wider)
+        .pipe(sort_data)
+    )
+
     columns_to_rename = {
         "FC": "fc",
         "Period": "actual",
@@ -99,16 +109,8 @@ def main():
 
     colums_to_reorder = ["target", "actual", "plan", "fc"]
 
-    df = (
-        df.merge(df_acc, on="account_no", how="left")
-        .merge(df_cc, on="cctr", how="left")
-        .pipe(filter_primary_costs)
-        .pipe(filter_by_year, report_year)
-        .pipe(filter_by_responsible, responsible_name)
-        .pipe(pivot_wider)
-        .pipe(rename_columns, columns_to_rename)
-        .pipe(reorder_columns, colums_to_reorder)
-        .pipe(sort_data)
+    df = df.pipe(rename_columns, columns_to_rename).pipe(
+        reorder_columns, colums_to_reorder
     )
 
     # Write data
