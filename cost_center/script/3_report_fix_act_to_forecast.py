@@ -47,7 +47,7 @@ def main():
 
     # Filenames
     input_file = path / "output" / "1_primary_cc_report.csv"
-    output_file = path / "output" / "3_fix_act_to_forecast_by_month.csv"
+    output_file = path / "output" / f"3_fix_actual_to_{version}_by_month.csv"
 
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})
