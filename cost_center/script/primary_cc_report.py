@@ -49,6 +49,7 @@ def pivot_wider(df):
         columns=["filter"],
         values="amt",
         aggfunc="sum",
+        fill_value=0,
     ).reset_index()
     return df
 
@@ -58,15 +59,13 @@ def sort_data(df):
     return df
 
 
-def rename_columns(df, columns_to_rename):
-    df = df.rename(columns=columns_to_rename)
+def rename_columns(df, cols_to_rename):
+    df = df.rename(columns=cols_to_rename)
     return df
 
 
-def reorder_columns(df, colums_to_reorder):
-    df = df[
-        [col for col in df.columns if col not in colums_to_reorder] + colums_to_reorder
-    ]
+def reorder_columns(df, cols_to_reorder):
+    df = df[[col for col in df.columns if col not in cols_to_reorder] + cols_to_reorder]
     return df
 
 
@@ -110,17 +109,17 @@ def main():
         "Period Target": "target",
     }
 
-    colums_to_reorder = ["target", "actual", "plan", "fc"]
+    columns_to_reorder = ["target", "actual", "plan", "fc"]
 
     df = (
         # Rename and Reorder value columns
         df.pipe(rename_columns, columns_to_rename).pipe(
-            reorder_columns, colums_to_reorder
+            reorder_columns, columns_to_reorder
         )
     )
 
     # Write data
-    df.to_csv(output_file, index=False, na_rep=0)
+    df.to_csv(output_file, index=False)
     print("A file is created")
 
 
