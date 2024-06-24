@@ -57,7 +57,7 @@ def main():
         # "actual",
     ]
 
-    multi_cols_to_remove = [
+    multi_idx_cols_to_remove = [
         ("fc", f"{year}-01-01"),
         ("fc", f"{year}-02-01"),
         ("fc", f"{year}-03-01"),
@@ -75,7 +75,7 @@ def main():
     df = (
         df.pipe(remove_columns, val_cols_to_remove)
         .pipe(pivot_wider)
-        .pipe(remove_columns, multi_cols_to_remove)
+        .pipe(remove_columns, multi_idx_cols_to_remove)
         .pipe(add_delta_to_fc)
         .pipe(filter_fix_costs)
     )
