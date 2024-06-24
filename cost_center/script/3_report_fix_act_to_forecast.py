@@ -32,6 +32,11 @@ def add_delta_to_fc(df):
     return df
 
 
+def filter_fix_costs(df):
+    df = df[df["f_v_cost"] == "Fix cost"]
+    return df
+
+
 def main():
 
     # Variables
@@ -39,7 +44,7 @@ def main():
 
     # Filenames
     input_file = path / "output" / "1_primary_cc_report.csv"
-    output_file = path / "output" / "3_actual_to_fc_by_month.csv"
+    output_file = path / "output" / "3_fix_act_to_forecast_by_month.csv"
 
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})
@@ -72,6 +77,7 @@ def main():
         .pipe(pivot_wider)
         .pipe(remove_columns, multi_cols_to_remove)
         .pipe(add_delta_to_fc)
+        .pipe(filter_fix_costs)
     )
 
     # Write data
