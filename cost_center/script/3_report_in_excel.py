@@ -7,6 +7,27 @@ path = Path(__file__).parent.parent
 
 
 # Functions
+def format_excel_table(workbook, worksheet):
+    # Specify row heights
+    worksheet.set_row(0, 20)
+
+    # Specify column widths
+    # worksheet.set_column("C:C", 50)  # Title
+    # worksheet.set_column("D:D", 100)  # Description
+    # worksheet.set_column("E:F", 11)  # Status, Due_date
+
+    # Enable text wrapping for an entire column
+    column_format = workbook.add_format()
+    column_format.set_text_wrap()
+    worksheet.set_column("C:C", 50, column_format)  # Title
+
+    # Freeze panes
+    worksheet.freeze_panes(1, 0)
+
+    # Set zoom
+    worksheet.set_zoom(100)
+
+    # You can apply additional formatting to cells as needed
 
 
 def main():
@@ -20,14 +41,13 @@ def main():
     # Process data
 
     # Unique values
-    unique_categories = df["responsible"].unique()
+    unique_categories = df["cctr"].unique()
 
     # Write data
     with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
         for category in unique_categories:
             # Create a DataFrame for the current category
-            category_df = df[df["responsible"] == category]
-            category_df = category_df.drop(columns=["responsible"])
+            category_df = df[df["cctr"] == category]
 
             # Write the dataframe data to XlsxWriter. Turn off the default header and
             # index and skip one row to allow us to insert a user defined header.
@@ -73,7 +93,7 @@ def main():
             for col_num, value in enumerate(category_df.columns.values):
                 worksheet.write(0, col_num, value, header_format)
 
-            # format_excel_table(workbook, worksheet)
+            format_excel_table(workbook, worksheet)
 
     print("A file is created")
 
