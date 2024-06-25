@@ -58,13 +58,18 @@ def add_delta_to_ytd_plan(df):
     return df
 
 
-def reorder_columns(df, cols_to_reorder):
-    df = df[[col for col in df.columns if col not in cols_to_reorder] + cols_to_reorder]
+def rename_columns(df, cols_to_rename):
+    df = df.rename(columns=cols_to_rename)
     return df
 
 
-def rename_columns(df, cols_to_rename):
-    df = df.rename(columns=cols_to_rename)
+def reorder_first_columns(df, cols_to_reorder):
+    df = df[cols_to_reorder + [col for col in df.columns if col not in cols_to_reorder]]
+    return df
+
+
+def reorder_last_columns(df, cols_to_reorder):
+    df = df[[col for col in df.columns if col not in cols_to_reorder] + cols_to_reorder]
     return df
 
 
@@ -83,65 +88,6 @@ def main():
     # Process data
     value_columns = ["actual", "ytd_plan", "plan", "fc"]  # remove "target"
 
-    columns_to_reorder = ["actual", "ytd_plan", "delta", "plan", "fc"]
-
-    columns_to_remove = [
-        # YTD Plan
-        f"ytd_plan_{year}-01-01",
-        f"ytd_plan_{year}-02-01",
-        f"ytd_plan_{year}-03-01",
-        f"ytd_plan_{year}-04-01",
-        f"ytd_plan_{year}-05-01",
-        f"ytd_plan_{year}-06-01",
-        f"ytd_plan_{year}-07-01",
-        f"ytd_plan_{year}-08-01",
-        f"ytd_plan_{year}-09-01",
-        f"ytd_plan_{year}-10-01",
-        f"ytd_plan_{year}-11-01",
-        f"ytd_plan_{year}-12-01",
-        # Plan
-        f"plan_{year}-01-01",
-        f"plan_{year}-02-01",
-        f"plan_{year}-03-01",
-        f"plan_{year}-04-01",
-        f"plan_{year}-05-01",
-        f"plan_{year}-06-01",
-        f"plan_{year}-07-01",
-        f"plan_{year}-08-01",
-        f"plan_{year}-09-01",
-        f"plan_{year}-10-01",
-        f"plan_{year}-11-01",
-        f"plan_{year}-12-01",
-        # FC
-        f"fc_{year}-01-01",
-        f"fc_{year}-02-01",
-        f"fc_{year}-03-01",
-        f"fc_{year}-04-01",
-        f"fc_{year}-05-01",
-        f"fc_{year}-06-01",
-        f"fc_{year}-07-01",
-        f"fc_{year}-08-01",
-        f"fc_{year}-09-01",
-        f"fc_{year}-10-01",
-        f"fc_{year}-11-01",
-        f"fc_{year}-12-01",
-    ]
-
-    columns_to_rename = {
-        "actual_2024-01-01": "act_01",
-        "actual_2024-02-01": "act_02",
-        "actual_2024-03-01": "act_03",
-        "actual_2024-04-01": "act_04",
-        "actual_2024-05-01": "act_05",
-        "actual_2024-06-01": "act_06",
-        "actual_2024-07-01": "act_07",
-        "actual_2024-08-01": "act_08",
-        "actual_2024-09-01": "act_09",
-        "actual_2024-10-01": "act_10",
-        "actual_2024-11-01": "act_11",
-        "actual_2024-12-01": "act_12",
-    }
-
     df = (
         df.pipe(filter_fix_costs)
         .pipe(remove_columns, ["target"])
@@ -149,9 +95,33 @@ def main():
         .pipe(flatten_columns)
         .pipe(remove_margin_row)
         .pipe(add_delta_to_ytd_plan)
-        .pipe(reorder_columns, columns_to_reorder)
+    )
+
+    columns_to_rename = {
+        # monthly columns for
+        # Actual
+        f"actual_{year:04d}-{month:02d}-01": f"act_{month:02d}"
+        for month in range(1, 13)
+    }
+
+    columns_to_remove = (
+        # monthly columns for
+        # YTD Plan
+        [f"ytd_plan_{year:04d}-{month:02d}-01" for month in range(1, 13)]
+        # Plan
+        + [f"plan_{year:04d}-{month:02d}-01" for month in range(1, 13)]
+        # FC
+        + [f"fc_{year:04d}-{month:02d}-01" for month in range(1, 13)]
+    )
+
+    first_columns_to_reorder = ["cctr", "account_no", "account_name", "plan", "fc"]
+    last_columns_to_reorder = ["actual", "ytd_plan", "delta", "plan", "fc"]
+
+    df = (
+        df.pipe(rename_columns, columns_to_rename)
         .pipe(remove_columns, columns_to_remove)
-        .pipe(rename_columns, columns_to_rename)
+        .pipe(reorder_first_columns, first_columns_to_reorder)
+        .pipe(reorder_last_columns, last_columns_to_reorder)
     )
 
     # Write data
