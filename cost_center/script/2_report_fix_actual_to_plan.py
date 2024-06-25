@@ -118,7 +118,7 @@ def main():
         .pipe(remove_columns, multi_idx_cols_to_remove)
         .pipe(add_delta_to_ytd_plan)
         .pipe(reorder_columns, columns_to_reorder)
-        # .pipe(remove_margin_row)
+        .pipe(remove_margin_row)
     )
 
     # Write data
