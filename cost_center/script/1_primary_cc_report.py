@@ -1,4 +1,6 @@
+import datetime
 import pandas as pd
+import numpy as np
 from pathlib import Path
 from janitor import clean_names
 
@@ -69,10 +71,31 @@ def reorder_columns(df, cols_to_reorder):
     return df
 
 
+def add_ytd_plan(df, year, month):
+    # Create a pandas Timestamp for the first day of the next month
+    first_of_next_month = pd.Timestamp(year, month, 1) + pd.DateOffset(months=1)
+    # Subtract one day to get the last day of the report month
+    end_of_ytd_month = first_of_next_month - pd.DateOffset(days=1)
+    # Copy plan data to create a new column
+    df["ytd_plan"] = df["plan"]
+    # Replace plan values after ytd_month with zero
+    df["ytd_plan"] = np.where(df["period"] <= end_of_ytd_month, df["ytd_plan"], 0)
+
+    return df
+
+
 def main():
 
     # Variables
     report_year = 2024
+    report_month = 5
+    # Create a pandas Timestamp for the first day of the next month
+    first_of_next_month = pd.Timestamp(report_year, report_month, 1) + pd.DateOffset(
+        months=1
+    )
+
+    # Subtract one day to get the last day of the report month
+    end_of_month = first_of_next_month - pd.DateOffset(days=1)
     responsible_name = "Kim, Hagjae"
 
     # Filenames
@@ -113,11 +136,12 @@ def main():
 
     df = (
         # Rename and Reorder value columns
-        df.pipe(rename_columns, columns_to_rename).pipe(
-            reorder_columns, columns_to_reorder
-        )
+        df.pipe(rename_columns, columns_to_rename)
+        .pipe(reorder_columns, columns_to_reorder)   
+        # Add new value column "ytd_plan"
+        .pipe(add_ytd_plan, report_year, report_month)
     )
-
+    
     # Write data
     df.to_csv(output_file, index=False)
     print("A file is created")
