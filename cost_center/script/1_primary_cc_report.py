@@ -87,16 +87,7 @@ def add_ytd_plan(df, year, month):
 def main():
 
     # Variables
-    report_year = 2024
-    report_month = 5
-    # Create a pandas Timestamp for the first day of the next month
-    first_of_next_month = pd.Timestamp(report_year, report_month, 1) + pd.DateOffset(
-        months=1
-    )
-
-    # Subtract one day to get the last day of the report month
-    end_of_month = first_of_next_month - pd.DateOffset(days=1)
-    responsible_name = "Kim, Hagjae"
+    from common_variable import year, month, responsible_name
 
     # Filenames
     input_file = path / "data" / "0004_TABLE_OUTPUT_Cctr report common.csv"
@@ -118,7 +109,7 @@ def main():
         .merge(df_cc, on="cctr", how="left")
         # Filter data
         .pipe(filter_primary_costs)
-        .pipe(filter_by_year, report_year)
+        .pipe(filter_by_year, year)
         .pipe(filter_by_responsible, responsible_name)
         # Reshape data
         .pipe(pivot_wider)
@@ -136,12 +127,13 @@ def main():
 
     df = (
         # Rename and Reorder value columns
-        df.pipe(rename_columns, columns_to_rename)
-        .pipe(reorder_columns, columns_to_reorder)   
+        df.pipe(rename_columns, columns_to_rename).pipe(
+            reorder_columns, columns_to_reorder
+        )
         # Add new value column "ytd_plan"
-        .pipe(add_ytd_plan, report_year, report_month)
+        .pipe(add_ytd_plan, year, month)
     )
-    
+
     # Write data
     df.to_csv(output_file, index=False)
     print("A file is created")

@@ -45,7 +45,7 @@ def reorder_columns(df, cols_to_reorder):
 def main():
 
     # Variables
-    year = 2024
+    from common_variable import year
 
     # Filenames
     input_file = path / "output" / "1_primary_cc_report.csv"
