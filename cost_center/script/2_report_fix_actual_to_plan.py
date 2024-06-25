@@ -42,6 +42,11 @@ def reorder_columns(df, cols_to_reorder):
     return df
 
 
+def remove_margin_row(df):
+    df = df[df[("cctr",)] != "All"]
+    return df
+
+
 def main():
 
     # Variables
@@ -113,6 +118,7 @@ def main():
         .pipe(remove_columns, multi_idx_cols_to_remove)
         .pipe(add_delta_to_ytd_plan)
         .pipe(reorder_columns, columns_to_reorder)
+        # .pipe(remove_margin_row)
     )
 
     # Write data
