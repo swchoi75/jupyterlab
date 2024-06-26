@@ -13,13 +13,19 @@ path = Path(__file__).parent.parent
 def read_data(filename):
     df = pd.read_csv(filename, dtype={"Cctr": str}).clean_names()
     df["period"] = pd.to_datetime(df["period"])
-    df = df.rename(columns={"account_no_": "account_no"})
+
+    # clean_trailing_underscore
+    df.columns = df.columns.map(lambda x: x.rstrip("_"))
+
     return df
 
 
 def read_acc_master(filename):
     df = pd.read_csv(filename).clean_names()
-    df = df.rename(columns={"account_no_": "account_no"})
+
+    # clean_trailing_underscore
+    df.columns = df.columns.map(lambda x: x.rstrip("_"))
+
     df = df[["account_no", "account_name", "acc_lv1", "acc_lv2", "acc_lv3"]]
     return df
 
