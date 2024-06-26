@@ -11,15 +11,18 @@ def format_excel_table(workbook, worksheet):
     # Specify row heights
     worksheet.set_row(0, 20)
 
-    # Specify column widths
-    # worksheet.set_column("C:C", 50)  # Title
-    # worksheet.set_column("D:D", 100)  # Description
-    # worksheet.set_column("E:F", 11)  # Status, Due_date
+    # Specify key columns widths
+    worksheet.set_column("C:C", 26)  # account_name
+    worksheet.set_column("D:D", 9)  # pctr
+    worksheet.set_column("F:F", 40)  # acc_lv1
+    worksheet.set_column("G:I", 22)  # acc_lv2, acc_lv3, responsible
+
+    # Specify values columns widths and format
+    worksheet.set_column("J:Z", 10)
 
     # Enable text wrapping for an entire column
     column_format = workbook.add_format()
     column_format.set_text_wrap()
-    worksheet.set_column("C:C", 50, column_format)  # Title
 
     # Freeze panes
     worksheet.freeze_panes(1, 0)
@@ -38,13 +41,12 @@ def main():
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})
 
-    # Process data
-
-    # Unique values
-    unique_categories = df["cctr"].unique()
-
     # Write data
     with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
+
+        # Unique values
+        unique_categories = df["cctr"].unique()
+
         for category in unique_categories:
             # Create a DataFrame for the current category
             category_df = df[df["cctr"] == category]
@@ -63,7 +65,7 @@ def main():
             (max_row, max_col) = category_df.shape
 
             # Create a list of column headers, to use in add_table().
-            column_settings = [{"header": column} for column in category_df.columns]
+            header_columns = [{"header": column} for column in category_df.columns]
 
             # Add the Excel table structure.
             worksheet.add_table(
@@ -72,7 +74,7 @@ def main():
                 max_row,
                 max_col - 1,
                 {
-                    "columns": column_settings,
+                    "columns": header_columns,
                     "style": "Table Style Medium 3",
                     "name": category,
                 },

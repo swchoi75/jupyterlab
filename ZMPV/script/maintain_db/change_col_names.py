@@ -8,14 +8,10 @@ path = Path(__file__).parent.parent
 
 
 # Functions
-def clean_trailing_underscore(column_name):
-    """Functions to clean column names"""
-    return column_name.rstrip("_")
-
-
 def clean_column_names(df):
     """Apply the cleaning function to all column names"""
-    df.columns = df.columns.map(clean_trailing_underscore)
+    # clean trailing underscore
+    df.columns = df.columns.map(lambda x: x.rstrip("_"))
     return df
 
 

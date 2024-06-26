@@ -14,7 +14,7 @@ def read_data(filename):
     df = pd.read_csv(filename, dtype={"Cctr": str}).clean_names()
     df["period"] = pd.to_datetime(df["period"])
 
-    # clean_trailing_underscore
+    # clean trailing underscore
     df.columns = df.columns.map(lambda x: x.rstrip("_"))
 
     return df
@@ -23,7 +23,7 @@ def read_data(filename):
 def read_acc_master(filename):
     df = pd.read_csv(filename).clean_names()
 
-    # clean_trailing_underscore
+    # clean trailing underscore
     df.columns = df.columns.map(lambda x: x.rstrip("_"))
 
     df = df[["account_no", "account_name", "acc_lv1", "acc_lv2", "acc_lv3"]]

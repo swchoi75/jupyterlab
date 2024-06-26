@@ -23,21 +23,17 @@ def read_data(filename):
     return df
 
 
-def clean_new_lines(column_name):
-    """Functions to clean column names"""
-    return column_name.replace("\n", "")
-
-
-def clean_trailing_underscore(column_name):
-    """Functions to clean column names"""
-    return column_name.rstrip("_")
-
-
 def clean_column_names(df):
     """Apply the cleaning function to all column names"""
-    df.columns = df.columns.map(clean_new_lines)
+
+    # clean new lines
+    df.columns = df.columns.map(lambda x: x.replace("\n", ""))
+
     df = df.clean_names()
-    df.columns = df.columns.map(clean_trailing_underscore)
+
+    # clean trailing underscore
+    df.columns = df.columns.map(lambda x: x.rstrip("_"))
+
     return df
 
 

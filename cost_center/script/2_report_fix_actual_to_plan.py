@@ -36,7 +36,7 @@ def flatten_columns(df):
         for col in df.columns.values
     ]
 
-    # clean_trailing_underscore
+    # clean trailing underscore
     df.columns = df.columns.map(lambda x: x.rstrip("_"))
 
     # remove "_All"
