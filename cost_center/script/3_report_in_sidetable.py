@@ -8,6 +8,11 @@ path = Path(__file__).parent.parent
 
 
 # Functions
+def remove_columns(df, cols_to_remove):
+    df = df[[col for col in df.columns if col not in cols_to_remove]]
+    return df
+
+
 def add_subtotal(df, category_columns, numeric_columns):
     """Add subtotal rows for the hirerachical category columns"""
 
@@ -16,7 +21,7 @@ def add_subtotal(df, category_columns, numeric_columns):
     df = df.groupby(category_columns).agg(agg_funcs)
 
     # (sidetable) add subtotal rows
-    df = df.stb.subtotal(sub_level=[4, 5])  # 1 based
+    df = df.stb.subtotal(sub_level=[1, 2])  # 1 based
 
     # change back to original category_column names
     df = df.reset_index()
@@ -35,6 +40,12 @@ def main():
     df = pd.read_csv(input_file, dtype={"cctr": str})
 
     # Process data
+    ## Remove unnecessary columns
+    columns_to_remove = ["responsible", "f_v_cost", "acc_lv3"]
+
+    df = df.pipe(remove_columns, columns_to_remove)
+
+    ## Sub-total
     category_columns = df.select_dtypes(include="object").columns.to_list()
     numeric_columns = df.select_dtypes(include="number").columns.to_list()
 
