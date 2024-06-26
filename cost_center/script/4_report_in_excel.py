@@ -35,8 +35,8 @@ def format_excel_table(workbook, worksheet):
 
 def main():
     # Filenames
-    input_file = path / "output" / "2_fix_act_to_plan_by_month.csv"
-    output_file = path / "output" / "3_report.xlsx"
+    input_file = path / "output" / "3_fix_act_to_plan_subtotal.csv"
+    output_file = path / "output" / "4_report.xlsx"
 
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})

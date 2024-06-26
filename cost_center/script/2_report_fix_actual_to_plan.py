@@ -113,7 +113,17 @@ def main():
         + [f"fc_{year:04d}-{month:02d}-01" for month in range(1, 13)]
     )
 
-    first_columns_to_reorder = ["cctr", "account_no", "account_name", "plan", "fc"]
+    first_columns_to_reorder = [
+        "responsible",
+        "f_v_cost",
+        "acc_lv3",
+        "acc_lv2",
+        "acc_lv1",
+        "account_no",
+        "account_name",
+        "pctr",
+        "cctr",
+    ]
     last_columns_to_reorder = ["actual", "ytd_plan", "delta", "plan", "fc"]
 
     df = (
