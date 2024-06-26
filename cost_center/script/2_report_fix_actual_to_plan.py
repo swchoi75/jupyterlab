@@ -29,12 +29,10 @@ def pivot_wider(df, val_cols):
     return df
 
 
-def flatten_columns(df):
+def flatten_multi_index(df):
     """Flatten MultiIndex Columns"""
-    df.columns = [
-        "_".join(col).strip() if isinstance(col, tuple) else col
-        for col in df.columns.values
-    ]
+    df.columns = df.columns.to_flat_index()
+    df.columns = ["_".join(col).strip() for col in df.columns]
 
     # clean trailing underscore
     df.columns = df.columns.map(lambda x: x.rstrip("_"))
@@ -92,7 +90,8 @@ def main():
         df.pipe(filter_fix_costs)
         .pipe(remove_columns, ["target"])
         .pipe(pivot_wider, value_columns)
-        .pipe(flatten_columns)
+        .pipe(flatten_multi_index)
+        # .pipe(clean_column_names)
         .pipe(remove_margin_row)
         .pipe(add_delta_to_ytd_plan)
     )

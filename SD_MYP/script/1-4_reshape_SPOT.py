@@ -62,17 +62,12 @@ def remove_zero_na(df):
     return df
 
 
-def clean_column_names(df):
-    """Apply the cleaning function to all column names"""
-    # clean trailing underscore
-    df.columns = df.columns.map(lambda x: x.rstrip("_"))
-    return df
-
-
 def flatten_multi_index(df):
     df.columns = df.columns.to_flat_index()
     df.columns = ["_".join(col).strip() for col in df.columns]
-    df = clean_column_names(df)
+
+    # clean trailing underscore
+    df.columns = df.columns.map(lambda x: x.rstrip("_"))
     return df
 
 
