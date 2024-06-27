@@ -104,9 +104,10 @@ def apply_formatting(workbook, worksheet):
     for col, width in column_list:
         worksheet.set_column(col, width)
 
-    # Enable text wrapping for an entire column
+    # Enable text wrapping for the specific column
     column_format = workbook.add_format()
-    column_format.set_text_wrap()  # seems to be NOT working
+    column_format.set_text_wrap()
+    worksheet.set_column("C:C", 50, column_format)  # Title
 
     # Freeze panes
     worksheet.freeze_panes(1, 0)
