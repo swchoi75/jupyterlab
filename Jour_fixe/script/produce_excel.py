@@ -3,12 +3,7 @@ from pathlib import Path
 
 
 # Path
-try:
-    path = Path(__file__).parent.parent
-except NameError:
-    import inspect
-
-    path = Path(inspect.getfile(lambda: None)).resolve().parent.parent
+path = Path(__file__).parent.parent
 
 
 # Functions
@@ -57,19 +52,61 @@ def select_columns(df):
     ]
 
 
-def format_excel_table(workbook, worksheet):
+def add_excel_table(df, worksheet, worksheet_name):
+
+    # Get the dimensions of the dataframe.
+    (max_row, max_col) = df.shape
+
+    # Create a list of column headers, to use in add_table().
+    column_settings = [{"header": column} for column in df.columns]
+
+    # Add the Excel table structure.
+    worksheet.add_table(
+        0,
+        0,
+        max_row,
+        max_col - 1,
+        {
+            "columns": column_settings,
+            "style": "Table Style Medium 3",
+            "name": worksheet_name,
+        },
+    )
+
+
+def apply_header_format(df, workbook, worksheet):
+    # Add header format
+    header_format = workbook.add_format(
+        {
+            "bold": True,
+            "align": "left",
+            "font_size": "14",
+            "font_color": "#4B4B46",  # VT Gray
+            "bg_color": "#F0E614",  # VT Yellow
+        }
+    )
+
+    # Write the header row explicitly with your formatting
+    for col_num, value in enumerate(df.columns.values):
+        worksheet.write(0, col_num, value, header_format)
+
+
+def apply_formatting(workbook, worksheet):
     # Specify row heights
     worksheet.set_row(0, 20)
 
-    # Specify column widths
-    worksheet.set_column("C:C", 50)  # Title
-    worksheet.set_column("D:D", 100)  # Description
-    worksheet.set_column("E:F", 11)  # Status, Due_date
+    # Specify columns widths
+    column_list = [
+        ("C:C", 50),  # Title
+        ("D:D", 100),  # Description
+        ("E:F", 11),  # Status, Due_date
+    ]
+    for col, width in column_list:
+        worksheet.set_column(col, width)
 
     # Enable text wrapping for an entire column
     column_format = workbook.add_format()
-    column_format.set_text_wrap()
-    worksheet.set_column("C:C", 50, column_format)  # Title
+    column_format.set_text_wrap()  # seems to be NOT working
 
     # Freeze panes
     worksheet.freeze_panes(1, 0)
@@ -90,19 +127,23 @@ def main():
     meta_file = path / "meta" / "email.csv"
     output_file = path / "output" / "report_jour_fixe.xlsx"
 
+    # Read data
+    df = read_data(input_file, meta_file)
+
+    # Process data
     df = (
-        read_data(input_file, meta_file)
-        .pipe(fileter_data, list_of_years)
+        df.pipe(fileter_data, list_of_years)
         .pipe(sort_data)
+        .pipe(rename_columns)
+        .pipe(select_columns)
     )
-
-    # Unique values
-    unique_categories = df["responsible"].unique()
-
-    df = df.pipe(rename_columns).pipe(select_columns)
 
     # Create a new Excel file and write separate sheets for each category
     with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
+
+        # Unique values
+        unique_categories = df["responsible"].unique()
+
         for category in unique_categories:
             # Create a DataFrame for the current category
             category_df = df[df["responsible"] == category]
@@ -118,41 +159,14 @@ def main():
             workbook = writer.book
             worksheet = writer.sheets[category]
 
-            # Get the dimensions of the dataframe.
-            (max_row, max_col) = category_df.shape
-
-            # Create a list of column headers, to use in add_table().
-            column_settings = [{"header": column} for column in category_df.columns]
-
-            # Add the Excel table structure.
-            worksheet.add_table(
-                0,
-                0,
-                max_row,
-                max_col - 1,
-                {
-                    "columns": column_settings,
-                    "style": "Table Style Medium 3",
-                    "name": category,
-                },
-            )
+            # Add Excel table
+            add_excel_table(category_df, worksheet, category)
 
             # Add header format
-            header_format = workbook.add_format(
-                {
-                    "bold": True,
-                    "align": "left",
-                    "font_size": "14",
-                    "font_color": "#4B4B46",  # VT Gray
-                    "bg_color": "#F0E614",  # VT Yellow
-                }
-            )
+            apply_header_format(category_df, workbook, worksheet)
 
-            # Write the header row explicitly with your formatting
-            for col_num, value in enumerate(category_df.columns.values):
-                worksheet.write(0, col_num, value, header_format)
-
-            format_excel_table(workbook, worksheet)
+            # Add formatting
+            apply_formatting(workbook, worksheet)
 
     print("A file is created")
 
