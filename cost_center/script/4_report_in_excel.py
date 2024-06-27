@@ -14,6 +14,10 @@ path = Path(__file__).parent.parent
 
 # Functions
 def main():
+
+    # Variables
+    skiprows = 5
+
     # Filenames
     input_file = path / "output" / "3-2_further_refine_report.csv"
     output_file = path / "output" / "4_cc_report_by_responsible.xlsx"
@@ -34,7 +38,11 @@ def main():
             # Write the dataframe data to XlsxWriter. Turn off the default header and
             # index and skip one row to allow us to insert a user defined header.
             category_df.to_excel(
-                writer, sheet_name=category, startrow=1, header=False, index=False
+                writer,
+                sheet_name=category,
+                startrow=1 + skiprows,
+                header=False,
+                index=False,
             )
 
             # Access the xlsxwriter workbook and worksheet
@@ -42,16 +50,16 @@ def main():
             worksheet = writer.sheets[category]
 
             # Add Excel table
-            add_excel_table(category_df, worksheet, category)
+            add_excel_table(category_df, worksheet, category, skiprows)
 
-            # Add header format
-            apply_header_formatting(category_df, workbook, worksheet)
+            # Add header formatting
+            apply_header_formatting(category_df, workbook, worksheet, skiprows)
 
             # Add conditional formatting
             apply_conditional_formatting(workbook, worksheet)
 
             # Add various other formatting
-            apply_other_formatting(workbook, worksheet)
+            apply_other_formatting(workbook, worksheet, skiprows)
 
     print("A file is created")
 

@@ -1,7 +1,7 @@
 # Functions
 
 
-def add_excel_table(df, worksheet, worksheet_name):
+def add_excel_table(df, worksheet, worksheet_name, skiprows):
 
     # Get the dimensions of the dataframe.
     (max_row, max_col) = df.shape
@@ -11,7 +11,7 @@ def add_excel_table(df, worksheet, worksheet_name):
 
     # Add the Excel table structure.
     worksheet.add_table(
-        0,
+        0 + skiprows,
         0,
         max_row,
         max_col - 1,
@@ -24,7 +24,7 @@ def add_excel_table(df, worksheet, worksheet_name):
     )
 
 
-def apply_header_formatting(df, workbook, worksheet):
+def apply_header_formatting(df, workbook, worksheet, skiprows):
     # Add header format
     format_header = workbook.add_format(
         {
@@ -38,7 +38,7 @@ def apply_header_formatting(df, workbook, worksheet):
 
     # Write the header row explicitly with your formatting
     for col_num, value in enumerate(df.columns.values):
-        worksheet.write(0, col_num, value, format_header)
+        worksheet.write(0 + skiprows, col_num, value, format_header)
 
 
 def apply_conditional_formatting(workbook, worksheet):
@@ -72,10 +72,10 @@ def apply_conditional_formatting(workbook, worksheet):
     )
 
 
-def apply_other_formatting(workbook, worksheet):
+def apply_other_formatting(workbook, worksheet, skiprows):
 
     # Specify row heights
-    worksheet.set_row(0, 20)
+    worksheet.set_row(0 + skiprows, 20)
 
     # Specify columns widths
     column_list = [
@@ -96,7 +96,7 @@ def apply_other_formatting(workbook, worksheet):
     worksheet.set_column("P:T", 12, format_numbers)
 
     # Freeze panes
-    worksheet.freeze_panes(1, 0)
+    worksheet.freeze_panes(1 + skiprows, 0)
 
     # Set zoom
     worksheet.set_zoom(100)
