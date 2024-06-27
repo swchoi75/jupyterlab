@@ -35,7 +35,7 @@ def format_excel_table(workbook, worksheet):
 
 def main():
     # Filenames
-    input_file = path / "output" / "3_fix_act_to_plan_subtotal.csv"
+    input_file = path / "output" / "3-2_further_refine_report.csv"
     output_file = path / "output" / "4_report.xlsx"
 
     # Read data

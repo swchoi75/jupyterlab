@@ -26,7 +26,7 @@ def read_acc_master(filename):
     # clean trailing underscore
     df.columns = df.columns.map(lambda x: x.rstrip("_"))
 
-    df = df[["account_no", "account_name", "acc_lv1", "acc_lv2", "acc_lv3"]]
+    df = df[["account_no", "account_description", "acc_lv1", "acc_lv2", "acc_lv3"]]
     return df
 
 

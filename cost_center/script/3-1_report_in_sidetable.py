@@ -21,7 +21,7 @@ def add_subtotal(df, category_columns, numeric_columns):
     df = df.groupby(category_columns).agg(agg_funcs)
 
     # (sidetable) add subtotal rows
-    df = df.stb.subtotal(sub_level=[1, 2])  # 1 based
+    df = df.stb.subtotal(sub_level=[1, 2, 3])  # 1 based
 
     # change back to original category_column names
     df = df.reset_index()
@@ -34,14 +34,19 @@ def main():
 
     # Filenames
     input_file = path / "output" / "2_fix_act_to_plan_by_month.csv"
-    output_file = path / "output" / "3_fix_act_to_plan_subtotal.csv"
+    output_file = path / "output" / "3-1_fix_act_to_plan_subtotal.csv"
 
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})
 
     # Process data
     ## Remove unnecessary columns
-    columns_to_remove = ["responsible", "f_v_cost", "acc_lv3"]
+    columns_to_remove = [
+        "responsible",
+        "f_v_cost",
+        "acc_lv3",
+        "account_no",
+    ]
 
     df = df.pipe(remove_columns, columns_to_remove)
 
