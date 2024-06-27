@@ -24,7 +24,7 @@ def add_excel_table(df, worksheet, worksheet_name):
         {
             "columns": column_settings,
             "style": "Table Style Medium 3",
-            "name": worksheet_name,
+            "name": "cc_" + worksheet_name,
         },
     )
 
@@ -47,6 +47,7 @@ def apply_header_format(df, workbook, worksheet):
 
 
 def apply_formatting(workbook, worksheet):
+
     # Specify row heights
     worksheet.set_row(0, 20)
 
@@ -62,9 +63,9 @@ def apply_formatting(workbook, worksheet):
     for col, width in column_list:
         worksheet.set_column(col, width)
 
-    # Enable text wrapping for an entire column
-    column_format = workbook.add_format()
-    column_format.set_text_wrap()
+    # Number formatting
+    format_for_numbers = workbook.add_format({"num_format": "#,##0"})
+    worksheet.set_column("D:T", 10, format_for_numbers)
 
     # Freeze panes
     worksheet.freeze_panes(1, 0)
