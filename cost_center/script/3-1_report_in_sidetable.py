@@ -1,6 +1,6 @@
 import pandas as pd
 from pathlib import Path
-import sidetable
+import sidetable  # for subtotal function
 
 
 # Path
