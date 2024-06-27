@@ -72,7 +72,7 @@ def apply_conditional_formatting(workbook, worksheet):
     )
 
 
-def apply_formatting(workbook, worksheet):
+def apply_other_formatting(workbook, worksheet):
 
     # Specify row heights
     worksheet.set_row(0, 20)

@@ -4,7 +4,7 @@ from excel_formatting import (
     add_excel_table,
     apply_header_formatting,
     apply_conditional_formatting,
-    apply_formatting,
+    apply_other_formatting,
 )
 
 
@@ -50,8 +50,8 @@ def main():
             # Add conditional formatting
             apply_conditional_formatting(workbook, worksheet)
 
-            # Add various formatting
-            apply_formatting(workbook, worksheet)
+            # Add various other formatting
+            apply_other_formatting(workbook, worksheet)
 
     print("A file is created")
 
