@@ -11,8 +11,8 @@ def clean_column_names(df):
 
     df = df.clean_names()
 
-    # clean trailing underscore
-    df.columns = df.columns.map(lambda x: x.lstrip("_").rstrip("_"))
+    # clean leading and trailing underscore
+    df.columns = df.columns.map(lambda x: x.strip("_"))
 
     return df
 
