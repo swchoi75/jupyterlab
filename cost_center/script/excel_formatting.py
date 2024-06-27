@@ -24,7 +24,7 @@ def add_excel_table(df, worksheet, worksheet_name):
     )
 
 
-def apply_header_format(df, workbook, worksheet):
+def apply_header_formatting(df, workbook, worksheet):
     # Add header format
     format_header = workbook.add_format(
         {

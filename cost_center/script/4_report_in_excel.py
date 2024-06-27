@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 from excel_formatting import (
     add_excel_table,
-    apply_header_format,
+    apply_header_formatting,
     apply_conditional_formatting,
     apply_formatting,
 )
@@ -45,7 +45,7 @@ def main():
             add_excel_table(category_df, worksheet, category)
 
             # Add header format
-            apply_header_format(category_df, workbook, worksheet)
+            apply_header_formatting(category_df, workbook, worksheet)
 
             # Add conditional formatting
             apply_conditional_formatting(workbook, worksheet)
