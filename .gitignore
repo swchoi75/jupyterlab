@@ -1,3 +1,6 @@
+# Virtual Environments
+venv/
+
 # R
 .Rproj.user
 .Rhistory
