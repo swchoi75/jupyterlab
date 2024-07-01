@@ -8,9 +8,10 @@ def add_label(workbook, worksheet, year, month, responsible_name):
     )
 
     # Write data
-    worksheet.write("B2", f"Year: {year}", cell_format)
-    worksheet.write("B3", f"YTD month: {month:0>2}", cell_format)  # ensure 2 digits
-    worksheet.write("B4", f"CC responsible: {responsible_name}", cell_format)
+    worksheet.write("B2", f"CC responsible: {responsible_name}", cell_format)
+    worksheet.write("B3", f"Year: {year}", cell_format)
+    worksheet.write("B4", f"YTD month: {month:0>2}", cell_format)  # ensure 2 digits
+    worksheet.write("B5", "Scope: primary fix costs", cell_format)
     worksheet.write("T5", "Unit: T KRW", cell_format)
 
 
