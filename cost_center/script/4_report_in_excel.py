@@ -29,7 +29,7 @@ def main():
     output_file = (
         # :0>: This pads the number with zeros from the left side.
         path
-        / "output"
+        / "report"
         / f"{year}-{month:0>2}_CC report for_{responsible_name}.xlsx"
     )
 
