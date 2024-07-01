@@ -91,7 +91,6 @@ def main():
         .pipe(remove_columns, ["target"])
         .pipe(pivot_wider, value_columns)
         .pipe(flatten_multi_index)
-        # .pipe(clean_column_names)
         .pipe(remove_margin_row)
         .pipe(add_delta_to_ytd_plan)
     )
