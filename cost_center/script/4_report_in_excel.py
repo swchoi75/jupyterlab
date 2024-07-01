@@ -6,6 +6,7 @@ from excel_formatting import (
     apply_header_formatting,
     apply_conditional_formatting,
     delta_conditional_formatting,
+    grand_total_conditional_formatting,
     apply_other_formatting,
 )
 
@@ -63,6 +64,7 @@ def main():
 
         # Add conditional formatting
         delta_conditional_formatting(workbook, worksheet)
+        grand_total_conditional_formatting(workbook, worksheet)
 
         # Add various other formatting
         apply_other_formatting(workbook, worksheet, skiprows)

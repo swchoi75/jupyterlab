@@ -95,12 +95,25 @@ def delta_conditional_formatting(workbook, worksheet):
             "value": 0,
             "format": format_bold_and_color,
         },
-    ),
+    )
     worksheet.conditional_format(
         "A2:C500",
         {
             "type": "formula",
             "criteria": "=$R2<0",
+            "format": format_bold_and_color,
+        },
+    )
+
+
+def grand_total_conditional_formatting(workbook, worksheet):
+    # Conditional Formatting
+    format_bold_and_color = workbook.add_format({"bold": True, "bg_color": "yellow"})
+    worksheet.conditional_format(
+        "A2:T500",
+        {
+            "type": "formula",
+            "criteria": '=ISNUMBER(SEARCH("grand_total",$A2))',
             "format": format_bold_and_color,
         },
     )
