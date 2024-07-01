@@ -1,5 +1,6 @@
 import pandas as pd
 from pathlib import Path
+import sidetable  # for subtotal function
 
 
 # Path
@@ -19,10 +20,18 @@ def add_subtotal(df, category_columns, numeric_columns):
     agg_funcs = {col: "sum" for col in numeric_columns}
     df = df.groupby(category_columns).agg(agg_funcs)
 
+    # (sidetable) add subtotal rows
+    df = df.stb.subtotal(sub_level=[1])  # 1 based
+
     # change back to original category_column names
     df = df.reset_index()
     df.columns = category_columns + numeric_columns
 
+    return df
+
+
+def remove_subtotal_rows(df, col_name):
+    df = df[~df[col_name].str.contains(" - subtotal")]
     return df
 
 
@@ -56,7 +65,9 @@ def main():
     category_columns = df.select_dtypes(include="object").columns.to_list()
     numeric_columns = df.select_dtypes(include="number").columns.to_list()
 
-    df = df.pipe(add_subtotal, category_columns, numeric_columns)
+    df = df.pipe(add_subtotal, category_columns, numeric_columns).pipe(
+        remove_subtotal_rows, "acc_lv2"
+    )
 
     # Write data
     df.to_csv(output_file, index=False)
