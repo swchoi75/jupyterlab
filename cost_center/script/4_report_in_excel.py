@@ -1,6 +1,7 @@
 import pandas as pd
 from pathlib import Path
 from excel_formatting import (
+    add_label,
     add_excel_table,
     apply_header_formatting,
     apply_conditional_formatting,
@@ -16,6 +17,8 @@ path = Path(__file__).parent.parent
 def main():
 
     # Variables
+    from common_variable import year, month, responsible_name
+
     skiprows = 5
 
     # Filenames
@@ -30,7 +33,7 @@ def main():
     # Write data
     with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
 
-        # Write summary
+        # Summary sheet
         df_summary.to_excel(
             writer,
             sheet_name="summary",
@@ -42,6 +45,9 @@ def main():
         # Access the xlsxwriter workbook and worksheet
         workbook = writer.book
         worksheet = writer.sheets["summary"]
+
+        # Add label
+        add_label(worksheet, year, month, responsible_name)
 
         # Add Excel table
         add_excel_table(df_summary, worksheet, "summary", skiprows)
@@ -72,6 +78,9 @@ def main():
             # Access the xlsxwriter workbook and worksheet
             workbook = writer.book
             worksheet = writer.sheets[category]
+
+            # Add label
+            add_label(worksheet, year, month, responsible_name)
 
             # Add Excel table
             add_excel_table(category_df, worksheet, category, skiprows)

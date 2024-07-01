@@ -1,6 +1,12 @@
 # Functions
 
 
+def add_label(worksheet, year, month, responsible_name):
+    worksheet.write("B2", f"Year: {year}")
+    worksheet.write("B3", f"YTD month: {month}")
+    worksheet.write("B4", f"CC responsible: {responsible_name}")
+
+
 def add_excel_table(df, worksheet, worksheet_name, skiprows):
 
     # Get the dimensions of the dataframe.
