@@ -1,6 +1,5 @@
 import pandas as pd
 from pathlib import Path
-import sidetable  # for subtotal function
 
 
 # Path
@@ -20,9 +19,6 @@ def add_subtotal(df, category_columns, numeric_columns):
     agg_funcs = {col: "sum" for col in numeric_columns}
     df = df.groupby(category_columns).agg(agg_funcs)
 
-    # (sidetable) add subtotal rows
-    df = df.stb.subtotal(sub_level=[1, 2, 3])  # 1 based
-
     # change back to original category_column names
     df = df.reset_index()
     df.columns = category_columns + numeric_columns
@@ -34,7 +30,7 @@ def main():
 
     # Filenames
     input_file = path / "output" / "2_fix_act_to_plan_by_month.csv"
-    output_file = path / "output" / "3-1_fix_act_to_plan_subtotal.csv"
+    output_file = path / "output" / "3-3_fix_act_to_plan_summary.csv"
 
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})
@@ -46,11 +42,11 @@ def main():
         "f_v_cost",
         "acc_lv3",
         "account_no",
+        "acc_lv1",
+        "account_description",
         # remaining category columns
         # "cctr",
         # "acc_lv2",
-        # "acc_lv1",
-        # "account_description",
         # "pctr",
     ]
 
