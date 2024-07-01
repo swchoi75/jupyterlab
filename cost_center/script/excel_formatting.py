@@ -1,10 +1,16 @@
 # Functions
 
 
-def add_label(worksheet, year, month, responsible_name):
-    worksheet.write("B2", f"Year: {year}")
-    worksheet.write("B3", f"YTD month: {month}")
-    worksheet.write("B4", f"CC responsible: {responsible_name}")
+def add_label(workbook, worksheet, year, month, responsible_name):
+    # Format
+    cell_format = workbook.add_format(
+        {"bold": True, "bg_color": "#EBF1DE"}  # light green
+    )
+
+    # Write data
+    worksheet.write("B2", f"Year: {year}", cell_format)
+    worksheet.write("B3", f"YTD month: {month:0>2}", cell_format)  # ensure 2 digits
+    worksheet.write("B4", f"CC responsible: {responsible_name}", cell_format)
 
 
 def add_excel_table(df, worksheet, worksheet_name, skiprows):
@@ -73,6 +79,28 @@ def apply_conditional_formatting(workbook, worksheet):
         {
             "type": "formula",
             "criteria": '=ISNUMBER(SEARCH("465 Cost of materials",$B2))',
+            "format": format_bold_and_color,
+        },
+    )
+
+
+def delta_conditional_formatting(workbook, worksheet):
+    # Conditional Formatting
+    format_bold_and_color = workbook.add_format({"font_color": "red"})
+    worksheet.conditional_format(
+        "R2:R500",
+        {
+            "type": "cell",
+            "criteria": "<",
+            "value": 0,
+            "format": format_bold_and_color,
+        },
+    ),
+    worksheet.conditional_format(
+        "A2:C500",
+        {
+            "type": "formula",
+            "criteria": "=$R2<0",
             "format": format_bold_and_color,
         },
     )

@@ -5,6 +5,7 @@ from excel_formatting import (
     add_excel_table,
     apply_header_formatting,
     apply_conditional_formatting,
+    delta_conditional_formatting,
     apply_other_formatting,
 )
 
@@ -24,7 +25,12 @@ def main():
     # Filenames
     input_file = path / "output" / "3-2_further_refine_report.csv"
     input_summary = path / "output" / "3-3_fix_act_to_plan_summary.csv"
-    output_file = path / "output" / "4_cc_report_by_responsible.xlsx"
+    output_file = (
+        # :0>: This pads the number with zeros from the left side.
+        path
+        / "output"
+        / f"{year}-{month:0>2}_CC report for_{responsible_name}.xlsx"
+    )
 
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})
@@ -47,7 +53,7 @@ def main():
         worksheet = writer.sheets["summary"]
 
         # Add label
-        add_label(worksheet, year, month, responsible_name)
+        add_label(workbook, worksheet, year, month, responsible_name)
 
         # Add Excel table
         add_excel_table(df_summary, worksheet, "summary", skiprows)
@@ -55,8 +61,14 @@ def main():
         # Add header formatting
         apply_header_formatting(df_summary, workbook, worksheet, skiprows)
 
+        # Add conditional formatting
+        delta_conditional_formatting(workbook, worksheet)
+
         # Add various other formatting
         apply_other_formatting(workbook, worksheet, skiprows)
+
+        # Add worksheet tab color
+        worksheet.set_tab_color("yellow")
 
         # Unique values
         unique_categories = df["cctr"].unique()
@@ -80,7 +92,7 @@ def main():
             worksheet = writer.sheets[category]
 
             # Add label
-            add_label(worksheet, year, month, responsible_name)
+            add_label(workbook, worksheet, year, month, responsible_name)
 
             # Add Excel table
             add_excel_table(category_df, worksheet, category, skiprows)
@@ -90,6 +102,7 @@ def main():
 
             # Add conditional formatting
             apply_conditional_formatting(workbook, worksheet)
+            delta_conditional_formatting(workbook, worksheet)
 
             # Add various other formatting
             apply_other_formatting(workbook, worksheet, skiprows)
