@@ -90,6 +90,14 @@ def add_ytd_plan(df, year, month):
     return df
 
 
+def divide_by_1000(df):
+    numeric_columns = df.select_dtypes(include="number").columns.to_list()
+
+    for col in numeric_columns:
+        df[col] = df[col] / 1000
+    return df
+
+
 def main():
 
     # Variables
@@ -138,6 +146,8 @@ def main():
         )
         # Add new value column "ytd_plan"
         .pipe(add_ytd_plan, year, month)
+        # Divide by 1000
+        .pipe(divide_by_1000)
     )
 
     # Write data
