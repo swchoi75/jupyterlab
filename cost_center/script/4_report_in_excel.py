@@ -20,13 +20,37 @@ def main():
 
     # Filenames
     input_file = path / "output" / "3-2_further_refine_report.csv"
+    input_summary = path / "output" / "3-3_fix_act_to_plan_summary.csv"
     output_file = path / "output" / "4_cc_report_by_responsible.xlsx"
 
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})
+    df_summary = pd.read_csv(input_summary, dtype={"cctr": str})
 
     # Write data
     with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
+
+        # Write summary
+        df_summary.to_excel(
+            writer,
+            sheet_name="summary",
+            startrow=1 + skiprows,
+            header=False,
+            index=False,
+        )
+
+        # Access the xlsxwriter workbook and worksheet
+        workbook = writer.book
+        worksheet = writer.sheets["summary"]
+
+        # Add Excel table
+        add_excel_table(df_summary, worksheet, "summary", skiprows)
+
+        # Add header formatting
+        apply_header_formatting(df_summary, workbook, worksheet, skiprows)
+
+        # Add various other formatting
+        apply_other_formatting(workbook, worksheet, skiprows)
 
         # Unique values
         unique_categories = df["cctr"].unique()

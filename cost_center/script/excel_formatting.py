@@ -13,7 +13,7 @@ def add_excel_table(df, worksheet, worksheet_name, skiprows):
     worksheet.add_table(
         0 + skiprows,
         0,
-        max_row,
+        max_row + skiprows,
         max_col - 1,
         {
             "columns": column_settings,
