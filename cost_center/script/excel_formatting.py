@@ -150,3 +150,51 @@ def apply_other_formatting(workbook, worksheet, skiprows):
     worksheet.set_zoom(100)
 
     # You can apply additional formatting to cells as needed
+
+
+def add_summary_sheet(writer, df, year, month, responsible_name, skiprows):
+
+    # Access the xlsxwriter workbook and worksheet
+    workbook = writer.book
+    worksheet = writer.sheets["summary"]
+
+    # Add label
+    add_label(workbook, worksheet, year, month, responsible_name)
+
+    # Add Excel table
+    add_excel_table(df, worksheet, "summary", skiprows)
+
+    # Add header formatting
+    apply_header_formatting(df, workbook, worksheet, skiprows)
+
+    # Add conditional formatting
+    delta_conditional_formatting(workbook, worksheet)
+    grand_total_conditional_formatting(workbook, worksheet)
+
+    # Add various other formatting
+    apply_other_formatting(workbook, worksheet, skiprows)
+
+    # Add worksheet tab color
+    worksheet.set_tab_color("yellow")
+
+
+def add_cc_sheet(writer, df, category, year, month, responsible_name, skiprows):
+    # Access the xlsxwriter workbook and worksheet
+    workbook = writer.book
+    worksheet = writer.sheets[category]
+
+    # Add label
+    add_label(workbook, worksheet, year, month, responsible_name)
+
+    # Add Excel table
+    add_excel_table(df, worksheet, category, skiprows)
+
+    # Add header formatting
+    apply_header_formatting(df, workbook, worksheet, skiprows)
+
+    # Add conditional formatting
+    apply_conditional_formatting(workbook, worksheet)
+    delta_conditional_formatting(workbook, worksheet)
+
+    # Add various other formatting
+    apply_other_formatting(workbook, worksheet, skiprows)

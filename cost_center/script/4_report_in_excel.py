@@ -1,14 +1,6 @@
 import pandas as pd
 from pathlib import Path
-from excel_formatting import (
-    add_label,
-    add_excel_table,
-    apply_header_formatting,
-    apply_conditional_formatting,
-    delta_conditional_formatting,
-    grand_total_conditional_formatting,
-    apply_other_formatting,
-)
+from excel_formatting import add_summary_sheet, add_cc_sheet
 
 
 # Path
@@ -24,8 +16,9 @@ def main():
     skiprows = 6
 
     # Filenames
+    input_hc = path / "output" / "0_headcount_report.csv"
+    input_summary = path / "output" / "3-0_fix_act_to_plan_summary.csv"
     input_file = path / "output" / "3-2_further_refine_report.csv"
-    input_summary = path / "output" / "3-3_fix_act_to_plan_summary.csv"
     output_file = (
         # :0>: This pads the number with zeros from the left side.
         path
@@ -34,8 +27,9 @@ def main():
     )
 
     # Read data
-    df = pd.read_csv(input_file, dtype={"cctr": str})
+    df_hc = pd.read_csv(input_hc, dtype={"cctr": str})
     df_summary = pd.read_csv(input_summary, dtype={"cctr": str})
+    df = pd.read_csv(input_file, dtype={"cctr": str})
 
     # Write data
     with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
@@ -49,30 +43,9 @@ def main():
             index=False,
         )
 
-        # Access the xlsxwriter workbook and worksheet
-        workbook = writer.book
-        worksheet = writer.sheets["summary"]
+        add_summary_sheet(writer, df, year, month, responsible_name, skiprows)
 
-        # Add label
-        add_label(workbook, worksheet, year, month, responsible_name)
-
-        # Add Excel table
-        add_excel_table(df_summary, worksheet, "summary", skiprows)
-
-        # Add header formatting
-        apply_header_formatting(df_summary, workbook, worksheet, skiprows)
-
-        # Add conditional formatting
-        delta_conditional_formatting(workbook, worksheet)
-        grand_total_conditional_formatting(workbook, worksheet)
-
-        # Add various other formatting
-        apply_other_formatting(workbook, worksheet, skiprows)
-
-        # Add worksheet tab color
-        worksheet.set_tab_color("yellow")
-
-        # Unique values
+        # Cost center sheet
         unique_categories = df["cctr"].unique()
 
         for category in unique_categories:
@@ -89,25 +62,7 @@ def main():
                 index=False,
             )
 
-            # Access the xlsxwriter workbook and worksheet
-            workbook = writer.book
-            worksheet = writer.sheets[category]
-
-            # Add label
-            add_label(workbook, worksheet, year, month, responsible_name)
-
-            # Add Excel table
-            add_excel_table(category_df, worksheet, category, skiprows)
-
-            # Add header formatting
-            apply_header_formatting(category_df, workbook, worksheet, skiprows)
-
-            # Add conditional formatting
-            apply_conditional_formatting(workbook, worksheet)
-            delta_conditional_formatting(workbook, worksheet)
-
-            # Add various other formatting
-            apply_other_formatting(workbook, worksheet, skiprows)
+            add_cc_sheet(writer, df, category, year, month, responsible_name, skiprows)
 
     print("A file is created")
 
