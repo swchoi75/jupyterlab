@@ -31,7 +31,7 @@ def main():
     skiprows = 6
 
     # Filenames
-    input_hc = path / "output" / "4-1_headcount_report.csv"
+    input_hc = path / "output" / "4-2_hc_report_in_sidetable.csv"
     input_summary = path / "output" / "3-1_summary_cost_report.csv"
     input_file = path / "output" / "3-3_further_refine_cost_report.csv"
     output_file = (
