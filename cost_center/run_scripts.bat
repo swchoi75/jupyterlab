@@ -3,6 +3,8 @@ where python
 
 @REM Running the scripts
 
+python script/0_headcount_report.py
+
 python script/1_primary_cc_report.py
 python script/2_report_fix_actual_to_plan.py
 

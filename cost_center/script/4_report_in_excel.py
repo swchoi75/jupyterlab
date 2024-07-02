@@ -8,6 +8,16 @@ path = Path(__file__).parent.parent
 
 
 # Functions
+def filter_by_responsible(df, responsible):
+    df = df[df["responsible"] == responsible]
+    return df
+
+
+def remove_columns(df, cols_to_remove):
+    df = df[[col for col in df.columns if col not in cols_to_remove]]
+    return df
+
+
 def main():
 
     # Variables
@@ -31,6 +41,17 @@ def main():
     df_summary = pd.read_csv(input_summary, dtype={"cctr": str})
     df = pd.read_csv(input_file, dtype={"cctr": str})
 
+    # Process data
+    df_hc = df_hc.pipe(filter_by_responsible, responsible_name).pipe(
+        remove_columns, ["responsible"]
+    )
+    df_summary = df_summary.pipe(filter_by_responsible, responsible_name).pipe(
+        remove_columns, ["responsible"]
+    )
+    df = df.pipe(filter_by_responsible, responsible_name).pipe(
+        remove_columns, ["responsible"]
+    )
+
     # Write data
     with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
 
@@ -44,7 +65,7 @@ def main():
         )
 
         add_headcount_sheet(
-            writer, df, "headcount", year, month, responsible_name, skiprows
+            writer, df_hc, "headcount", year, month, responsible_name, skiprows
         )
 
         # Summary sheet
@@ -57,7 +78,7 @@ def main():
         )
 
         add_summary_sheet(
-            writer, df, "summary", year, month, responsible_name, skiprows
+            writer, df_summary, "summary", year, month, responsible_name, skiprows
         )
 
         # Cost center sheet

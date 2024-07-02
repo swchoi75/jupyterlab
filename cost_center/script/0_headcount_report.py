@@ -40,11 +40,6 @@ def filter_by_year(df, year):
     return df
 
 
-def filter_by_responsible(df, responsible):
-    df = df[df["responsible"] == responsible]
-    return df
-
-
 def filter_version(df, filter_values):
     df = df[df["version"].isin(filter_values)]
     return df
@@ -114,7 +109,7 @@ def clean_column_names(df):
 def main():
 
     # Variables
-    from common_variable import year, responsible_name
+    from common_variable import year
 
     # Filenames
     input_file = path / "data" / "0003_TABLE_OUTPUT_Headcount common.csv"
@@ -135,7 +130,6 @@ def main():
         .merge(df_poc, on="pctr", how="left")
         .pipe(filter_source, "HRIS")
         .pipe(filter_by_year, year)
-        .pipe(filter_by_responsible, responsible_name)
         .pipe(filter_version, versions)
         .pipe(remove_columns, ["job_family", "fc_x+x"])
         .pipe(pivot_wider_by_version)

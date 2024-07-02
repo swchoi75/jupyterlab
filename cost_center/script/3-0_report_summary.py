@@ -47,7 +47,7 @@ def main():
     # Process data
     ## Remove unnecessary columns
     columns_to_remove = [
-        "responsible",
+        # "responsible",
         "f_v_cost",
         "acc_lv3",
         "account_no",

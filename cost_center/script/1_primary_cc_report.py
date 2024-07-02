@@ -53,11 +53,6 @@ def filter_by_year(df, year):
     return df
 
 
-def filter_by_responsible(df, responsible):
-    df = df[df["responsible"] == responsible]
-    return df
-
-
 def pivot_wider(df):
     df = df.pivot_table(
         index=[col for col in df.columns if col not in ["filter", "amt"]],
@@ -108,7 +103,7 @@ def divide_by_1000(df):
 def main():
 
     # Variables
-    from common_variable import year, month, responsible_name
+    from common_variable import year, month
 
     # Filenames
     input_file = path / "data" / "0004_TABLE_OUTPUT_Cctr report common.csv"
@@ -132,7 +127,6 @@ def main():
         # Filter data
         .pipe(filter_primary_costs)
         .pipe(filter_by_year, year)
-        .pipe(filter_by_responsible, responsible_name)
         # Reshape data
         .pipe(pivot_wider)
         .pipe(sort_data)
