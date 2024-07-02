@@ -18,6 +18,11 @@ def remove_columns(df, cols_to_remove):
     return df
 
 
+def remove_subtotal_rows(df, col_name):
+    df = df[~df[col_name].str.contains(" - subtotal")]
+    return df
+
+
 def main():
 
     # Variables
@@ -43,13 +48,17 @@ def main():
 
     # Process data
     df_hc = df_hc.pipe(filter_by_responsible, responsible_name).pipe(
-        remove_columns, ["responsible"]
+        remove_columns, "responsible"
     )
+
     df_summary = df_summary.pipe(filter_by_responsible, responsible_name).pipe(
-        remove_columns, ["responsible"]
+        remove_columns, "responsible"
     )
-    df = df.pipe(filter_by_responsible, responsible_name).pipe(
-        remove_columns, ["responsible"]
+
+    df = (
+        df.pipe(filter_by_responsible, responsible_name)
+        .pipe(remove_columns, "responsible")
+        .pipe(remove_subtotal_rows, "cctr")
     )
 
     # Write data

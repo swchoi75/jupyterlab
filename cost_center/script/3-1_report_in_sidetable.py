@@ -21,7 +21,7 @@ def add_subtotal(df, category_columns, numeric_columns):
     df = df.groupby(category_columns).agg(agg_funcs)
 
     # (sidetable) add subtotal rows
-    df = df.stb.subtotal(sub_level=[1, 2, 3])  # 1 based
+    df = df.stb.subtotal(sub_level=[1, 2, 3, 4])  # 1 based
 
     # change back to original category_column names
     df = df.reset_index()
@@ -42,11 +42,11 @@ def main():
     # Process data
     ## Remove unnecessary columns
     columns_to_remove = [
-        # "responsible",
         "f_v_cost",
         "acc_lv3",
         "account_no",
         # remaining category columns
+        # "responsible",
         # "cctr",
         # "acc_lv2",
         # "acc_lv1",

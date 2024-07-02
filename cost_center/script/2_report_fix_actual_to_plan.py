@@ -113,17 +113,17 @@ def main():
     )
 
     first_columns_to_reorder = [
-        # to be removed in the next script
-        "responsible",
-        "f_v_cost",
-        "acc_lv3",
-        "account_no",
         #
+        "responsible",  # to be made as sub-total
         "cctr",  # to be made as sub-total
         "acc_lv2",  # to be made as sub-total
         "acc_lv1",  # to be made as sub-total
         "account_description",
         "pctr",
+        # to be removed in the next script
+        "f_v_cost",
+        "acc_lv3",
+        "account_no",
     ]
     last_columns_to_reorder = ["actual", "ytd_plan", "delta", "plan", "fc"]
 

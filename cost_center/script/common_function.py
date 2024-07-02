@@ -115,7 +115,7 @@ def grand_total_conditional_formatting(workbook, worksheet):
         "A2:X500",
         {
             "type": "formula",
-            "criteria": '=ISNUMBER(SEARCH("grand_total",$A2))',
+            "criteria": '=ISNUMBER(SEARCH("subtotal",$A2))',
             "format": format_bold_and_color,
         },
     )
