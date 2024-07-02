@@ -152,17 +152,19 @@ def apply_other_formatting(workbook, worksheet, skiprows):
     # You can apply additional formatting to cells as needed
 
 
-def add_summary_sheet(writer, df, year, month, responsible_name, skiprows):
+def add_headcount_sheet(
+    writer, df, sheet_name, year, month, responsible_name, skiprows
+):
 
     # Access the xlsxwriter workbook and worksheet
     workbook = writer.book
-    worksheet = writer.sheets["summary"]
+    worksheet = writer.sheets[sheet_name]
 
     # Add label
     add_label(workbook, worksheet, year, month, responsible_name)
 
     # Add Excel table
-    add_excel_table(df, worksheet, "summary", skiprows)
+    add_excel_table(df, worksheet, sheet_name, skiprows)
 
     # Add header formatting
     apply_header_formatting(df, workbook, worksheet, skiprows)
@@ -178,16 +180,42 @@ def add_summary_sheet(writer, df, year, month, responsible_name, skiprows):
     worksheet.set_tab_color("yellow")
 
 
-def add_cc_sheet(writer, df, category, year, month, responsible_name, skiprows):
+def add_summary_sheet(writer, df, sheet_name, year, month, responsible_name, skiprows):
+
     # Access the xlsxwriter workbook and worksheet
     workbook = writer.book
-    worksheet = writer.sheets[category]
+    worksheet = writer.sheets[sheet_name]
 
     # Add label
     add_label(workbook, worksheet, year, month, responsible_name)
 
     # Add Excel table
-    add_excel_table(df, worksheet, category, skiprows)
+    add_excel_table(df, worksheet, sheet_name, skiprows)
+
+    # Add header formatting
+    apply_header_formatting(df, workbook, worksheet, skiprows)
+
+    # Add conditional formatting
+    delta_conditional_formatting(workbook, worksheet)
+    grand_total_conditional_formatting(workbook, worksheet)
+
+    # Add various other formatting
+    apply_other_formatting(workbook, worksheet, skiprows)
+
+    # Add worksheet tab color
+    worksheet.set_tab_color("yellow")
+
+
+def add_cc_sheet(writer, df, sheet_name, year, month, responsible_name, skiprows):
+    # Access the xlsxwriter workbook and worksheet
+    workbook = writer.book
+    worksheet = writer.sheets[sheet_name]
+
+    # Add label
+    add_label(workbook, worksheet, year, month, responsible_name)
+
+    # Add Excel table
+    add_excel_table(df, worksheet, sheet_name, skiprows)
 
     # Add header formatting
     apply_header_formatting(df, workbook, worksheet, skiprows)

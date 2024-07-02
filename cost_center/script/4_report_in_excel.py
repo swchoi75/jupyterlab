@@ -1,6 +1,6 @@
 import pandas as pd
 from pathlib import Path
-from common_function import add_summary_sheet, add_cc_sheet
+from common_function import add_headcount_sheet, add_summary_sheet, add_cc_sheet
 
 
 # Path
@@ -34,6 +34,19 @@ def main():
     # Write data
     with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
 
+        # Headcount sheet
+        df_hc.to_excel(
+            writer,
+            sheet_name="headcount",
+            startrow=1 + skiprows,
+            header=False,
+            index=False,
+        )
+
+        add_headcount_sheet(
+            writer, df, "headcount", year, month, responsible_name, skiprows
+        )
+
         # Summary sheet
         df_summary.to_excel(
             writer,
@@ -43,7 +56,9 @@ def main():
             index=False,
         )
 
-        add_summary_sheet(writer, df, year, month, responsible_name, skiprows)
+        add_summary_sheet(
+            writer, df, "summary", year, month, responsible_name, skiprows
+        )
 
         # Cost center sheet
         unique_categories = df["cctr"].unique()
