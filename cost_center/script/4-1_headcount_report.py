@@ -9,7 +9,7 @@ path = Path(__file__).parent.parent
 
 # Functions
 def read_data(filename):
-    df = pd.read_csv(filename, dtype={"Cctr": str}).clean_names()
+    df = pd.read_csv(filename, dtype={"Cctr": str, "Job family": str}).clean_names()
     df = df.rename(
         columns={"month": "period", "data_type": "version", "profit_ctr": "pctr"}
     )
@@ -106,6 +106,11 @@ def clean_column_names(df):
     return df
 
 
+def rename_columns(df, cols_to_rename):
+    df = df.rename(columns=cols_to_rename)
+    return df
+
+
 def main():
 
     # Variables
@@ -138,6 +143,7 @@ def main():
         .pipe(flatten_multi_index)
         .pipe(remove_margin_row)
         .pipe(clean_column_names)
+        .pipe(rename_columns, {"act": "actual"})
     )
 
     columns_to_rename = {
