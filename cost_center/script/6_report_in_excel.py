@@ -77,17 +77,17 @@ def main():
             writer, df_hc, "headcount", year, month, responsible_name, skiprows
         )
 
-        # Summary sheet
+        # Cost overview sheet
         df_summary.to_excel(
             writer,
-            sheet_name="summary",
+            sheet_name="cost_overview",
             startrow=1 + skiprows,
             header=False,
             index=False,
         )
 
         add_summary_sheet(
-            writer, df_summary, "summary", year, month, responsible_name, skiprows
+            writer, df_summary, "cost_overview", year, month, responsible_name, skiprows
         )
 
         # Cost center sheet

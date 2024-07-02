@@ -152,10 +152,7 @@ def apply_other_formatting(workbook, worksheet, skiprows):
     # You can apply additional formatting to cells as needed
 
 
-def add_headcount_sheet(
-    writer, df, sheet_name, year, month, responsible_name, skiprows
-):
-
+def add_cc_sheet(writer, df, sheet_name, year, month, responsible_name, skiprows):
     # Access the xlsxwriter workbook and worksheet
     workbook = writer.book
     worksheet = writer.sheets[sheet_name]
@@ -170,14 +167,11 @@ def add_headcount_sheet(
     apply_header_formatting(df, workbook, worksheet, skiprows)
 
     # Add conditional formatting
+    apply_conditional_formatting(workbook, worksheet)
     delta_conditional_formatting(workbook, worksheet)
-    grand_total_conditional_formatting(workbook, worksheet)
 
     # Add various other formatting
     apply_other_formatting(workbook, worksheet, skiprows)
-
-    # Add worksheet tab color
-    worksheet.set_tab_color("yellow")
 
 
 def add_summary_sheet(writer, df, sheet_name, year, month, responsible_name, skiprows):
@@ -199,20 +193,29 @@ def add_summary_sheet(writer, df, sheet_name, year, month, responsible_name, ski
     delta_conditional_formatting(workbook, worksheet)
     grand_total_conditional_formatting(workbook, worksheet)
 
-    # Add various other formatting
-    apply_other_formatting(workbook, worksheet, skiprows)
-
     # Add worksheet tab color
     worksheet.set_tab_color("yellow")
 
+    # Add various other formatting
+    apply_other_formatting(workbook, worksheet, skiprows)
 
-def add_cc_sheet(writer, df, sheet_name, year, month, responsible_name, skiprows):
+
+def add_headcount_sheet(
+    writer, df, sheet_name, year, month, responsible_name, skiprows
+):
+
     # Access the xlsxwriter workbook and worksheet
     workbook = writer.book
     worksheet = writer.sheets[sheet_name]
 
     # Add label
-    add_label(workbook, worksheet, year, month, responsible_name)
+    cell_format = workbook.add_format(
+        {"bold": True, "bg_color": "#EBF1DE"}  # light green
+    )
+
+    worksheet.write("B2", f"CC responsible: {responsible_name}", cell_format)
+    worksheet.write("B3", f"Year: {year}", cell_format)
+    worksheet.write("B4", f"YTD month: {month:0>2}", cell_format)  # ensure 2 digits
 
     # Add Excel table
     add_excel_table(df, worksheet, sheet_name, skiprows)
@@ -221,8 +224,30 @@ def add_cc_sheet(writer, df, sheet_name, year, month, responsible_name, skiprows
     apply_header_formatting(df, workbook, worksheet, skiprows)
 
     # Add conditional formatting
-    apply_conditional_formatting(workbook, worksheet)
     delta_conditional_formatting(workbook, worksheet)
+    grand_total_conditional_formatting(workbook, worksheet)
+
+    # Add worksheet tab color
+    worksheet.set_tab_color("yellow")
 
     # Add various other formatting
-    apply_other_formatting(workbook, worksheet, skiprows)
+    ## Specify row heights
+    worksheet.set_row(0 + skiprows, 20)
+
+    ## Specify columns widths
+    column_list = [
+        # category columns
+        ("B:B", 35),  # account_description
+        ("J:J", 14),  # plant_name
+        # value columns
+        ("K:V", 9),
+        ("W:X", 9),
+    ]
+    for col, width in column_list:
+        worksheet.set_column(col, width)
+
+    ## Number formatting
+    format_whole_numbers = workbook.add_format({"num_format": "#,##0"})
+    format_decimal_numbers = workbook.add_format({"num_format": "#,##0.0"})
+    worksheet.set_column("K:V", 9, format_whole_numbers)
+    worksheet.set_column("W:X", 9, format_decimal_numbers)
