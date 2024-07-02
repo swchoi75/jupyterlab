@@ -59,7 +59,7 @@ def apply_conditional_formatting(workbook, worksheet):
     # Conditional Formatting
     format_bold = workbook.add_format({"bold": True})
     worksheet.conditional_format(
-        "A2:T500",
+        "A2:X500",
         {
             "type": "formula",
             "criteria": '=ISNUMBER(SEARCH("subtotal",$B2))',
@@ -69,7 +69,7 @@ def apply_conditional_formatting(workbook, worksheet):
 
     format_bold_and_color = workbook.add_format({"bold": True, "bg_color": "yellow"})
     worksheet.conditional_format(
-        "A2:T500",
+        "A2:X500",
         {
             "type": "formula",
             "criteria": '=ISNUMBER(SEARCH("299 Total Labor Costs",$B2))',
@@ -77,7 +77,7 @@ def apply_conditional_formatting(workbook, worksheet):
         },
     )
     worksheet.conditional_format(
-        "A2:T500",
+        "A2:X500",
         {
             "type": "formula",
             "criteria": '=ISNUMBER(SEARCH("465 Cost of materials",$B2))',
@@ -90,7 +90,7 @@ def delta_conditional_formatting(workbook, worksheet):
     # Conditional Formatting
     format_bold_and_color = workbook.add_format({"font_color": "red"})
     worksheet.conditional_format(
-        "R2:R500",
+        "V2:V500",
         {
             "type": "cell",
             "criteria": "<",
@@ -99,10 +99,10 @@ def delta_conditional_formatting(workbook, worksheet):
         },
     )
     worksheet.conditional_format(
-        "A2:C500",
+        "A2:B500",
         {
             "type": "formula",
-            "criteria": "=$R2<0",
+            "criteria": "=$V2<0",
             "format": format_bold_and_color,
         },
     )
@@ -112,7 +112,7 @@ def grand_total_conditional_formatting(workbook, worksheet):
     # Conditional Formatting
     format_bold_and_color = workbook.add_format({"bold": True, "bg_color": "yellow"})
     worksheet.conditional_format(
-        "A2:T500",
+        "A2:X500",
         {
             "type": "formula",
             "criteria": '=ISNUMBER(SEARCH("grand_total",$A2))',
@@ -129,20 +129,19 @@ def apply_other_formatting(workbook, worksheet, skiprows):
     # Specify columns widths
     column_list = [
         # category columns
-        ("A:A", 9),  # cctr
-        ("B:B", 40),  # account_description
-        ("C:C", 9),  # cctr
+        ("B:B", 46),  # account_description
+        ("G:G", 14),  # plant_name
         # value columns
-        ("D:O", 11),
-        ("P:T", 12),
+        ("H:S", 9),
+        ("T:X", 10),
     ]
     for col, width in column_list:
         worksheet.set_column(col, width)
 
     # Number formatting
     format_numbers = workbook.add_format({"num_format": "#,##0"})
-    worksheet.set_column("D:O", 11, format_numbers)
-    worksheet.set_column("P:T", 12, format_numbers)
+    worksheet.set_column("H:S", 9, format_numbers)
+    worksheet.set_column("T:X", 10, format_numbers)
 
     # Freeze panes
     worksheet.freeze_panes(1 + skiprows, 0)

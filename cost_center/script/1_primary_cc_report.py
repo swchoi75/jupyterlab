@@ -36,6 +36,13 @@ def read_cc_master(filename):
     return df
 
 
+def read_poc_master(filename):
+    df = pd.read_csv(filename).clean_names()
+    df = df.rename(columns={"profit_center": "pctr"})
+    df = df[["pctr", "division", "bu", "outlet_name", "plant_name"]]
+    return df
+
+
 def filter_primary_costs(df):
     df = df[df["acc_lv3"] == "500 Dir.cost centre costs"]
     return df
@@ -114,13 +121,14 @@ def main():
     df = read_data(input_file)
     df_cc = read_cc_master(meta_cc)
     df_acc = read_acc_master(meta_acc)
-    df_poc = pd.read_csv(meta_poc).clean_names()
+    df_poc = read_poc_master(meta_poc)
 
     # Process data
     df = (
         # Add master data
         df.merge(df_acc, on="account_no", how="left")
         .merge(df_cc, on="cctr", how="left")
+        .merge(df_poc, on="pctr", how="left")
         # Filter data
         .pipe(filter_primary_costs)
         .pipe(filter_by_year, year)

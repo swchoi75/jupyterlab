@@ -21,7 +21,7 @@ def main():
     # Variables
     from common_variable import year, month, responsible_name
 
-    skiprows = 5
+    skiprows = 6
 
     # Filenames
     input_file = path / "output" / "3-2_further_refine_report.csv"
