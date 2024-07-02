@@ -110,7 +110,7 @@ def main():
     meta_acc = path / "meta" / "0000_TABLE_MASTER_Acc level.csv"
     meta_cc = path / "meta" / "0000_TABLE_MASTER_Cost center_general.csv"
     meta_poc = path / "meta" / "POC.csv"
-    output_file = path / "output" / "1_primary_cc_report.csv"
+    output_file = path / "output" / "1_primary_cost_report.csv"
 
     # Read data
     df = read_data(input_file)

@@ -33,8 +33,8 @@ def split_and_get_last(df, col):
 def main():
 
     # Filenames
-    input_file = path / "output" / "3-1_fix_act_to_plan_subtotal.csv"
-    output_file = path / "output" / "3-2_further_refine_report.csv"
+    input_file = path / "output" / "3-2_cost_report_in_sidetable.csv"
+    output_file = path / "output" / "3-3_further_refine_cost_report.csv"
 
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})

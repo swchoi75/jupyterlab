@@ -31,9 +31,9 @@ def main():
     skiprows = 6
 
     # Filenames
-    input_hc = path / "output" / "0_headcount_report.csv"
-    input_summary = path / "output" / "3-0_fix_act_to_plan_summary.csv"
-    input_file = path / "output" / "3-2_further_refine_report.csv"
+    input_hc = path / "output" / "4-1_headcount_report.csv"
+    input_summary = path / "output" / "3-1_summary_cost_report.csv"
+    input_file = path / "output" / "3-3_further_refine_cost_report.csv"
     output_file = (
         # :0>: This pads the number with zeros from the left side.
         path

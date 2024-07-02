@@ -115,7 +115,7 @@ def main():
     input_file = path / "data" / "0003_TABLE_OUTPUT_Headcount common.csv"
     meta_cc = path / "meta" / "0000_TABLE_MASTER_Cost center_general.csv"
     meta_poc = path / "meta" / "POC.csv"
-    output_file = path / "output" / "0_headcount_report.csv"
+    output_file = path / "output" / "4-1_headcount_report.csv"
 
     # Read data
     df = read_data(input_file)

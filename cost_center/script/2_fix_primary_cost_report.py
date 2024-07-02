@@ -77,8 +77,8 @@ def main():
     from common_variable import year
 
     # Filenames
-    input_file = path / "output" / "1_primary_cc_report.csv"
-    output_file = path / "output" / "2_fix_act_to_plan_by_month.csv"
+    input_file = path / "output" / "1_primary_cost_report.csv"
+    output_file = path / "output" / "2_fix_primary_cost_report.csv"
 
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})

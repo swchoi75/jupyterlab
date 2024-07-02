@@ -38,8 +38,8 @@ def remove_subtotal_rows(df, col_name):
 def main():
 
     # Filenames
-    input_file = path / "output" / "2_fix_act_to_plan_by_month.csv"
-    output_file = path / "output" / "3-0_fix_act_to_plan_summary.csv"
+    input_file = path / "output" / "2_fix_primary_cost_report.csv"
+    output_file = path / "output" / "3-1_summary_cost_report.csv"
 
     # Read data
     df = pd.read_csv(input_file, dtype={"cctr": str})
