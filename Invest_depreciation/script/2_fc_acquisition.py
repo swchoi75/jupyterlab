@@ -101,9 +101,11 @@ def col_start_of_depr(df):
 
 
 def col_asset_category(df, actual_month_end):
-    """New column: "asset category" based on the column "start_of_depr"""
+    """New column: "asset category" based on the column "acquisition_date"""
     df["asset_category"] = np.where(
-        df["start_of_depr"] < pd.to_datetime(actual_month_end), "past fc", "future fc"
+        df["acquisition_date"] <= pd.to_datetime(actual_month_end),
+        "past fc",
+        "future fc",
     )
     return df
 

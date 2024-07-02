@@ -40,6 +40,8 @@ def calc_depr_end(row):
 def calc_monthly_depr(row):
     if row["useful_life_year"] == 0:
         return 0
+    elif row["asset_category"] == "past fc":
+        return 0
     monthly_depr = row["acquisition"] / (row["useful_life_year"] * 12)
     return monthly_depr
 

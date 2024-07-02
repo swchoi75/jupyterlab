@@ -4,7 +4,7 @@ import pandas as pd
 # Variables
 
 # Monthly update
-version = "Plan"  # "FC" or "Plan"
+version = "FC"  # "FC" or "Plan"
 GPA_version = "v001"
 actual_month_end = "2024-05-31"  # 완료된 월 마감
 
