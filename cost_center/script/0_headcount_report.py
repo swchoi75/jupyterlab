@@ -10,14 +10,28 @@ path = Path(__file__).parent.parent
 # Functions
 def read_data(filename):
     df = pd.read_csv(filename, dtype={"Cctr": str}).clean_names()
-    df = df.rename(columns={"month": "period", "data_type": "version"})
+    df = df.rename(
+        columns={"month": "period", "data_type": "version", "profit_ctr": "pctr"}
+    )
     df["period"] = pd.to_datetime(df["period"])
     return df
 
 
 def read_cc_master(filename):
     df = pd.read_csv(filename, dtype={"Cctr": str}).clean_names()
-    df = df[["cctr", "responsible"]]
+    df = df[["cctr", "fix_var", "cctr_description", "responsible"]]
+    return df
+
+
+def read_poc_master(filename):
+    df = pd.read_csv(filename).clean_names()
+    df = df.rename(columns={"profit_center": "pctr"})
+    df = df[["pctr", "division", "bu", "outlet_name", "plant_name"]]
+    return df
+
+
+def filter_source(df, filter_values):
+    df = df[df["source"] == filter_values]
     return df
 
 
@@ -105,17 +119,21 @@ def main():
     # Filenames
     input_file = path / "data" / "0003_TABLE_OUTPUT_Headcount common.csv"
     meta_cc = path / "meta" / "0000_TABLE_MASTER_Cost center_general.csv"
+    meta_poc = path / "meta" / "POC.csv"
     output_file = path / "output" / "0_headcount_report.csv"
 
     # Read data
     df = read_data(input_file)
     df_cc = read_cc_master(meta_cc)
+    df_poc = read_poc_master(meta_poc)
 
     # Process data
     versions = ["Act", "Bud.Eop"]
 
     df = (
         df.merge(df_cc, on="cctr", how="left")
+        .merge(df_poc, on="pctr", how="left")
+        .pipe(filter_source, "HRIS")
         .pipe(filter_by_year, year)
         .pipe(filter_by_responsible, responsible_name)
         .pipe(filter_version, versions)
