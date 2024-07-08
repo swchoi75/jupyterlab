@@ -14,8 +14,8 @@ def read_multiple_files(list_of_files):
         pd.read_excel(
             file,
             sheet_name="Total devaluation",
-            header=3,
-            usecols="B:AM",
+            skiprows=5,
+            usecols="B:BD",
         )  # .assign(source=re.search(r"[0-9.-]+", file).group())
         for file in list_of_files
     ]
