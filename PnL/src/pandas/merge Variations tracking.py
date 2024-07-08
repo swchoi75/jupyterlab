@@ -73,9 +73,6 @@ def filter_rows(df):
 
 
 def process_text(df):
-    # df["source"] = df["source"].str.replace("_2024", "")
-    # df["source"] = df["source"].str.replace(".xlsx", "")
-    # df["source"] = df["source"].str.replace("variations_tracking_242_", "")
     df["source"] = df["source"].str.extract(r"(CW\d{2})")
     return df
 
