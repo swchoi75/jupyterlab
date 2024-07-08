@@ -38,6 +38,16 @@ def read_multiple_files(list_of_files):
     return df
 
 
+def read_poc(filename):
+    df = pd.read_csv(filename, dtype="str")  # .clean_names()
+    return df
+
+
+def read_category_item(filename):
+    df = pd.read_csv(filename, dtype="str")  # .clean_names()
+    return df
+
+
 def process_columns(df):
     # clean column names
     # Remove "\n" in the column names
@@ -52,50 +62,42 @@ def process_columns(df):
             "Unnamed: 5": "Items",
         }
     )
+    # df = df.clean_names()
+
     return df
 
 
 def filter_rows(df):
-    df = df[df["plant"] == "242"]
+    df = df[df["Plant"] == "242"]
     return df
 
 
 def process_text(df):
-    df["source"] = df["source"].str.replace("_2023", "")
-    df["source"] = df["source"].str.replace(".xlsx", "")
-    df["source"] = df["source"].str.replace("variations_tracking_ICH_", "")
+    # df["source"] = df["source"].str.replace("_2024", "")
+    # df["source"] = df["source"].str.replace(".xlsx", "")
+    # df["source"] = df["source"].str.replace("variations_tracking_242_", "")
+    df["source"] = df["source"].str.extract(r"(CW\d{2})")
     return df
 
 
-def poc(filename):
-    df = pd.read_csv(filename, dtype="str").clean_names()
-    return df
-
-
-def join_with_poc(df, filename):
-    poc_df = poc(filename)
-    df_merged = pd.merge(df, poc_df, on=["plant", "outlet"], how="left")
+def join_with_poc(df, df_poc):
+    df_merged = pd.merge(df, df_poc, on=["Plant", "Outlet"], how="left")
     return df_merged
 
 
-def variations_item(filename):
-    df = pd.read_csv(filename).clean_names()
-    return df
-
-
-def join_with_variations(df, filename):
-    variations_df = variations_item(filename)
-    df_merged = pd.merge(df, variations_df, on="items", how="left")
+def join_with_category(df, df_category):
+    df_merged = pd.merge(df, df_category, on="Items", how="left")
     return df_merged
 
 
 def main():
+
     # Path
     data_path = path / "data" / "Variations tracking"
 
     # Filenames
     meta_poc = path / "meta" / "POC.csv"
-    meta_file = path / "meta" / "Variations items.csv"
+    meta_category = path / "meta" / "Variations items.csv"
     output_file = path / "output" / "Variations trackings.csv"
 
     # Input data: List of multiple text files
@@ -107,15 +109,16 @@ def main():
 
     # Read data
     df = read_multiple_files(xls_files)
+    df_poc = read_poc(meta_poc)
+    df_category = read_category_item(meta_category)
 
     # Process data
     df = (
         df.pipe(process_columns)
-        .pipe(clean_names)
         .pipe(filter_rows)
         .pipe(process_text)
-        .pipe(join_with_poc, meta_poc)
-        .pipe(join_with_variations, meta_file)
+        .pipe(join_with_poc, df_poc)
+        .pipe(join_with_category, df_category)
     )
 
     # Write data
