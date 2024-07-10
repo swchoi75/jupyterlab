@@ -49,7 +49,7 @@ def main():
 
     # Power BI Dimensions
     selected_columns = ["fy", "productline", "product_hierarchy", "PH_description"]
-    selected_productlines = ["PL DTC", "PL ENC", "PL MTC"]
+    selected_productlines = ["PL DTC", "PL ENC", "PL MTC", "PL HVD"]
     two_id_columns = ["fy", "product_hierarchy"]
 
     df_1 = (
