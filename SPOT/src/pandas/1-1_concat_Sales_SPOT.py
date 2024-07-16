@@ -61,7 +61,7 @@ def main():
     year = 2024
 
     # Path
-    data_path = path / "data" / "SPOT" / f"{year}"
+    data_path = path / "data" / f"{year}"
 
     # Filenames
     xls_files = [

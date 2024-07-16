@@ -6,7 +6,7 @@ library(here)
 
 
 # Path
-path <- here("Planning_Strategy")
+path <- here("SPOT")
 
 
 # Functions
@@ -45,7 +45,7 @@ remove_two_years <- function(df) {
 
 main <- function() {
   # Filenames
-  input_file <- here(path, "data", "SPOT", "2022", "SPOT_combined.csv")
+  input_file <- here(path, "data", "2022", "SPOT_combined.csv")
   output_file <- here(path, "output", "SPOT merged.csv")
 
   # Read data
