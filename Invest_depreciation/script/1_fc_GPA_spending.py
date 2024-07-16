@@ -48,9 +48,11 @@ def rename_columns(df):
     return df
 
 
-def remove_version(df, GPA_version):
+def remove_version(df, GPA_version_1, GPA_version_2):
     """Remove the GPA version prefix from each column name"""
-    df.columns = df.columns.str.replace(GPA_version, "")
+    df.columns = df.columns.str.replace(GPA_version_1, "").str.replace(
+        GPA_version_2, ""
+    )
     return df
 
 
@@ -150,7 +152,12 @@ def enrich_dataset(df, df_meta_coi, cc_master, poc_master):
 
 def main():
     # Variables
-    from common_variable import GPA_filename, GPA_version, spending_total_col
+    from common_variable import (
+        GPA_filename,
+        GPA_version_1,
+        GPA_version_2,
+        spending_total_col,
+    )
 
     # Filenames
     input_file = path / "data" / GPA_filename
@@ -164,7 +171,7 @@ def main():
     gpa = (
         gpa.pipe(clean_column_names)
         .pipe(rename_columns)
-        .pipe(remove_version, GPA_version)
+        .pipe(remove_version, GPA_version_1, GPA_version_2)
         .pipe(select_columns)
         .pipe(handle_missing_vals, spending_total_col)
         .pipe(basic_or_project)

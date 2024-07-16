@@ -78,15 +78,21 @@ def col_acquisition(df):
 def str_to_month_ends(series):
     """Helper function"""
     # Convert year_month to datetime with day set to 1st
-    series = pd.to_datetime(series, format="%Y_%m")
+    s1 = pd.to_datetime(series, format="%Y_%m", errors='coerce')
+    s2 = pd.to_datetime(series, format="%m_%Y", errors='coerce')
+    series = s1.fillna(s2)
     # Add one month and subtract one day to get the month end
     series = series + pd.DateOffset(months=1, days=-1)
     return series
 
 
-def col_acquisition_date(df, text_to_remove):
+def col_acquisition_date(df, text_to_remove_1, text_to_remove_2):
     """New column: "Acquisition date" based on the spending months"""
-    s = df["spend_month"].str.replace(text_to_remove, "")
+    s = (
+        df["spend_month"]
+        .str.replace(text_to_remove_1, "")
+        .str.replace(text_to_remove_2, "")
+    )
     s = str_to_month_ends(s)
     df["acquisition_date"] = s
     return df
@@ -151,7 +157,8 @@ def main():
     # Variables
     from common_variable import (
         spending_total_col,
-        text_to_remove,
+        text_to_remove_1,
+        text_to_remove_2,
         current_year_end,
         actual_month_end,
     )
@@ -172,7 +179,9 @@ def main():
     df = (
         df.pipe(pivot_longer)
         .pipe(col_acquisition)
-        .pipe(col_acquisition_date, text_to_remove)  # based on the spending months
+        .pipe(
+            col_acquisition_date, text_to_remove_1, text_to_remove_2
+        )  # based on the spending months
         .pipe(col_start_of_depr)
         .pipe(col_asset_category, actual_month_end)
         .pipe(col_useful_life_year)
