@@ -38,7 +38,7 @@ def clean_column_names(df):
     return df
 
 
-def rename_columns(df):
+def rename_columns_in_2022(df):
     """This is used only for SPOT 2022 data"""
     df = df.rename(
         columns={
@@ -76,7 +76,11 @@ def main():
 
     # Process data
     if year == 2022:
-        df = df.pipe(clean_column_names).pipe(rename_columns).pipe(extract_numbers)
+        df = (
+            df.pipe(clean_column_names)
+            .pipe(rename_columns_in_2022)
+            .pipe(extract_numbers)
+        )
     else:
         df = df.pipe(clean_column_names).pipe(extract_numbers)
 
