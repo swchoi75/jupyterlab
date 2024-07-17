@@ -13,9 +13,9 @@ source(here(path, "src", "dplyr", "common_functions.R"))
 filter_var_account <- function(df) {
   # Var costs : Add account information
   df <- df %>%
-    filter(.data[["coom"]] == "Var") %>%
+    filter(df$coom == "Var") %>%
     # Remove S90xxx accounts
-    filter(.data[["acc_lv6"]] != "Assessments to COPA") %>%
+    filter(df$acc_lv6 != "Assessments to COPA") %>%
     mutate(
       LDC_MDC = case_when(
         str_starts(costctr, "8") ~ "Start up costs",

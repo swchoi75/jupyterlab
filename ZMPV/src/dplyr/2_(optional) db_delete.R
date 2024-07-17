@@ -14,7 +14,7 @@ delete_last_month <- function(df) {
 
   # Filter out last month
   df <- df |>
-    filter(.data[["m_y_from_"]] != last_month)
+    filter(df$m_y_from_ != last_month)
 
   return(df)
 }

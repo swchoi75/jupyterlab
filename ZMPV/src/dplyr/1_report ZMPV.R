@@ -11,29 +11,29 @@ path <- here("ZMPV")
 zmpv_ico <- function(df) {
   # Filter Intercompany
   df <- df %>%
-    filter(.data[["outs_ic"]] == "IC")
+    filter(df$outs_ic == "IC")
   return(df)
 }
 
 zmpv_ppv <- function(df) {
   # Filter Net PPV
   df <- df %>%
-    filter(.data[["net_pm_ppv"]] < -10000 | .data[["net_pm_ppv"]] > 10000)
+    filter(df$net_pm_ppv < -10000 | df$net_pm_ppv > 10000)
   return(df)
 }
 
 zmpv_fx <- function(df) {
   # Filter FX Material (= former PPV FX)
   df <- df %>%
-    filter(.data[["fx_effect"]] < -10000 | .data[["fx_effect"]] > 10000)
+    filter(df$fx_effect < -10000 | df$fx_effect > 10000)
   return(df)
 }
 
 zmpv_loco <- function(df) {
   # Filter LOCO
   df <- df %>%
-    filter(abs(.data[["std_tool_c"]]) + abs(.data[["std_freigh"]]) +
-      abs(.data[["std_customs"]]) > 10000)
+    filter(abs(df$std_tool_c) + abs(df$std_freigh) +
+             abs(df$std_customs) > 10000)
   return(df)
 }
 
@@ -41,11 +41,11 @@ zmpv_smd <- function(df) {
   # Filter SMD Outsourcing
   df <- df %>%
     filter(
-      .data[["vendor"]] == "0009085884" | # Geumhwa Electronics Co., Ltd.
-        .data[["vendor"]] == "0009072686" # Nextech Co., Ltd
+      df$vendor == "0009085884" | # Geumhwa Electronics Co., Ltd.
+        df$vendor == "0009072686" # Nextech Co., Ltd
       #| `Vendor` == "0009149214"# Continental Automotive Electronics,
     ) %>%
-    filter(.data[["gr_quantity"]] != 0)
+    filter(df$gr_quantity != 0)
   return(df)
 }
 

@@ -1,4 +1,6 @@
-library(tidyverse)
+library(dplyr)
+library(readr)
+library(stringr)
 library(lubridate)
 
 pricing <- function() {
@@ -19,10 +21,10 @@ main_data <- function() {
 process_date_columns <- function(df) {
   df %>%
     mutate(
-      data_timestamp = mdy_hm(data_timestamp),
-      created_at = mdy_hm(created_at),
-      updated_at = mdy_hm(updated_at),
-      last_patch = mdy_hm(last_patch)
+      data_timestamp = mdy_hm(df$data_timestamp),
+      created_at = mdy_hm(df$created_at),
+      updated_at = mdy_hm(df$updated_at),
+      last_patch = mdy_hm(df$last_patch)
     )
 }
 

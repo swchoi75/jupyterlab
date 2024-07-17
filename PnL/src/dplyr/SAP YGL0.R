@@ -25,8 +25,8 @@ process_textual_columns <- function(df) {
   # Extract RACE account, G/L accounts, Profit center in number format
   df <- df |>
     mutate(
-      source = str_extract(.data[["source"]], "[0-9\\-]{8,9}"),
-      Key = str_extract(.data[["OneGL B/S + P/L"]], "[0-9]+|^K[0-9]+|^P[0-9]+")
+      source = str_extract(df$source, "[0-9\\-]{8,9}"),
+      Key = str_extract(df["OneGL B/S + P/L"], "[0-9]+|^K[0-9]+|^P[0-9]+")
     )
   return(df)
 }
@@ -50,14 +50,14 @@ lookup_table <- function(filename) {
     col_types = cols(.default = col_character()),
   ) |>
     # Extract RACE account, G/L account in number format ----
-    mutate(Key = str_extract(.data[["Key"]], "[0-9]+|^K[0-9]+|^P[0-9]+"))
+    mutate(Key = str_extract(df$Key, "[0-9]+|^K[0-9]+|^P[0-9]+"))
   return(df)
 }
 
 join_with_lookup <- function(df, filename) {
   df <- df |>
     left_join(lookup_table(filename), by = "Key") |>
-    filter(.data[["A"]] != "")
+    filter(df$A != "")
   return(df)
 }
 

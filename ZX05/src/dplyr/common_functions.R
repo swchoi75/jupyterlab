@@ -18,7 +18,7 @@ remove_unnecessary_columns <- function(df) {
       "acc_lv3",
       "acc_lv4",
       "acc_lv5",
-      "acc_lv6",
+      "acc_lv6"
     ))
 }
 
@@ -30,7 +30,7 @@ process_numeric_columns <- function(df) {
       ~ (.x / -10^3)
     )) |>
     mutate(
-      delta_to_plan = round(.data[["actual"]] - .data[["plan"]], 3),
+      delta_to_plan = round(df$actual - df$plan, 3),
       .after = "target"
     )
   return(df)
@@ -55,8 +55,7 @@ master_coom <- function(filename) {
 add_vol_diff <- function(df) {
   df <- df %>%
     mutate(
-      volume_difference = round(.data[["plan"]] - .data[["target"]], 3),
-      # .after = "delta_to_plan"
+      volume_difference = round(df$plan - df$target, 3),
     )
   return(df)
 }

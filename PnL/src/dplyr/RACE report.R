@@ -52,14 +52,14 @@ join_with_outlet <- function(df, filename) {
 profit_and_loss <- function(df) {
   df <- df |>
     select(!c("period_0", "ytd_0":"ytd_12")) |>
-    filter(str_detect(.data[["financial_statement_item"]], "^3|^CO"))
+    filter(str_detect(df$financial_statement_item, "^3|^CO"))
   return(df)
 }
 
 balance_sheet <- function(df) {
   df <- df |>
     select(!c("period_0":"period_12")) |>
-    filter(str_detect(.data[["financial_statement_item"]], "^1|^2"))
+    filter(str_detect(df$financial_statement_item, "^1|^2"))
   return(df)
 }
 

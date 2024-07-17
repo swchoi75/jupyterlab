@@ -25,7 +25,7 @@ read_multiple_files <- function(list_of_files) {
 
 remove_na_rows <- function(df) {
   df <- df |>
-    filter(!is.na(.data[["plant"]]))
+    filter(!is.na(df$plant))
   return(df)
 }
 
@@ -40,7 +40,7 @@ year_month <- function(df) {
 
 filter_data <- function(df) {
   df <- df |>
-    filter(.data[["monthly_impact"]] > 10^7 | .data[["monthly_impact"]] < -10^7)
+    filter(df$monthly_impact > 10^7 | df$monthly_impact < -10^7)
   return(df)
 }
 

@@ -37,7 +37,7 @@ process_columns <- function(df) {
 
 filter_rows <- function(df) {
   df <- df |>
-    filter(!is.na(.data[["plant"]]))
+    filter(!is.na(df$plant))
   return(df)
 }
 
@@ -45,9 +45,9 @@ process_text <- function(df, path_name) {
   # Remove unnecessary text
   df <- df |>
     mutate(
-      source = str_remove(.data[["source"]], "_2023"),
-      source = str_remove(.data[["source"]], ".xlsx"),
-      source = str_remove(.data[["source"]], path_name)
+      source = str_remove(df$source, "_2023"),
+      source = str_remove(df$source, ".xlsx"),
+      source = str_remove(df$source, path_name)
     )
   return(df)
 }

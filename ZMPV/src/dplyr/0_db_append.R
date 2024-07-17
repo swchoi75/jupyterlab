@@ -22,7 +22,7 @@ remove_col_row <- function(df) {
   # Remove first two columns and sub-total rows
   df <- df |>
     select(-c(1, 2)) |>
-    filter(!is.na(.data[["Profit Cen"]]))
+    filter(!is.na(df["Profit Cen"]))
   return(df)
 }
 

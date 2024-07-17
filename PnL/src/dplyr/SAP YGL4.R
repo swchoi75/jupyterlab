@@ -30,9 +30,9 @@ select_columns <- function(df) {
 process_textual_columns <- function(df, path_name) {
   df <- df |>
     mutate(
-      source = str_remove(.data[["source"]], path_name),
-      source = str_remove(.data[["source"]], ".dat$"),
-      PrCr = str_extract(.data[["OneGL B/S + P/L"]], "[0-9\\-]{8,9}")
+      source = str_remove(df$source, path_name),
+      source = str_remove(df$source, ".dat$"),
+      PrCr = str_extract(df["OneGL B/S + P/L"], "[0-9\\-]{8,9}")
     )
   return(df)
 }

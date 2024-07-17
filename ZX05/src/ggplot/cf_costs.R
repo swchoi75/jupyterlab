@@ -84,16 +84,16 @@ df_sum <- df %>%
 delta_chart <- function(df, y_col) {
   # Summarize the data
   df <- df %>%
-    group_by(.data[[y_col]], .data[["acc_lv2"]]) %>%
+    group_by(df[y_col], df$acc_lv2) %>%
     summarise(across(numeric_cols, sum)) %>%
     ungroup()
   # Visualize the data
   plt <- ggplot(
     df,
     aes(
-      x = .data[["delta_to_plan"]],
-      y = fct_reorder(.data[[y_col]], desc(.data[["delta_to_plan"]])),
-      fill = .data[["acc_lv2"]]
+      x = df$delta_to_plan,
+      y = fct_reorder(df[y_col], desc(df$delta_to_plan)),
+      fill = df$acc_lv2
     )
   ) +
     geom_col() +

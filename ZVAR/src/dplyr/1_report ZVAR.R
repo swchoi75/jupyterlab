@@ -12,8 +12,8 @@ zvar_act <- function(df, cols_common, cols_activity) {
   # Select activity variance
   df <- df |>
     select(all_of(cols_common), all_of(cols_activity)) |>
-    filter(!is.na(.data[["acttyp"]])) |>
-    filter(is.na(.data[["no_post"]]))
+    filter(!is.na(df$acttyp)) |>
+    filter(is.na(df$no_post))
   return(df)
 }
 
@@ -21,11 +21,11 @@ zvar_mat_full <- function(df, cols_common, cols_material) {
   # Select material usage variance
   df <- df |>
     select(all_of(cols_common), all_of(cols_material)) |>
-    filter(is.na(.data[["acttyp"]])) |>
-    filter(is.na(.data[["no_post"]])) |>
+    filter(is.na(df$acttyp)) |>
+    filter(is.na(df$no_post)) |>
     # Filter out zero values
-    filter(!(.data[["mvqn"]] == 0 & .data[["mvsu"]] == 0 &
-      .data[["mvpr"]] == 0 & .data[["bset"]] == 0))
+    filter(!(df$mvqn == 0 & df$mvsu == 0 &
+               df$mvpr == 0 & df$bset == 0))
   return(df)
 }
 
@@ -34,7 +34,7 @@ zvar_mat_major <- function(df) {
   df <- df |>
     filter(
       abs(
-        .data[["mvqn"]] + .data[["mvsu"]] + .data[["mvpr"]] + .data[["bset"]]
+        df$mvqn + df$mvsu + df$mvpr + df$bset
       ) > 10^5
     )
   return(df)
@@ -44,8 +44,8 @@ zvar_oth <- function(df, cols_common, cols_others) {
   # Select other variance
   df <- df |>
     select(all_of(cols_common), all_of(cols_others)) |>
-    filter(is.na(.data[["acttyp"]])) |>
-    filter(!is.na(.data[["no_post"]]))
+    filter(is.na(df$acttyp)) |>
+    filter(!is.na(df$no_post))
   return(df)
 }
 

@@ -65,8 +65,8 @@ extract_poc <- function(df) {
   df <- df |>
     mutate(
       outlet_plant = str_extract(source, "[0-9\\_]{7,9}"),
-      outlet = str_extract(.data[["outlet_plant"]], "[0-9]{3,4}"),
-      plant = str_extract(.data[["outlet_plant"]], "[0-9]{3}$")
+      outlet = str_extract(df$outlet_plant, "[0-9]{3,4}"),
+      plant = str_extract(df$outlet_plant, "[0-9]{3}$")
     ) |>
     select(!c("source", "outlet_plant")) |>
     relocate(c("outlet", "plant"))
