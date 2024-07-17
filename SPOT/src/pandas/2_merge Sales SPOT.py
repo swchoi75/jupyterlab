@@ -43,8 +43,9 @@ def remove_zero_na(df):
 
 
 def main():
-    # Variable
+    # Variables
     year = 2024
+
     if year == 2021 or year == 2022:  # Before Project NEXT
         list_of_cols = [
             "source",
@@ -60,7 +61,7 @@ def main():
             "sop_line_item",
             "won_lost_exit_date",
         ]
-    elif year == 2023 or year == 2024:  # After Project NEXT
+    else:  # After Project NEXT
         list_of_cols = [
             "source",
             "division",  # after project NEXT
@@ -89,7 +90,7 @@ def main():
             "won_lost_exit_date",
         ]
 
-    # Path
+    # Filenames
     input_file = path / "output" / f"SPOT_combined_{year}.csv"
     output_file = path / "output" / f"SPOT_merged_{year}.csv"
 

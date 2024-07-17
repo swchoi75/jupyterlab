@@ -48,22 +48,52 @@ remove_zero_na <- function(df) {
 
 main <- function() {
   # Variable
-  year <- 2022
+  year <- 2024
 
-  list_of_cols <- c(
-    "source",
-    "business_unit",
-    "segment", # before project NEXT
-    "business_type",
-    "om_status",
-    "sourcing_customer",
-    "sourcing_decis_date",
-    "project_title",
-    "project_id",
-    "line_item_descr", # before project NEXT
-    "sop_line_item",
-    "won_lost_exit_date"
-  )
+  if (year == 2021 || year == 2022) {
+    list_of_cols <- c(
+      "source",
+      "business_unit",
+      "segment", # before project NEXT
+      "business_type",
+      "om_status",
+      "sourcing_customer",
+      "sourcing_decis_date",
+      "project_title",
+      "project_id",
+      "line_item_descr", # before project NEXT
+      "sop_line_item",
+      "won_lost_exit_date"
+    )
+  } else {
+    list_of_cols <- c(
+      "source",
+      "division",  # after project NEXT
+      "business_unit",
+      "product_line",  # after project NEXT
+      "sourcing_cust_group",  # after project NEXT
+      "sourcing_cust_cat_name",  # after project NEXT
+      "business_type",
+      "om_status",
+      "sales_plant",  # after project NEXT
+      "sales_plant_pivot",  # after project NEXT
+      "kam_office_sour_cus",  # after project NEXT
+      "final_customer_group",  # after project NEXT
+      "country_final_cust",  # after project NEXT
+      "country_prod_plant",  # after project NEXT
+      "sourcing_customer",
+      "sourcing_decis_date",
+      "project_title",
+      "product_group",  # after project NEXT
+      "product_group_pivot",  # after project NEXT
+      "product_hierarchy",  # after project NEXT
+      "product_hierarchy_pivot",  # after project NEXT
+      "project_id",
+      "line_item_description",  # after project NEXT
+      "sop_line_item",
+      "won_lost_exit_date"
+    )
+  }
 
   # Filenames
   input_file <- here(path, "output", glue("SPOT_combined_{year}.csv"))
