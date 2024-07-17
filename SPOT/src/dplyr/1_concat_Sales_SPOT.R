@@ -43,7 +43,7 @@ extract_numbers <- function(df) {
 
 main <- function() {
   # Variable
-  year <- 2022
+  year <- 2024
 
   # Path
   data_path <- here(path, "data", glue("{year}"))
