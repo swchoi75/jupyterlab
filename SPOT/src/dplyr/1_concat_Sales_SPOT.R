@@ -50,7 +50,7 @@ main <- function() {
 
   # Filenames
   xls_files <- dir_ls(data_path, regexp = "\\.xls?")
-  output_file <- here(path, "output", glue("SPOT_combined_{year}_in_R.csv"))
+  output_file <- here(path, "output", glue("SPOT_combined_{year}.csv"))
 
   # Read data
   df <- read_multiple_files((xls_files))
