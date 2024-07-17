@@ -12,17 +12,17 @@ library(scales)
 path <- "../"
 
 # Read the data
-df <- read_csv(paste0(path, "output/ZX05/CF costs.csv")) %>%
+df <- read_csv(paste0(path, "output/ZX05/CF costs.csv")) |>
   clean_names()
 
 
 # Change data type
-df <- df %>%
+df <- df |>
   mutate(across(cost_ctr, as.character))
 
 
 # Filter primary costs
-df <- df %>%
+df <- df |>
   filter(acc_lv2 %in% c(
     "299 Total Labor Costs",
     "465 Cost of materials",
@@ -48,12 +48,12 @@ numeric_cols <- c(
   "delta_to_plan"
 )
 
-df <- df %>%
+df <- df |>
   select(all_of(id_cols), all_of(numeric_cols))
 
 
 # Change sign logic from RACE to SAP & from k LC to LC
-df <- df %>%
+df <- df |>
   mutate(
     across(numeric_cols, ~ (.x * -1e+3)),
     across(c("delta_to_plan"), ~ (.x * -1))
@@ -61,31 +61,31 @@ df <- df %>%
 
 
 # Summarize the data ----
-df <- df %>%
-  group_by(pick(id_cols)) %>%
-  summarise(across(numeric_cols, sum)) %>%
+df <- df |>
+  group_by(pick(id_cols)) |>
+  summarise(across(numeric_cols, sum)) |>
   ungroup()
 
-top_10_negative <- df %>%
-  arrange(delta_to_plan) %>%
+top_10_negative <- df |>
+  arrange(delta_to_plan) |>
   slice_head(n = 10)
 
-top_10_positive <- df %>%
-  arrange(delta_to_plan) %>%
+top_10_positive <- df |>
+  arrange(delta_to_plan) |>
   slice_tail(n = 10)
 
-df_sum <- df %>%
-  group_by() %>%
-  summarise(across(numeric_cols, sum)) %>%
+df_sum <- df |>
+  group_by() |>
+  summarise(across(numeric_cols, sum)) |>
   ungroup()
 
 
 # Visualize the data ----
 delta_chart <- function(df, y_col) {
   # Summarize the data
-  df <- df %>%
-    group_by(df[y_col], df$acc_lv2) %>%
-    summarise(across(numeric_cols, sum)) %>%
+  df <- df |>
+    group_by(df[y_col], df$acc_lv2) |>
+    summarise(across(numeric_cols, sum)) |>
     ungroup()
   # Visualize the data
   plt <- ggplot(

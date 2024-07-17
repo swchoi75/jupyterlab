@@ -37,8 +37,8 @@ opts <- options(knitr.kable.NA = "")
 knitr::kable(bind_rows(top_10_negative, df_sum),
   caption = "Top 10 Negative variations",
   format.args = list(big.mark = ",", scientific = FALSE)
-) %>%
-  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+) |>
+  kable_styling(bootstrap_options = c("striped", "hover")) |>
   row_spec(nrow(top_10_negative) + 1, bold = TRUE)
 ```
 
@@ -48,8 +48,8 @@ opts <- options(knitr.kable.NA = "")
 knitr::kable(bind_rows(top_10_positive, df_sum),
   caption = "Top 10 Positive variations",
   format.args = list(big.mark = ",", scientific = FALSE)
-) %>%
-  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+) |>
+  kable_styling(bootstrap_options = c("striped", "hover")) |>
   row_spec(nrow(top_10_positive) + 1, bold = TRUE)
 ```
 
@@ -59,7 +59,7 @@ opts <- options(knitr.kable.NA = "")
 knitr::kable(bind_rows(df, df_sum),
   caption = "PMME costs 2023 YTD May",
   format.args = list(big.mark = ",", scientific = FALSE)
-) %>%
-  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+) |>
+  kable_styling(bootstrap_options = c("striped", "hover")) |>
   row_spec(nrow(df) + 1, bold = TRUE)
 ```

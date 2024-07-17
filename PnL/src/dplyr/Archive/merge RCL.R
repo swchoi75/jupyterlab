@@ -15,7 +15,7 @@ xls_files <- dir_ls("data/RCL", regexp = "\\.xlsm$")
 
 
 # Read multiple excel files ----
-df <- xls_files %>%
+df <- xls_files |>
   map_dfr(read_excel,
     sheet = "RCL Input GC", skip = 4, .id = "source",
     col_types = c(
@@ -30,13 +30,13 @@ df <- xls_files %>%
 
 
 # Change GC to LC ----
-df <- df %>%
+df <- df |>
   mutate(across(where(is.numeric), ~ .x * bud_fx))
 
 
 # Rename Columns ----
-df <- df %>%
-  select(!c("ACT Period GC":"FC GC fx impact")) %>%
+df <- df |>
+  select(!c("ACT Period GC":"FC GC fx impact")) |>
   rename(
     `Period Plan`         = `Single Period BUD GC`,
     `Period Act`          = `Single Period ACT GC @ BUD fx`,
@@ -58,30 +58,30 @@ df <- df %>%
 
 
 # Get Outlet, Plant infomration from file names using Regex ----
-df <- df %>%
+df <- df |>
   mutate(
     Outlet_Plant = str_extract(source, "[0-9\\_]{7,9}"),
     Outlet = str_extract(Outlet_Plant, "[0-9]{3,4}"),
     Plant = str_extract(Outlet_Plant, "[0-9]{3}$")
-  ) %>%
-  select(!c(source, Outlet_Plant)) %>%
+  ) |>
+  select(!c(source, Outlet_Plant)) |>
   relocate(Outlet, Plant)
 
 
 # Plant Outlet Combination ----
-poc <- read_csv("meta/POC.csv", col_types = "ccc") %>% # "c" as Character type
+poc <- read_csv("meta/POC.csv", col_types = "ccc") |> # "c" as Character type
   select(!c(CU, `Profit Center`))
 
-df <- df %>%
-  left_join(poc, by = c("Outlet", "Plant")) %>%
+df <- df |>
+  left_join(poc, by = c("Outlet", "Plant")) |>
   relocate(BU, `Outlet name`, `Plant name`)
 
 
 # Add key column for look up RCL comments ----
-df <- df %>%
+df <- df |>
   tidyr::unite(Key, c("Outlet", "Plant", "RCL Item structure"),
     remove = FALSE
-  ) %>%
+  ) |>
   relocate(Key, .after = last_col())
 
 

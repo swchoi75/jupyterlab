@@ -53,7 +53,7 @@ master_coom <- function(filename) {
 
 # Operational costs ----
 add_vol_diff <- function(df) {
-  df <- df %>%
+  df <- df |>
     mutate(
       volume_difference = round(df$plan - df$target, 3),
     )
@@ -61,26 +61,26 @@ add_vol_diff <- function(df) {
 }
 
 process_master_data <- function(df, df_cc, df_acc, df_coom, df_poc) {
-  df <- df %>%
-    left_join(df_cc, c("costctr" = "cctr")) %>%
-    left_join(df_acc, c("gl_accounts" = "account_no")) %>%
+  df <- df |>
+    left_join(df_cc, c("costctr" = "cctr")) |>
+    left_join(df_acc, c("gl_accounts" = "account_no")) |>
     left_join(df_coom, c(
       "costctr" = "cctr",
       "gl_accounts" = "account_no"
-    )) %>%
+    )) |>
     tidyr::separate(
       col = "lv3", into = c(NA, "function_2"),
       sep = "-", remove = FALSE
-    ) %>%
-    relocate("function_2", .after = last_col()) %>%
-    left_join(df_poc, c("pctr" = "profit_center")) %>%
-    rename(c(profit_center = "pctr")) %>%
+    ) |>
+    relocate("function_2", .after = last_col()) |>
+    left_join(df_poc, c("pctr" = "profit_center")) |>
+    rename(c(profit_center = "pctr")) |>
     return(df)
 }
 
 # Process COOM data for fix and variable costs
 split_fix_var <- function(df) {
-  df <- df %>%
+  df <- df |>
     mutate(coom = case_when(
       # handle budget topic
       fix_var == "Var" & gl_accounts == "K399" ~ "Var",

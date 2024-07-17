@@ -12,10 +12,10 @@ source(here(path, "src", "dplyr", "common_functions.R"))
 # Functions
 filter_fix_account <- function(df) {
   # Fix costs : Add account information
-  df <- df %>%
-    filter(df$coom == "Fix") %>%
+  df <- df |>
+    filter(df$coom == "Fix") |>
     # Remove S90xxx accounts
-    filter(df$acc_lv6 != "Assessments to COPA") %>%
+    filter(df$acc_lv6 != "Assessments to COPA") |>
     mutate(
       ce_text = case_when(
         # PV Costs : special logic for Division P in 2023 (temporary)
@@ -70,7 +70,7 @@ filter_fix_account <- function(df) {
 
 add_race_item <- function(df) {
   # Fix costs : Add RACE account information
-  df <- df %>%
+  df <- df |>
     mutate(
       race_item = case_when(
         function_2 == "FGK" ~ "PE production",
@@ -120,13 +120,13 @@ main <- function() {
   df_poc <- read_master_file(meta_poc)
 
   # Process data
-  df <- df %>%
-    process_numeric_columns() %>%
-    add_vol_diff() %>%
-    process_master_data(df_cc, df_acc, df_coom, df_poc) %>%
-    split_fix_var() %>%
-    filter_fix_account() %>%
-    add_race_item() %>%
+  df <- df |>
+    process_numeric_columns() |>
+    add_vol_diff() |>
+    process_master_data(df_cc, df_acc, df_coom, df_poc) |>
+    split_fix_var() |>
+    filter_fix_account() |>
+    add_race_item() |>
     remove_unnecessary_columns()
 
   # Write data

@@ -11,7 +11,7 @@ xls_files <- dir_ls("data/Inventory devaluation", regexp = "\\.xlsx$")
 
 
 # Read multiple excel files ----
-df <- xls_files %>%
+df <- xls_files |>
   map_dfr(read_excel,
     sheet = "Total devaluation",
     range = "B4:AM30000",
@@ -20,18 +20,18 @@ df <- xls_files %>%
 
 
 # Remove NA rows ----
-df <- df %>%
+df <- df |>
   filter(!is.na(Plant))
 
 
 # Capture Year and Month ----
-df <- df %>%
+df <- df |>
   mutate(
     source = str_extract(source, "[0-9.-]+"),
   )
 
 # Filter the dataset ----
-df <- df %>%
+df <- df |>
   filter(`Monthly Impact` > 10^7 | `Monthly Impact` < -10^7)
 
 

@@ -11,7 +11,7 @@ xls_files <- dir_ls("data/Variations tracking", regexp = "\\.xlsx$")
 
 
 # Read multiple excel files ----
-df <- xls_files %>%
+df <- xls_files |>
   map_dfr(read_excel,
     sheet = "Seasonalized Variations",
     range = "A16:AA228",
@@ -20,18 +20,18 @@ df <- xls_files %>%
 
 
 # Select columns and remove NA rows ----
-df <- df %>%
-  select(-c(4:6, 24:28)) %>%
+df <- df |>
+  select(-c(4:6, 24:28)) |>
   rename(
     Plant  = ...1,
     Outlet = ...2,
     Items  = ...6,
-  ) %>%
+  ) |>
   filter(!is.na(Plant))
 
 
 # Remove unnecessary text ----
-df <- df %>%
+df <- df |>
   mutate(
     source = str_remove(source, "_2022"),
     source = str_remove(source, ".xlsx"),
@@ -45,14 +45,14 @@ df <- df %>%
 # Add POC information ----
 poc <- read_csv("meta/POC.csv")
 
-df <- df %>%
+df <- df |>
   left_join(poc, by = c("Plant", "Outlet"))
 
 
 # Add Variations item information ----
 var <- read_csv("meta/Variations items.csv")
 
-df <- df %>%
+df <- df |>
   left_join(var, by = "Items")
 
 

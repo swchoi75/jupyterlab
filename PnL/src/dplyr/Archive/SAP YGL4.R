@@ -10,18 +10,18 @@ txt_files <- dir_ls("data/SAP YGL4", regexp = ".txt")
 
 
 # Read multiple tab-delimited files ----
-df <- txt_files %>%
+df <- txt_files |>
   map_dfr(read_tsv,
           skip = 32,
           locale = locale(encoding = "UTF-16LE"),
           col_types = cols(.default = col_character()),
           .id = "source"
-  ) %>%
+  ) |>
   select(source, `OneGL B/S + P/L`, `01`:`12`)
 
 
 # Change column names ----
-df <- df %>%
+df <- df |>
   rename(
     Items = source,
     PrCr = `OneGL B/S + P/L`,
@@ -29,7 +29,7 @@ df <- df %>%
     Jul = `07`, Aug = `08`, Sep = `09`, Oct = `10`, Nov = `11`, Dec = `12`
   )
 
-df <- df %>%
+df <- df |>
   mutate(
     Items = str_remove(Items, "data/SAP YGL4/"),
     Items = str_remove(Items, ".txt"),
@@ -38,7 +38,7 @@ df <- df %>%
 
 
 # Remove thousand separators "," and Convert types ----
-df <- df %>%
+df <- df |>
   mutate(
     across(c(Jan:Dec), ~ str_remove_all(.x, ",")),
     across(c(Jan:Dec), as.double),
@@ -47,8 +47,8 @@ df <- df %>%
 
 
 # Change sign logic etc ----
-df <- df %>%
-  mutate(across(Jan:Dec, ~ .x / -10^6)) %>% # Sign logic change from SAP to RACE
+df <- df |>
+  mutate(across(Jan:Dec, ~ .x / -10^6)) |> # Sign logic change from SAP to RACE
   tidyr::drop_na()
 
 

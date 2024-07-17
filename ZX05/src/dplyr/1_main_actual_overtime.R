@@ -12,17 +12,17 @@ source(here(path, "src", "dplyr", "common_functions.R"))
 # Functions
 filter_var_account <- function(df) {
   # Var costs : Add account information
-  df <- df %>%
-    filter(df$coom == "Var") %>%
+  df <- df |>
+    filter(df$coom == "Var") |>
     # Remove S90xxx accounts
-    filter(df$acc_lv6 != "Assessments to COPA") %>%
+    filter(df$acc_lv6 != "Assessments to COPA") |>
     mutate(
       LDC_MDC = case_when(
         str_starts(costctr, "8") ~ "Start up costs",
         (function_2 == "FGK" & acc_lv2 == "299 Total Labor Costs") ~ "LDC",
         (function_2 == "FGK" & acc_lv2 == "465 Cost of materials") ~ "MDC"
       )
-    ) %>%
+    ) |>
     mutate(
       ce_text = case_when(
         # LDC
