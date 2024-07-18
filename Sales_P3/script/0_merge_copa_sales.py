@@ -32,6 +32,9 @@ def read_multiple_files(list_of_files):
                 "FIRE Plant": str,
                 "FIREOutlet": str,
             },
+        ).rename(
+            # Rename columns that are changing between data source
+            columns={"Stock val.": "Stock Value"}
         )
         for file in list_of_files
     ]
@@ -53,7 +56,7 @@ def remove_sub_total_rows(df):
 def main():
 
     # Filenames
-    data_path = path / "data"
+    data_path = path / "data" / "Actual"
     output_file = path / "db" / "COPA_Sales_2024.parquet"
 
     # Input data: List of multiple text files
