@@ -1,53 +1,25 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
+from janitor import clean_names
 
 
-def process_actual_data(path):
-    # Read CSV file as string
-    df = pd.read_csv(path, dtype="str")
-
-    # Specify data types
-    df = df.astype(
-        {
-            "Quantity": float,
-            "TotSalesLC": float,
-            "Stock val.": float,
-        }
-    )
-
-    # Perform data wrangling operations on the dataframe
-    df = wrangle_dataframe(df)
-
-    # Return the processed dataframe
-    return df
+# Path
+path = Path(__file__).parent.parent
 
 
-def wrangle_dataframe(df):
-    df = group_summarize(df)
-    df = rename_columns(df)
-    df = filter_out_zero(df)
-    df = split_period(df)
-    return df
-
-
+# Functions
 def group_summarize(df):
     df = (
         df.groupby(
             [
-                "Period",
-                "Profit Ctr",
-                "RecordType",
-                "Cost Elem.",
-                "Account Class",
-                "Plnt",
-                "Product",
-                "MatNr Descr.",
-                "Sold-to party",
-                "Sold-to Name 1",
+                col
+                for col in df.columns
+                if col not in ["quantity", "totsaleslc", "stock_value"]
             ],
             dropna=False,  # Important, as we have missing values in Plnt, Product, etc
         )
-        .agg({"Quantity": "sum", "TotSalesLC": "sum", "Stock val.": "sum"})
+        .agg({"quantity": "sum", "totsaleslc": "sum", "stock_value": "sum"})
         .reset_index()
     )
     return df
@@ -55,17 +27,17 @@ def group_summarize(df):
 
 def rename_columns(df):
     new_columns = {
-        "Quantity": "Qty",
-        "TotSalesLC": "Sales_LC",
-        "Stock val.": "STD_Costs",
-        "MatNr Descr.": "Material Description",
+        "quantity": "qty",
+        "totsaleslc": "sales_lc",
+        "stock_value": "std_costs",
+        "matnr_descr": "material_description",
     }
     return df.rename(columns=new_columns)
 
 
 def filter_out_zero(df):
     # Select rows where quantity, sales, or standard costs are non-zero
-    non_zero_rows = ~((df["Qty"] == 0) & (df["Sales_LC"] == 0) & (df["STD_Costs"] == 0))
+    non_zero_rows = ~((df["qty"] == 0) & (df["sales_lc"] == 0) & (df["std_costs"] == 0))
 
     # Filter out zero rows and return the resulting dataframe
     filtered_df = df[non_zero_rows]
@@ -74,17 +46,56 @@ def filter_out_zero(df):
 
 def split_period(df):
     # Split period into year and month columns
-    df[["Year", "Month"]] = df["Period"].str.split(".", expand=True)
-    df[["Year", "Month"]] = df[["Year", "Month"]].astype(float)
+    df[["year", "month"]] = df["period"].str.split(".", expand=True)
+    df[["year", "month"]] = df[["year", "month"]].astype(float)
     # To match with budget
-    df["Year"] = df["Year"] - 1
+    df["year"] = df["year"] - 1
     # Specify data types
-    df = df.astype({"Year": int, "Month": int})
+    df = df.astype({"year": int, "month": int})
     return df
 
 
-def kappa_hev(path):
-    df = pd.read_excel(path, sheet_name="format")
-    df["STD_Costs"] = np.where(df["D/C"] == 40, df["STD_Costs"], df["STD_Costs"] * -1)
-    df = df.drop("D/C", axis="columns")
+def clean_column_names(df):
+    df = df.clean_names()
+    df.columns = df.columns.str.strip("_")
     return df
+
+
+def process_std_costs(df):
+    df["std_costs"] = np.where(df["d_c"] == 40, df["std_costs"], df["std_costs"] * -1)
+    df = df.drop("d_c", axis="columns")
+    return df
+
+
+def main():
+    # Variable
+    year = 2024
+
+    # Filenames
+    input_copa_sales = path / "db" / f"COPA_Sales_{year}.parquet"
+    input_kappa_cost = path / "data" / "Actual" / "Kappa HEV adj_costs.xlsx"
+    output_file = path / "output" / "1_actual_sales.csv"
+
+    # Read data
+    df = pd.read_parquet(input_copa_sales)
+    df_sub = pd.read_excel(input_kappa_cost, sheet_name="format")
+
+    # Process data
+    df = (
+        df.pipe(group_summarize)
+        .pipe(rename_columns)
+        .pipe(filter_out_zero)
+        .pipe(split_period)
+    )
+
+    kappa_cost = df_sub.pipe(clean_column_names).pipe(process_std_costs)
+
+    df = pd.concat([df, kappa_cost], ignore_index=True)
+
+    # Write data
+    df.to_csv(output_file, index=False)
+    print("A file is created")
+
+
+if __name__ == "__main__":
+    main()
