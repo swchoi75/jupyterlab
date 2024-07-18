@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 
 
-from actualsales import process_actual_data, kappa_hev
+from actualsales import process_actual_data, process_std_costs
 from budgetsales import process_budget_data
 from budgetstdcosts import budget_std_costs
 from copasales import process_copa_sales, sales_ytd
@@ -31,12 +31,15 @@ path = Path(__file__).parent.parent
 
 
 def main():
+
+    # Filenames
+    copa_path = path / "db" / "COPA_Sales_2024.parquet"
+    kappa_path = "data/Actual/Kappa HEV adj_costs.xlsx"
+
     # Process actual data
-    copa_path = path / "db" / "COPA_2023.csv"
     df_act = process_actual_data(copa_path)
 
-    kappa_path = "data/Actual/Kappa HEV adj_costs.xlsx"
-    kappa_cost = kappa_hev(kappa_path)
+    kappa_cost = process_std_costs(kappa_path)
 
     df_act = pd.concat([df_act, kappa_cost], ignore_index=True)
 
