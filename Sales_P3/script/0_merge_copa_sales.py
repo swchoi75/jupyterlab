@@ -53,6 +53,12 @@ def remove_sub_total_rows(df):
     return df.loc[df["RecordType"].notna()]
 
 
+def clean_column_names(df):
+    df = df.clean_names()
+    df.columns = df.columns.str.strip("_")
+    return df
+
+
 def main():
 
     # Filenames
@@ -66,7 +72,11 @@ def main():
 
     # Process data
     df = read_multiple_files(txt_files)
-    df = df.pipe(remove_first_two_columns).pipe(remove_sub_total_rows).pipe(clean_names)
+    df = (
+        df.pipe(remove_first_two_columns)
+        .pipe(remove_sub_total_rows)
+        .pipe(clean_column_names)
+    )
 
     # Write to Parquet file
     df.to_parquet(output_file, index=False)
