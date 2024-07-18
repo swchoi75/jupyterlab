@@ -43,7 +43,7 @@ def main():
 
     # Extract HMG customer part number
     pattern = r"\b([A-Z0-9]{5}-[A-Z0-9]{5})\b"
-    df["HMG_PN"] = df["matnr_descr_"].str.extract(pattern)
+    df["HMG_PN"] = df["matnr_descr"].str.extract(pattern)
 
     # Write data
     df.to_csv(output_file, index=False)

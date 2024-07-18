@@ -12,9 +12,9 @@ def rename_columns_to_COPA(df):
     """Rename columns from Zsales to COPA Sales"""
     df = df.rename(
         columns={
-            "gl_acct": "cost_elem_",
+            "gl_acct": "cost_elem",
             "material": "product",
-            "material_description": "matnr_descr_",
+            "material_description": "matnr_descr",
             "billto_name": "sold_to_name_1",
             "bill_qty": "quantity",
             "sales_hw": "totsaleslc",
@@ -32,7 +32,7 @@ def filter_by_year(df, list_of_years=["2019", "2020"]):
 
 def add_recordtype(df):
     """Add new columns for ZSales"""
-    df["recordtype"] = np.where(df["cost_elem_"] == "M08001", "B", "F")
+    df["recordtype"] = np.where(df["cost_elem"] == "M08001", "B", "F")
     return df
 
 
@@ -46,7 +46,7 @@ def sales_overview(df):
     """Generate Sales Overview"""
     df = (
         df.groupby(
-            ["fy", "profit_ctr", "recordtype", "cost_elem_"],
+            ["fy", "profit_ctr", "recordtype", "cost_elem"],
             dropna=False,  # To avoid deleting rows with missing values
         )
         .agg({"quantity": "sum", "totsaleslc": "sum"})
