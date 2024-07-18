@@ -69,16 +69,16 @@ def process_std_costs(df):
 
 def main():
     # Variable
-    year = 2024
+    year = 2023
 
     # Filenames
-    input_copa_sales = path / "db" / f"COPA_Sales_{year}.parquet"
-    input_kappa_cost = path / "data" / "Actual" / "Kappa HEV adj_costs.xlsx"
+    input_main = path / "db" / f"COPA_Sales_{year}.parquet"
+    input_sub = path / "data" / "Actual" / "Kappa HEV adj_costs.xlsx"
     output_file = path / "output" / "1_actual_sales.csv"
 
     # Read data
-    df = pd.read_parquet(input_copa_sales)
-    df_sub = pd.read_excel(input_kappa_cost, sheet_name="format")
+    df = pd.read_parquet(input_main)
+    df_sub = pd.read_excel(input_sub, sheet_name="format")
 
     # Process data
     df = (

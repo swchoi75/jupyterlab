@@ -1,37 +1,13 @@
 import pandas as pd
+from pathlib import Path
+from janitor import clean_names
 
 
-def process_budget_data(path):
-    df = read_excel_file(path)
-    df = wrangle_dataframe(df)
-    return df
+# Path
+path = Path(__file__).parent.parent
 
 
-def read_excel_file(path):
-    df = pd.read_excel(path, sheet_name="Cons", skiprows=2)
-    return df
-
-
-def wrangle_dataframe(df):
-    df = rename_columns(df)
-    df = select_columns(df)
-    df = process_textual_columns(df)
-    df = process_numeric_columns(df)
-    df = split_period(df)
-
-    # Add columns
-    df["Plnt"] = df.apply(add_plant_info, axis="columns")
-    df["Account Class"] = df.apply(add_account_class, axis="columns")
-    df["RecordType"] = df.apply(add_record_type, axis="columns")
-
-    # Miscellaneous
-    df = sales_in_full(df)
-    df = remove_na(df)
-    df = remove_zero(df)
-    df = reorder_columns(df)
-    return df
-
-
+# Functions
 def rename_columns(df):
     df = df.rename(
         columns={
@@ -150,12 +126,12 @@ def sales_in_full(df):
     return df
 
 
-def remove_na(df):
+def remove_missing_values(df):
     # Remove NA values in Profit center
     return df.dropna(subset=["Profit Ctr"])
 
 
-def remove_zero(df):
+def remove_zero_values(df):
     # Remove zero values in Qty and Sales
     return df[(df["Qty"] != 0) | (df["Sales_LC"] != 0)]
 
@@ -179,3 +155,55 @@ def reorder_columns(df):
         ]
     ]
     return df
+
+
+def clean_column_names(df):
+    df = df.clean_names()
+    df.columns = df.columns.str.strip("_")
+    return df
+
+
+def main():
+
+    # Filenames
+    input_file = (
+        path
+        / "data"
+        / "Plan"
+        / "2023_BPR_Consolidation_20220907_CMU Material EQ update.xlsx"
+    )
+    output_file = path / "output" / "2_budget_sales.csv"
+
+    # Read data
+    df = pd.read_excel(input_file, sheet_name="Cons", skiprows=2)
+
+    # Process data
+    df = (
+        df.pipe(rename_columns)
+        .pipe(select_columns)
+        .pipe(process_textual_columns)
+        .pipe(process_numeric_columns)
+        .pipe(split_period)
+    )
+
+    # Add columns
+    df["Plnt"] = df.apply(add_plant_info, axis="columns")
+    df["Account Class"] = df.apply(add_account_class, axis="columns")
+    df["RecordType"] = df.apply(add_record_type, axis="columns")
+
+    # Miscellaneous
+    df = (
+        df.pipe(sales_in_full)
+        .pipe(remove_missing_values)
+        .pipe(remove_zero_values)
+        .pipe(reorder_columns)
+        .pipe(clean_column_names)
+    )
+
+    # Write data
+    df.to_csv(output_file, index=False)
+    print("A file is created")
+
+
+if __name__ == "__main__":
+    main()
