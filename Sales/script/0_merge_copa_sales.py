@@ -65,7 +65,7 @@ def main():
 
     # Filenames
     data_path = path / "data" / f"{year}"
-    output_file = path / "db" / "COPA_Sales_2024.parquet"
+    output_file = path / "db" / f"COPA_Sales_{year}.parquet"
 
     # Input data: List of multiple text files
     txt_files = [

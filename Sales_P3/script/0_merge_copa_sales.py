@@ -60,10 +60,12 @@ def clean_column_names(df):
 
 
 def main():
+    # Variable
+    year = 2024
 
     # Filenames
     data_path = path / "data" / "Actual"
-    output_file = path / "db" / "COPA_Sales_2024.parquet"
+    output_file = path / "db" / f"COPA_Sales_{year}.parquet"
 
     # Input data: List of multiple text files
     txt_files = [
