@@ -8,6 +8,18 @@ path = Path(__file__).parent.parent
 
 
 # Functions
+def rename_columns(df):
+    df = df.rename(
+        columns={
+            "Profit Center": "Profit Ctr",
+            "Product Hierarchy": "Product Hierarchy",
+            "PH_3 simple": "PH_3 simple",
+            "PRD/MER": "PRD/MER",
+        }
+    )
+    return df
+
+
 def select_columns(df, list_of_cols):
     df = df[list_of_cols]
     return df
@@ -82,13 +94,13 @@ def main():
     output_file = path / "output" / "5_sales_with_meta_data.csv"
 
     # Read data
-    df = pd.read_csv(input_file)
+    df = pd.read_csv(input_file, dtype=str)
     df_cc = pd.read_csv(meta_1, dtype=str)
     df_gl = pd.read_csv(meta_2, dtype=str)
     df_poc = pd.read_csv(meta_3, dtype=str)
     df_cm_cluster = pd.read_excel(meta_4, sheet_name="YPC1")
     df_cust_mat = pd.read_excel(meta_5, sheet_name="Sheet1", dtype=str)
-    df_mat = pd.read_csv(meta_6,dtype=str)
+    df_mat = pd.read_csv(meta_6, dtype=str)
     df_ph = pd.read_csv(meta_7, dtype=str)
 
     # Process data
@@ -104,16 +116,9 @@ def main():
         select_columns, ["Product", "Customer Material"]
     ).dropna(subset=["Customer Material"])
 
-    df_ph = df_ph.rename(
-        columns={
-            "Profit Center": "Profit Ctr",
-            "Product Hierarchy": "Product Hierarchy",
-            "PH_3 simple": "PH_3 simple",
-            "PRD/MER": "PRD/MER",
-        }
-    ).pipe(
+    df_ph = df_ph.pipe(rename_columns).pipe(
         select_columns, ["Profit Ctr", "Product Hierarchy", "PH_3 simple", "PRD/MER"]
-    )    
+    )
 
     df = (
         df.pipe(join_customer_center, df_cc)
