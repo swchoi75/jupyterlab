@@ -19,6 +19,11 @@ def rename_columns(df):
     return df
 
 
+def select_columns(df, list_of_cols):
+    df = df[list_of_cols]
+    return df
+
+
 def budget_std_costs(df):
 
     # Calculate standard costs
@@ -40,6 +45,7 @@ def main():
     meta_1 = path / "meta" / "Material master_0180.xlsx"
     meta_2 = path / "meta" / "Material master_2182.xlsx"
     output_file = path / "output" / "3_budget_std_costs.csv"
+    output_meta = path / "meta" / "material_master.csv"
 
     # Read data
     df = pd.read_csv(input_file)
@@ -51,17 +57,27 @@ def main():
         pd.concat([df_0180, df_2182], ignore_index=True)
         .pipe(rename_columns)
         .pipe(clean_names)
-        # select columns
-        .loc[:, ["product", "profit_ctr", "material_type", "standard_price"]]
+        .pipe(
+            select_columns,
+            [
+                "product",
+                "profit_ctr",
+                "material_type",
+                "product_hierarchy",
+                "standard_price",
+            ],
+        )
     )
 
-    df = df.merge(df_meta, on=["profit_ctr", "product"], how="left").pipe(
+    df_sub = df_meta.drop(columns=["product_hierarchy"])
+    df = df.merge(df_sub, on=["profit_ctr", "product"], how="left").pipe(
         budget_std_costs
     )
 
     # Write data
     df.to_csv(output_file, index=False)
-    print("A file is created")
+    df_meta.to_csv(output_meta, index=False)
+    print("Files are created")
 
 
 if __name__ == "__main__":
