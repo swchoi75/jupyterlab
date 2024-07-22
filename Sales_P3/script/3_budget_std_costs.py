@@ -9,6 +9,7 @@ path = Path(__file__).parent.parent
 
 # Functions
 def rename_columns(df):
+    # for master file: Material
     df = df.rename(
         columns={
             "Product Hierachy": "product_hierarchy",

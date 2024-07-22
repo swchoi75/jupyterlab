@@ -9,6 +9,7 @@ path = Path(__file__).parent.parent
 
 # Functions
 def rename_columns(df):
+    # for master file: Product hiearachy
     df = df.rename(
         columns={
             "Profit Center": "Profit Ctr",
