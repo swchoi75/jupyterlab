@@ -92,7 +92,7 @@ def main():
     meta_5 = path / "meta" / "Customer Material.xlsx"
     meta_6 = path / "meta" / "material_master.csv"
     meta_7 = path / "meta" / "PH info.csv"
-    output_file = path / "output" / "5_sales_with_meta_data.csv"
+    output_file = path / "output" / "5_sales_with_master_data.csv"
 
     # Read data
     df = pd.read_csv(input_file, dtype=str)

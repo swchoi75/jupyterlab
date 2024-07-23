@@ -11,6 +11,8 @@ path = Path(__file__).parent.parent
 def missing_customer_center(df):
     # select columns
     df = df[["sold_to_party", "sold_to_name_1", "customer_center"]]
+    # filter out missing values
+    df = df.dropna(subset="sold_to_name_1")
     # filter missing values
     df = df[df["customer_center"].isna()]
     # Drop duplicates
@@ -21,6 +23,8 @@ def missing_customer_center(df):
 def missing_gl_accounts(df):
     # select columns
     df = df[["cost_elem", "account_class", "g_l_account_name"]]
+    # filter out missing values
+    df = df.dropna(subset="cost_elem")
     # filter missing values
     df = df[df["g_l_account_name"].isna()]
     # Drop duplicates
@@ -31,6 +35,8 @@ def missing_gl_accounts(df):
 def missing_poc(df):
     # select columns
     df = df[["profit_ctr", "outlet"]]
+    # filter out missing values
+    df = df.dropna(subset="profit_ctr")
     # filter missing values
     df = df[df["outlet"].isna()]
     # Drop duplicates
@@ -43,32 +49,42 @@ def missing_cm_cluster(df):
     df = df[
         ["version", "month", "profit_ctr", "product", "material_type", "cm_cluster"]
     ]
+    # filter out missing values
+    df = df.dropna(subset="product")
     # filter missing values
     df = df[df["cm_cluster"].isna()]
+    # Drop duplicates
+    df = df.drop_duplicates()
+
     # filter contract manufacturing product
     df = df[df["profit_ctr"].isin(["50803-044", "50803-045", "50803-046"])]
     df = df[df["material_type"].isin(["FERT"])]
-    # Drop duplicates
-    df = df.drop_duplicates()
+
     return df
 
 
 def missing_customer_material(df):
     # select columns
     df = df[["version", "division", "material_type", "product", "customer_material"]]
+    # filter out missing values
+    df = df.dropna(subset="product")
     # filter missing values
     df = df[df["customer_material"].isna()]
+    # Drop duplicatesm
+    df = df.drop_duplicates()
+
     # filter Division E finished / semi-finished
     df = df[df["division"] == "E"]
     df = df[df["material_type"].isin(["FERT", "HALB"])]
-    # Drop duplicatesm
-    df = df.drop_duplicates()
+
     return df
 
 
 def missing_material_master(df):
     # select columns
     df = df[["version", "year", "profit_ctr", "product", "material_type"]]
+    # filter out missing values
+    df = df.dropna(subset="product")
     # filter missing values
     df = df[df["material_type"].isna()]
     # Drop duplicates
@@ -81,17 +97,19 @@ def missing_product_hierarchy(df):
     df = df[["profit_ctr", "product_hierarchy", "ph_3_simple"]]
     # filter missing values
     df = df[df["ph_3_simple"].isna()]
-    # filter out contract manufacturing
-    df = df[~df["profit_ctr"].isin(["50803-044", "50803-045", "50803-046"])]
     # Drop duplicates
     df = df.drop_duplicates()
+
+    # filter out contract manufacturing
+    df = df[~df["profit_ctr"].isin(["50803-044", "50803-045", "50803-046"])]
+
     return df
 
 
 def main():
 
     # Filenames
-    input_file = path / "output" / "5_sales_with_meta_data.csv"
+    input_file = path / "output" / "5_sales_with_master_data.csv"
 
     output_1 = path / "meta" / "test_CC_2024_missing.csv"
     output_2 = path / "meta" / "test_GL_missing.csv"
@@ -105,22 +123,22 @@ def main():
     df = pd.read_csv(input_file, dtype=str)
 
     # Process data
-    df_cc = df.pipe(missing_customer_center)
-    df_gl = df.pipe(missing_gl_accounts)
-    df_poc = df.pipe(missing_poc)
-    df_cm_cluster = df.pipe(missing_cm_cluster)
-    df_cust_mat = df.pipe(missing_customer_material)
-    df_mat = df.pipe(missing_material_master)
-    df_ph = df.pipe(missing_product_hierarchy)
+    df_1 = missing_customer_center(df)
+    df_2 = missing_gl_accounts(df)
+    df_3 = missing_poc(df)
+    df_4 = missing_cm_cluster(df)
+    df_5 = missing_customer_material(df)
+    df_6 = missing_material_master(df)
+    df_7 = missing_product_hierarchy(df)
 
     # Write data
-    df_cc.to_csv(output_1, index=False)
-    df_gl.to_csv(output_2, index=False)
-    df_poc.to_csv(output_3, index=False)
-    df_cm_cluster.to_csv(output_4, index=False)
-    df_cust_mat.to_csv(output_5, index=False)
-    df_mat.to_csv(output_6, index=False)
-    df_ph.to_csv(output_7, index=False)
+    df_1.to_csv(output_1, index=False)
+    df_2.to_csv(output_2, index=False)
+    df_3.to_csv(output_3, index=False)
+    df_4.to_csv(output_4, index=False)
+    df_5.to_csv(output_5, index=False)
+    df_6.to_csv(output_6, index=False)
+    df_7.to_csv(output_7, index=False)
 
     print("Files are created")
 
