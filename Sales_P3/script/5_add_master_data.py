@@ -88,7 +88,7 @@ def main():
     meta_1 = path / "meta" / "CC_2024.csv"
     meta_2 = path / "meta" / "GL.csv"
     meta_3 = path / "meta" / "POC.csv"
-    meta_4 = path / "meta" / "YPC1 costing_Icheon.xlsx"
+    meta_4 = path / "meta" / "2024-06_YPC1 costing_Icheon.xlsx"
     meta_5 = path / "meta" / "Customer Material.xlsx"
     meta_6 = path / "meta" / "material_master.csv"
     meta_7 = path / "meta" / "PH info.csv"

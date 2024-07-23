@@ -40,9 +40,14 @@ def missing_poc(df):
 
 def missing_cm_cluster(df):
     # select columns
-    df = df[["profit_ctr", "product", "cm_cluster"]]
+    df = df[
+        ["version", "month", "profit_ctr", "product", "material_type", "cm_cluster"]
+    ]
     # filter missing values
     df = df[df["cm_cluster"].isna()]
+    # filter contract manufacturing product
+    df = df[df["profit_ctr"].isin(["50803-044", "50803-045", "50803-046"])]
+    df = df[df["material_type"].isin(["FERT"])]
     # Drop duplicates
     df = df.drop_duplicates()
     return df
@@ -50,17 +55,20 @@ def missing_cm_cluster(df):
 
 def missing_customer_material(df):
     # select columns
-    df = df[["profit_ctr", "product", "customer_material"]]
+    df = df[["version", "division", "material_type", "product", "customer_material"]]
     # filter missing values
     df = df[df["customer_material"].isna()]
-    # Drop duplicates
+    # filter Division E finished / semi-finished
+    df = df[df["division"] == "E"]
+    df = df[df["material_type"].isin(["FERT", "HALB"])]
+    # Drop duplicatesm
     df = df.drop_duplicates()
     return df
 
 
 def missing_material_master(df):
     # select columns
-    df = df[["version", "year", "month", "profit_ctr", "product", "material_type"]]
+    df = df[["version", "year", "profit_ctr", "product", "material_type"]]
     # filter missing values
     df = df[df["material_type"].isna()]
     # Drop duplicates
@@ -73,6 +81,8 @@ def missing_product_hierarchy(df):
     df = df[["profit_ctr", "product_hierarchy", "ph_3_simple"]]
     # filter missing values
     df = df[df["ph_3_simple"].isna()]
+    # filter out contract manufacturing
+    df = df[~df["profit_ctr"].isin(["50803-044", "50803-045", "50803-046"])]
     # Drop duplicates
     df = df.drop_duplicates()
     return df
