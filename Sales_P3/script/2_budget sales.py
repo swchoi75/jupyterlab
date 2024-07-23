@@ -21,7 +21,7 @@ def rename_columns(df):
     return df
 
 
-def select_columns(df):
+def select_columns(df, year):
     col_category = [
         "Account Class",
         "Product",
@@ -30,8 +30,8 @@ def select_columns(df):
         "Sold-to party",
         "Sold-to Name 1",
     ]
-    col_vol = [f"2023_{month:02d} vol" for month in range(1, 13)]
-    col_amt = [f"2023_{month:02d} k LC" for month in range(1, 13)]
+    col_vol = [f"{year}_{month:02d} vol" for month in range(1, 13)]
+    col_amt = [f"{year}_{month:02d} k LC" for month in range(1, 13)]
 
     df = df[col_category + col_vol + col_amt]
     return df
@@ -50,7 +50,7 @@ def process_textual_columns(df):
     return df
 
 
-def process_numeric_columns(df):
+def process_numeric_columns(df, year):
     col_category = [
         "Account Class",
         "Product",
@@ -59,8 +59,8 @@ def process_numeric_columns(df):
         "Sold-to party",
         "Sold-to Name 1",
     ]
-    col_vol = [f"2023_{month:02d} vol" for month in range(1, 13)]
-    col_amt = [f"2023_{month:02d} k LC" for month in range(1, 13)]
+    col_vol = [f"{year}_{month:02d} vol" for month in range(1, 13)]
+    col_amt = [f"{year}_{month:02d} k LC" for month in range(1, 13)]
 
     # Split data into volume and sales amount dataframes
     df_vol = df[col_category + col_vol]
@@ -164,13 +164,16 @@ def clean_column_names(df):
 
 
 def main():
+    # Variable
+    year = 2024
 
     # Filenames
     input_file = (
         path
         / "data"
         / "Plan"
-        / "2023_BPR_Consolidation_20220907_CMU Material EQ update.xlsx"
+        # / f"{year}_BPR_Consolidation_20220907_CMU Material EQ update.xlsx"
+        / f"{year}_Consolidate_Sales_Budget 2024 CDP BIN_version_Incl.ICO_231004.xlsx"
     )
     output_file = path / "output" / "2_budget_sales.csv"
 
@@ -180,9 +183,9 @@ def main():
     # Process data
     df = (
         df.pipe(rename_columns)
-        .pipe(select_columns)
+        .pipe(select_columns, year)
         .pipe(process_textual_columns)
-        .pipe(process_numeric_columns)
+        .pipe(process_numeric_columns, year)
         .pipe(split_period)
     )
 

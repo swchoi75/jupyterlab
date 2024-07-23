@@ -9,6 +9,23 @@ path = Path(__file__).parent.parent
 
 
 # Functions
+def drop_columns(df):
+    df = df.drop(
+        columns=[
+            "doc_no",
+            "created_on",
+            "created_by",
+            "ref_doc_no",
+            "rf_itm",
+            "ac_documentno",
+            "delivery",
+            "item",
+            "tr_prt",
+        ]
+    )
+    return df
+
+
 def group_summarize(df):
     df = (
         df.groupby(
@@ -69,7 +86,7 @@ def process_std_costs(df):
 
 def main():
     # Variable
-    year = 2023
+    year = 2024
 
     # Filenames
     input_main = path / "db" / f"COPA_Sales_{year}.parquet"
@@ -82,7 +99,8 @@ def main():
 
     # Process data
     df = (
-        df.pipe(group_summarize)
+        df.pipe(drop_columns)
+        .pipe(group_summarize)
         .pipe(rename_columns)
         .pipe(filter_out_zero)
         .pipe(split_period)
