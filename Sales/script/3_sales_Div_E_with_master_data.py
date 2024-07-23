@@ -14,7 +14,7 @@ def main():
     cg_file = path / "meta" / "customer_group.xlsx"
     ph_file = path / "meta" / "product_hierarchy_Div E.xlsx"
     pg_file = path / "meta" / "product_group_Div E.xlsx"
-    output_file = path / "output" / "Sales Div E_with meta.csv"
+    output_file = path / "output" / "Sales Div E_with master data.csv"
 
     # Read data
     df = pd.read_csv(input_file)
