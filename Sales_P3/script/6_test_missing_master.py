@@ -60,7 +60,7 @@ def missing_customer_material(df):
 
 def missing_material_master(df):
     # select columns
-    df = df[["profit_ctr", "product", "material_type"]]
+    df = df[["version", "year", "month", "profit_ctr", "product", "material_type"]]
     # filter missing values
     df = df[df["material_type"].isna()]
     # Drop duplicates
