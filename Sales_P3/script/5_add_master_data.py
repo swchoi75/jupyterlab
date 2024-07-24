@@ -74,13 +74,6 @@ def join_product_hierarchy(df, df_meta):
     return df
 
 
-def sales_ytd(df):
-    df_act = df.query("version == 'Actual'")
-    last_month = df_act["month"].max()
-    df = df[df["month"] <= last_month]
-    return df
-
-
 def main():
 
     # Filenames
