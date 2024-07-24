@@ -65,8 +65,8 @@ def replace_missing_values(df):
 def main():
 
     # Filenames
-    input_file = path / "output" / "7_ytd_sales_spv_mapping.csv"
-    output_file = path / "output" / "8_ytd_sales_price_impact.csv"
+    input_file = path / "output" / "6_ytd_sales_spv_mapping.csv"
+    output_file = path / "output" / "7_ytd_sales_price_impact.csv"
 
     # Read data
     df = pd.read_csv(input_file)

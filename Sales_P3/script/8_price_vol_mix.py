@@ -68,9 +68,9 @@ def add_delta_margin_mix(df):
 def main():
 
     # Filenames
-    input_file = path / "output" / "8_ytd_sales_price_impact.csv"
+    input_file = path / "output" / "7_ytd_sales_price_impact.csv"
     meta_file = path / "meta" / "Budget Contribution Margin ratio.csv"
-    output_file = path / "output" / "9_ytd_sales_p3_impact.csv"
+    output_file = path / "output" / "ytd_sales_p3_impact.csv"
 
     # Read data
     df = pd.read_csv(input_file)
