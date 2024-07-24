@@ -3,10 +3,10 @@ where python
 
 @REM Actual sales
 python src/pandas/0_merge_copa_sales.py
-python src/pandas/1_actual sales.py
+python src/pandas/1_actual_sales.py
 
 @REM Budget sales
-python src/pandas/2_budget sales.py
+python src/pandas/2_budget_sales.py
 python src/pandas/3_budget_std_costs.py
 
 @REM Combine Actual and Budget Sales & add master data
