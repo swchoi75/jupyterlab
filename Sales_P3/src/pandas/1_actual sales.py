@@ -5,7 +5,7 @@ from janitor import clean_names
 
 
 # Path
-path = Path(__file__).parent.parent
+path = Path(__file__).parent.parent.parent
 
 
 # Functions
