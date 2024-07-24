@@ -9,8 +9,6 @@ path = Path(__file__).parent.parent
 
 
 # Functions
-
-
 def bud_price(df, col_name):
     """Define a custom function to calculate the budget price"""
     col = col_name
@@ -64,7 +62,7 @@ def main():
     output_1 = path / "output" / "bud_price_div_e.csv"
     output_2 = path / "output" / "bud_price_div_p.csv"
     output_3 = path / "output" / "bud_price_pl_cm.csv"
-    output_file = path / "output" / "6_ytd_sales_p3.csv"
+    output_file = path / "output" / "7_ytd_sales_spv_mapping.csv"
 
     # Read data
     df = pd.read_csv(input_file)
