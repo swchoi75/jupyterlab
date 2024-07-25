@@ -90,7 +90,7 @@ def main():
 
     # Filenames
     input_main = path / "db" / f"COPA_Sales_{year}.parquet"
-    input_sub = path / "data" / "Actual" / "Kappa HEV adj_costs.xlsx"
+    input_sub = path / "data" / "actual" / "Kappa HEV adj_costs.xlsx"
     output_file = path / "output" / "1_actual_sales.csv"
 
     # Read data

@@ -33,7 +33,7 @@ def read_multiple_files(list_of_files):
                 "FIREOutlet": str,
             },
         ).rename(
-            # Rename columns that are changing between data source
+            # Correct the occasional column name in the data source
             columns={"Stock val.": "Stock Value"}
         )
         for file in list_of_files
@@ -63,17 +63,19 @@ def main():
     # Variable
     year = 2024
 
-    # Filenames
-    data_path = path / "data" / "Actual"
-    output_file = path / "db" / f"COPA_Sales_{year}.parquet"
+    # Path
+    data_path = path / "data" / "actual"
 
-    # Input data: List of multiple text files
-    txt_files = [
+    # Filenames
+    input_files = [
         file for file in data_path.iterdir() if file.is_file() and file.suffix == ".TXT"
     ]
+    output_file = path / "db" / f"COPA_Sales_{year}.parquet"
+
+    # Read data
+    df = read_multiple_files(input_files)
 
     # Process data
-    df = read_multiple_files(txt_files)
     df = (
         df.pipe(remove_first_two_columns)
         .pipe(remove_sub_total_rows)

@@ -171,7 +171,7 @@ def main():
     input_file = (
         path
         / "data"
-        / "Plan"
+        / "plan"
         # / f"{year}_BPR_Consolidation_20220907_CMU Material EQ update.xlsx"
         / f"{year}_Consolidate_Sales_Budget 2024 CDP BIN_version_Incl.ICO_231004.xlsx"
     )
