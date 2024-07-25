@@ -88,8 +88,6 @@ def split_period(df):
     # Split Period into Year / Month
     df[["Year", "Month"]] = df["Period"].str.split("_", expand=True)
     df[["Year", "Month"]] = df[["Year", "Month"]].astype(float)
-    # To match with Actual
-    # df["Year"] = df["Year"] + 1
     # Specify data types
     df = df.astype({"Year": int, "Month": int})
     return df
