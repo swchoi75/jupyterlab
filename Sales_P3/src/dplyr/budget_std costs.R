@@ -1,10 +1,8 @@
 library(dplyr)
-library(stringr)
 library(readxl)
 library(readr)
 library(janitor)
 library(here)
-library(glue)
 
 
 # Path
@@ -34,49 +32,6 @@ budget_std_costs <- function(df) {
   df <- df |>
     mutate(std_costs = .data$qty * .data$standard_price) |>
     select(!c("standard_price"))
-  return(df)
-}
-
-
-# Material master ----
-mat_0180 <- "meta/Material master_0180.xlsx"
-mat_2182 <- "meta/Material master_2182.xlsx"
-
-master_material <- function(path) {
-  df <- read_excel(path, sheet = "MM")
-
-  df <- df |>
-    rename(c(
-      `Product Hierarchy` = "Product Hierachy...8"
-    )) |>
-    select(c(
-      "Material",
-      "Profit Center",
-      "Material type",
-      "Product Hierarchy",
-      "Standard Price",
-      "Ext. Matl. Group"
-    )) |>
-    rename(c(
-      Product = "Material",
-      `Profit Ctr` = "Profit Center",
-    ))
-
-  return(df)
-}
-
-master_mat_0180 <- function() {
-  df <- master_material(mat_0180)
-  return(df)
-}
-
-master_mat_2182 <- function() {
-  df <- master_material(mat_2182)
-  return(df)
-}
-
-material_master <- function() {
-  df <- bind_rows(master_mat_0180(), master_mat_2182())
   return(df)
 }
 
