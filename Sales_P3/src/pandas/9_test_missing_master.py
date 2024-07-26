@@ -44,7 +44,7 @@ def missing_poc(df):
     return df
 
 
-def missing_cm_cluster(df):
+def missing_cm_cluster(df, cm_profit_ctr):
     # select columns
     df = df[
         ["version", "month", "profit_ctr", "product", "material_type", "cm_cluster"]
@@ -57,7 +57,7 @@ def missing_cm_cluster(df):
     df = df.drop_duplicates()
 
     # filter contract manufacturing product
-    df = df[df["profit_ctr"].isin(["50803-044", "50803-045", "50803-046"])]
+    df = df[df["profit_ctr"].isin(cm_profit_ctr)]
     df = df[df["material_type"].isin(["FERT"])]
 
     return df
@@ -92,7 +92,7 @@ def missing_material_master(df):
     return df
 
 
-def missing_product_hierarchy(df):
+def missing_product_hierarchy(df, cm_profit_ctr):
     # select columns
     df = df[["profit_ctr", "product_hierarchy", "ph_3_simple"]]
     # filter missing values
@@ -101,12 +101,14 @@ def missing_product_hierarchy(df):
     df = df.drop_duplicates()
 
     # filter out contract manufacturing
-    df = df[~df["profit_ctr"].isin(["50803-044", "50803-045", "50803-046"])]
+    df = df[~df["profit_ctr"].isin(cm_profit_ctr)]
 
     return df
 
 
 def main():
+    # Variable
+    cm_profit_ctr = ["50803-044", "50803-045", "50803-046"]
 
     # Filenames
     input_file = path / "output" / "5_sales_with_master_data.csv"
@@ -126,10 +128,10 @@ def main():
     df_1 = missing_customer_center(df)
     df_2 = missing_gl_accounts(df)
     df_3 = missing_poc(df)
-    df_4 = missing_cm_cluster(df)
+    df_4 = missing_cm_cluster(df, cm_profit_ctr)
     df_5 = missing_customer_material(df)
     df_6 = missing_material_master(df)
-    df_7 = missing_product_hierarchy(df)
+    df_7 = missing_product_hierarchy(df, cm_profit_ctr)
 
     # Write data
     df_1.to_csv(output_1, index=False)
