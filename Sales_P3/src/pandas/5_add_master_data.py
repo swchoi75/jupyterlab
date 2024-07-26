@@ -8,19 +8,6 @@ path = Path(__file__).parent.parent.parent
 
 
 # Functions
-def rename_columns(df):
-    # for master file: Product hiearachy
-    df = df.rename(
-        columns={
-            "Profit Center": "Profit Ctr",
-            "Product Hierarchy": "Product Hierarchy",
-            "PH_3 simple": "PH_3 simple",
-            "PRD/MER": "PRD/MER",
-        }
-    )
-    return df
-
-
 def select_columns(df, list_of_cols):
     df = df[list_of_cols]
     return df
@@ -110,7 +97,7 @@ def main():
         select_columns, ["Product", "Customer Material"]
     ).dropna(subset=["Customer Material"])
 
-    df_ph = df_ph.pipe(rename_columns).pipe(
+    df_ph = df_ph.rename(columns={"Profit Center": "Profit Ctr"}).pipe(
         select_columns, ["Profit Ctr", "Product Hierarchy", "PH_3 simple", "PRD/MER"]
     )
 
