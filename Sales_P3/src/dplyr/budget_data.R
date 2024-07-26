@@ -181,12 +181,17 @@ main <- function() {
     select_columns(year) |>
     process_volume_and_amount() |>
     process_miscellaneous() |>
-    split_period() |>
+    split_period()
+    
+  df <- df |>
     arrange_by_month() |>
     add_account_class() |>
-    add_record_type() |>
+    add_record_type()
+
+  df <- df |>
     remove_na() |>
-    remove_zero()
+    remove_zero() |>
+    clean_names()
 
   # Write data
   write_csv(df, output_file)
