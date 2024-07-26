@@ -8,8 +8,6 @@ path = Path(__file__).parent.parent.parent
 
 
 # Functions
-
-
 def main():
 
     # Filenames
