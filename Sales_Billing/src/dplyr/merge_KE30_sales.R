@@ -21,6 +21,8 @@ read_txt_file <- function(file_path) {
     col_types = cols(
       "RecordType" = col_character(),
       "Customer" = col_character(),
+      "AAG" = col_character(),
+      "Dv" = col_character(),
     ),
   )
   return(df)
@@ -48,10 +50,11 @@ main <- function() {
   year <- "2024"
 
   # Path
-  data_path <- here(path, "data", "KE30")
+  # data_path <- here(path, "data", "KE30", "Archive", glue("{year}"))
+  data_path <- here(path, "data", "KE30")  # current year
 
   # Filenames
-  input_files <- dir_ls(data_path, regexp = "\\.XLS")
+  input_files <- dir_ls(data_path, regexp = "\\.XLS|\\.xls")
   output_file <- here(path, "db", glue("KE30_{year}.csv"))
 
   # Read data

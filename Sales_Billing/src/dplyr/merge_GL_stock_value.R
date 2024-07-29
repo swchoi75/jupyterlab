@@ -39,10 +39,11 @@ main <- function() {
   year <- "2024"
 
   # Path
-  data_path <- here(path, "data", "GL")
+  # data_path <- here(path, "data", "GL", "Archive", glue("{year}"))
+  data_path <- here(path, "data", "GL")  # for current year
 
   # Filenames
-  input_files <- dir_ls(data_path, regexp = "\\.XLS")
+  input_files <- dir_ls(data_path, regexp = "\\.XLS|\\.xls")
   output_file <- here(path, "db", glue("GL_{year}.csv"))
 
   # Read data
