@@ -13,16 +13,16 @@ def bud_price(df, col_name):
     """Define a custom function to calculate the budget price"""
     col = col_name
     df = (
-        df.loc[:, ["version", "month", "profit_ctr", col, "qty", "sales_lc"]]
+        df.loc[:, ["version", "profit_ctr", col, "qty", "sales_lc"]]
         .query('version == "Budget"')
         .groupby(["version", "profit_ctr", col])
         .agg(qty=("qty", "sum"), sales_lc=("sales_lc", "sum"))
         .assign(bud_price=lambda x: np.round(x.sales_lc / x.qty, 0))
         .reset_index()
         .dropna(subset=[col])
-        .loc[:, ["profit_ctr", col, "bud_price"]]
+        .loc[:, ["profit_ctr", col, "bud_price"]]  # select columns
     )
-    df["mapping key"] = df[col]
+    df["mapping_key"] = df[col]
     return df
 
 
@@ -49,8 +49,8 @@ def sales_ytd(df):
     return df
 
 
-# mapping between between actual and budget
 def spv_mapping(df, bud_price, col_name):
+    """mapping between between actual and budget"""
     df = df.merge(bud_price, on=["profit_ctr", col_name], how="left")
     return df
 
