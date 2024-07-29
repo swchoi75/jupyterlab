@@ -18,7 +18,10 @@ read_txt_file <- function(file_path) {
   df <- read_tsv(file_path,
     skip = 7,
     locale = locale(encoding = "UTF-16LE"),
-    col_types = cols(RecordType = col_character()),
+    col_types = cols(
+      "RecordType" = col_character(),
+      "Customer" = col_character(),
+    ),
   )
   return(df)
 }
@@ -48,7 +51,7 @@ main <- function() {
   data_path <- here(path, "data", "KE30")
 
   # Filenames
-  input_files <- dir_ls(data_path, regexp = "\\.xls")
+  input_files <- dir_ls(data_path, regexp = "\\.XLS")
   output_file <- here(path, "db", glue("KE30_{year}.csv"))
 
   # Read data
