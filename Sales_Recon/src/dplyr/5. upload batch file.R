@@ -79,8 +79,8 @@ main <- function() {
              .data$Material == "0")
 
   # Write data
-  write_csv(result, output_1, na = "")
-  write_csv(skip, output_2, na = "")
+  write_excel_csv(result, output_1, na = "")
+  write_excel_csv(skip, output_2, na = "")
   print("Files are created")
 }
 

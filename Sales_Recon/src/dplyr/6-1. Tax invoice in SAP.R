@@ -35,10 +35,10 @@ main <- function() {
 
   df <- df |>
     mutate(
-      across(Amount, ~ str_remove_all(.x, ",")),
-      across(Amount, as.double)
+      across("Amount", ~ str_remove_all(.x, ",")),
+      across("Amount", as.double)
     ) |>
-    arrange(`Sold-to Party`)
+    arrange("Sold-to Party")
 
   # Write data
   write_excel_csv(df, output_file, na = "0")

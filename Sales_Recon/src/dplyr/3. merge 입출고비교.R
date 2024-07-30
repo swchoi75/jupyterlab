@@ -4,6 +4,7 @@ library(purrr)
 library(stringr)
 library(readr)
 library(here)
+library(glue)
 
 
 # Path
@@ -20,7 +21,8 @@ read_excel_multiple_sheets <- function(file_path) {
     set_names() |>
     map_df(
       ~ read_xlsx(
-        path = wb_path, sheet = .x,
+        path = file_path,
+        sheet = .x,
         range = "A4:AI1000",
         col_types = "text"
       ),
@@ -33,7 +35,7 @@ read_excel_multiple_sheets <- function(file_path) {
 remove_unnecessary_row <- function(df) {
   df <- df |>
     filter(!.data$고객명 == 0) |>
-    filter(!str_starts(`Customer PN`, "A2C")) # Remove Kappa HEV ADJ
+    filter(!str_starts(.data$`Customer PN`, "A2C")) # Remove Kappa HEV ADJ
   return(df)
 }
 
@@ -58,7 +60,7 @@ format_price_list <- function(df) {
     filter(.data$Plant != 0) |>
     filter(.data$`Profit Center` != 0) |>
     select(!c(11:12)) |>
-    arrange(c("Profit Center", "Customer PN rev"))
+    arrange("Profit Center", "Customer PN rev")
   return(df)
 }
 
@@ -75,15 +77,15 @@ format_uninvoiced_qty <- function(df) {
   # Format for Uninvoiced
   df <- df |>
     select(c(2:4, 6, 12, 7:8, 13:14, 23, 19, 36)) |>
-    filter(.data조정Q != 0) |>
+    filter(.data$조정Q != 0) |>
     mutate(
       `Order type` = case_when(
-        `조정Q` > 0 ~ "ZOR",
-        `조정Q` < 0 ~ "ZRE"
+        조정Q > 0 ~ "ZOR",
+        조정Q < 0 ~ "ZRE"
       ),
       `Order reason` = "C02",
-      `Adj_Qty` = abs(`조정Q`),
-      `이월체크` = "X",
+      Adj_Qty = abs(.data$조정Q),
+      이월체크 = "X",
     )
   return(df)
 }
@@ -110,15 +112,23 @@ format_uninvoiced_amt <- function(df) {
         key == "환율차이" ~ "A04",
         key == "서열비" ~ "A12",
       ),
-      `Adj_Amt` = abs(value),
+      `Adj_Amt` = abs(.data$value),
       `이월체크` = "",
     )
   return(df)
 }
 
+
 main <- function() {
+  # Variables
+  year <- "2024"
+  month <- "06"
+
   # Filenames
-  input_file <- here(path, "report in Excel", "2024-06 입출고 비교.xlsx")
+  input_file <- here(
+    path, "report in Excel",
+    glue("{year}-{month} 입출고 비교.xlsx")
+  )
 
   output_0 <- here(path, "output", "입출고비교 all.csv")
   output_1 <- here(path, "output", "입출고비교 to Price list.csv")

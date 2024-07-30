@@ -25,8 +25,8 @@ read_txt_file <- function(file_path) {
 two_billing_dates <- function(df) {
   df <- df |>
     mutate(
-      `Billing Day` = str_sub(`Billing Date`, 9, 10),
-      .after = Plant
+      `Billing Day` = str_sub(.data$`Billing Date`, 9, 10),
+      .after = "Plant"
     )
   return(df)
 }
@@ -49,12 +49,12 @@ main <- function() {
 
   # Filenames
   input_1 <- here(
-    path, "data", "SAP results",
-    glue("Sales adjustment_0180_{year}{month}")
+    path, "data", "SAP_results",
+    glue("Sales adjustment_0180_{year}{month}.xls")
   )
   input_2 <- here(
-    path, "data", "SAP results",
-    glue("Sales adjustment_0180_{year}{month}")
+    path, "data", "SAP_results",
+    glue("Sales adjustment_2182_{year}{month}.xls")
   )
   output_file <- here(path, "output", "6-2. SAP uninvoiced sales.csv")
 
@@ -65,7 +65,7 @@ main <- function() {
 
   # Process data
   df <- bind_rows(df_0180, df_2182) |>
-    relocate(Plant, .after = `Sales Organization`)
+    relocate("Plant", .after = "Sales Organization")
 
   df <- df |>
     two_billing_dates() |>
