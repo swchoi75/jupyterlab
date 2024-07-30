@@ -28,32 +28,33 @@ process_ke30 <- function(df) {
     ) |>
     mutate(
       period = str_sub(.data$period, 7, 8),
-      source = "KE30", .before = .data$period
+      source = "KE30", .before = "period"
     )
   return(df)
 }
 
 
 process_gl <- function(df) {
-  gl <- gl |>
+  df <- df |>
     mutate(
       across(
-        c("quantity", "amount_in_dc", "amt_in_loc_cur"),
+        c("quantity", "amount_in_doc_curr", "amount_in_local_cur"),
         as.double
       )
     ) |>
     select(c(
       "period",
       "profit_ctr",
-      "material", "quantity",
-      "amt_in_loc_cur"
+      "material",
+      "quantity",
+      "amount_in_local_cur"
     )) |>
     rename(
-      profit_ctr = .data$profit_ctr,
-      product = .data$material,
-      stock_val = .data$amt_in_loc_cur
+      "profit_center" = "profit_ctr",
+      "product" = "material",
+      "stock_val" = "amount_in_local_cur"
     ) |>
-    mutate(source = "GL Account", .before = .data$period)
+    mutate(source = "GL Account", .before = "period")
 
   return(df)
 }
@@ -75,14 +76,13 @@ main <- function() {
     clean_names()
 
   # Process data
-  df <- df |>
-    process_ke30() |>
-    process_gl() |>
-    bind_rows(df_ke30, df_gl)
+  df_ke30 <- df_ke30 |> process_ke30()
+  df_gl <- df_gl |> process_gl()
+  df <- bind_rows(df_ke30, df_gl)
 
   df <- df |>
     group_by(
-      c("source", "period", "profit_center", "product"),
+      across(c("source", "period", "profit_center", "product")),
     ) |>
     summarise(
       quantity = sum(.data$quantity),

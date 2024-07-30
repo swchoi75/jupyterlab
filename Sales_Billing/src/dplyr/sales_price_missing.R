@@ -52,11 +52,11 @@ main <- function() {
 
   # Filenames
   input_1 <- here(
-    path, "Sales Delivery Report",
+    path, "data", "Sales Delivery Report",
     glue("Delivery report_0180_{year}_{month}.xls")
   )
   input_2 <- here(
-    path, "Sales Delivery Report",
+    path, "data", "Sales Delivery Report",
     glue("Delivery report_2182_{year}_{month}.xls")
   )
   output_1 <- here(path, "output", "Sales delivery report.csv")

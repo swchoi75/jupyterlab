@@ -24,7 +24,7 @@ rename_columns <- function(df) {
 
 main <- function() {
   # Filenames
-  input_file <- here(path, "db", "Sales_20240702.xls")
+  input_file <- here(path, "data", "Sales_20240702.xls")
   output_file <- here(path, "output", "Sales by month.csv")
 
   # Read data
