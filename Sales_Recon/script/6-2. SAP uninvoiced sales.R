@@ -1,52 +1,79 @@
-library(readr)
 library(dplyr)
+library(readr)
 library(stringr)
+library(here)
+library(glue)
 
 
-# Read a tab-delimited file ----
-# Update monthly
-df_0180 <- read_tsv("C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Recon/data/SAP_results/Sales adjustment_0180_202406.xls",
-  skip = 4,
-  locale = locale(encoding = "UTF-16LE"),
-  col_types = cols(.default = col_character()),
-) %>%
-  filter(!is.na(`Sales Organization`)) %>%
-  select(-c(1, 2, 23))
-
-# Update monthly
-df_2182 <- read_tsv("C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Recon/data/SAP_results/Sales adjustment_2182_202406.xls",
-  skip = 4,
-  locale = locale(encoding = "UTF-16LE"),
-  col_types = cols(.default = col_character()),
-) %>%
-  filter(!is.na(`Sales Organization`)) %>%
-  select(-c(1, 2, 23))
+# Path
+path <- here("Sales_Recon")
 
 
-# Combine two dataframes ----
-df_0180 <- df_0180 %>%
-  mutate(Plant = "0180")
+# Functions
+read_txt_file <- function(file_path) {
+  df <- read_tsv(file_path,
+    skip = 4,
+    locale = locale(encoding = "UTF-16LE"),
+    col_types = cols(.default = col_character()),
+  ) |>
+    filter(!is.na(.data$`Sales Organization`)) |>
+    select(-c(1, 2, 23))
+  return(df)
+}
 
-df_2182 <- df_2182 %>%
-  mutate(Plant = "2182")
 
-df <- bind_rows(df_0180, df_2182) %>%
-  relocate(Plant, .after = `Sales Organization`)
+two_billing_dates <- function(df) {
+  df <- df |>
+    mutate(
+      `Billing Day` = str_sub(`Billing Date`, 9, 10),
+      .after = Plant
+    )
+  return(df)
+}
 
 
-# Two billing dates ----
-df <- df %>%
-  mutate(
-    `Billing Day` = str_sub(`Billing Date`, 9, 10),
-    .after = Plant
+remove_unnecessary_row <- function(df) {
+  # Filter out unneccessary rows on 2nd day ----
+  df <- df |>
+    filter(!(.data$`Billing Day` == "02" &
+               !str_detect(.data$`Purchase Order`, "매출조정")
+           ))
+  return(df)
+}
+
+
+main <- function() {
+  # Variables
+  year <- "2024"
+  month <- "06"
+
+  # Filenames
+  input_1 <- here(
+    path, "data", "SAP results",
+    glue("Sales adjustment_0180_{year}{month}")
   )
+  input_2 <- here(
+    path, "data", "SAP results",
+    glue("Sales adjustment_0180_{year}{month}")
+  )
+  output_file <- here(path, "output", "6-2. SAP uninvoiced sales.csv")
 
-# Filter out unneccessary rows on 2nd day ----
-df <- df %>%
-  filter(!(`Billing Day` == "02" &
-    !str_detect(`Purchase Order`, "매출조정")
-  ))
 
+  # Read data
+  df_0180 <- read_txt_file(input_1) |> mutate(Plant = "0180")
+  df_2182 <- read_txt_file(input_2) |> mutate(Plant = "2182")
 
-# Write UTF-8 CSV files with BOM ----
-write_excel_csv(df, "C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Recon/output/6-2. SAP uninvoiced sales.csv")
+  # Process data
+  df <- bind_rows(df_0180, df_2182) |>
+    relocate(Plant, .after = `Sales Organization`)
+
+  df <- df |>
+    two_billing_dates() |>
+    remove_unnecessary_row()
+
+  # Write data
+  write_excel_csv(df, output_file)
+  print("A file is created")
+}
+
+main()

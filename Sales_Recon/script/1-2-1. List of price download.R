@@ -1,30 +1,45 @@
-library(readr)
 library(dplyr)
+library(readr)
 library(stringr)
 library(readxl)
+library(janitor)
+library(here)
+library(glue)
 
 
-# Read Excel files ----
-df_0180 <- read_excel("C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Recon/data/SAP/Billing_0180_2024_06.xlsx") %>% # Update monthly
-filter(!is.na(`Sales Organization`))
+# Path
+path <- here("Sales_Recon")
 
 
-df_2182 <- read_excel("C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Recon/data/SAP/Billing_2182_2024_06.xlsx") %>% # Update monthly
-filter(!is.na(`Sales Organization`))
+# Functions
+main <- function() {
+  # Variables
+  year <- "2024"
+  month <- "06"
 
+  # Filenames
+  input_1 <- here(
+    path, "data", "SAP", glue("Billing_0180_{year}_{month}.xlsx")
+  )
+  input_2 <- here(
+    path, "data", "SAP", glue("Billing_2182_{year}_{month}.xlsx")
+  )
+  output_file <- here(path, "output", "1-2-1. list of price download.xls")
 
-# Combine files ----
-df <- df_0180 %>%
-  bind_rows(df_2182)
+  # Read data
+  df_0180 <- read_excel(input_1) |> filter(!is.na(.data$`Sales Organization`))
+  df_2182 <- read_excel(input_2) |> filter(!is.na(.data$`Sales Organization`))
 
+  # Process data
+  df <- bind_rows(df_0180, df_2182)
 
-# Select columns ----
-df1 <- df %>%
-  select(`Material Number`)
+  df <- df |>
+    select(c("Material Number")) |>
+    distinct(pick("Material Number"))
 
-output <- df1 %>%
-  distinct(`Material Number`)
+  # Write data
+  write_tsv(df, output_file, na = "")
+  print("A file is created")
+}
 
-  
-# Write UTF-8 CSV files with BOM ----
-write_tsv(output, "C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Recon/output/1-2-1. list of price download.xls", na = "")
+main()

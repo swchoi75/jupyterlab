@@ -4,120 +4,136 @@ library(writexl)
 library(readr)
 library(purrr)
 library(stringr)
+library(here)
+library(glue)
 
 
-# Read CSV files ----
-df <- read_csv("C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Recon/output/입출고비교 to Price diff.csv", show_col_types = FALSE)
+# Path
+path <- here("Sales_Recon")
 
 
-# Read meta data in tab-delimited files ----
-mm_0180 <- read_tsv("C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Report/meta/Material master_0180_2024.xls",
-  skip = 6,
-  locale = locale(encoding = "UTF-16LE"),
-  col_types = list(.default = col_character()),
-)
-
-mm_2182 <- read_tsv("C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Report/meta/Material master_2182_2024.xls",
-  skip = 6,
-  locale = locale(encoding = "UTF-16LE"),
-  col_types = list(.default = col_character()),
-)
-
-mm <- bind_rows(mm_0180, mm_2182) %>%
-  rename(`Product Hierarchy` = `Product Hierachy...11`) %>%
-  select(`Material`, `Profit Center`, `Description`)
+# Functions
+read_txt_file <- function(file_path) {
+  df <- read_tsv(file_path,
+    skip = 6,
+    locale = locale(encoding = "UTF-16LE"),
+    col_types = list(.default = col_character()),
+  )
+  return(df)
+}
 
 
-
-wb_path <- "C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales P3/meta/2024_ACT & BUD MLFB mapping data.xlsx"
-wb_sheets <- excel_sheets(wb_path)
-wb_sheets <- wb_sheets[[2]]
-
-df1 <- read_xlsx(path = wb_path, sheet = wb_sheets)
+read_excel_file <- function(file_path, sheet_number) {
+  df <- read_xlsx(path = file_path, sheet = wb_sheets[[sheet_number]])
+  return(df)
+}
 
 
-wb_path <- "C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Recon/meta/Project Info with budget PN.xlsx"
-wb_sheets <- excel_sheets(wb_path)
-wb_sheets <- wb_sheets[[1]]
-
-df2 <- read_xlsx(path = wb_path, sheet = wb_sheets)
-
-
-# Join main data with meta data ----
-df <- df %>%
-  left_join(mm, by = c(
-    "MLFB" = "Material",
-    "Profit Center" = "Profit Center"
-  ))
+add_material_master <- function(df, df_meta) {
+  # Join main data with meta data ----
+  df <- df |>
+    left_join(df_meta, by = c(
+      "MLFB" = "Material",
+      "Profit Center" = "Profit Center"
+    ))
+  return(df)
+}
 
 
-# Miscellaneous ----
-df <- df %>%
-  relocate(Description, .after = MLFB) %>%
-  select(-c(`Customer PN rev`))
+add_bu_outlet <- function(df) {
+  # Add BU / Outlet Information
+  df <- df |>
+    mutate(
+      outlet = case_when(
+        `Profit Center` == "50803-049" ~ "ENC",
+        `Profit Center` == "50803-051" ~ "MTC",
+        `Profit Center` == "50803-010" ~ "DTC",
+        `Profit Center` == "50803-026" ~ "HYD",
+        `Profit Center` == "50803-009" ~ "EAC",
+        `Profit Center` == "50803-063" ~ "DAC E",
+        `Profit Center` %in% c("50802-018", "50803-034") ~ "MES",
+      ),
+      .before = `sold to`
+    ) |>
+    mutate(
+      BU = case_when(
+        outlet == "ENC" ~ "CT",
+        outlet == "MTC" ~ "CT",
+        outlet == "DTC" ~ "CT",
+        outlet == "HYD" ~ "HT",
+        outlet == "EAC" ~ "AC",
+        outlet == "DAC E" ~ "AC",
+        outlet == "MES" ~ "SC",
+      ),
+      .before = outlet
+    ) |>
+    arrange(c("BU", "outlet"))
+  return(df)
+}
 
 
-# Add BU / Outlet Information ----
-df <- df %>%
-  mutate(
-    outlet = case_when(
-      `Profit Center` == "50803-049" ~ "ENC",
-      `Profit Center` == "50803-051" ~ "MTC",
-      `Profit Center` == "50803-010" ~ "DTC",
-      `Profit Center` == "50803-026" ~ "HYD",
-      `Profit Center` == "50803-009" ~ "EAC",
-      `Profit Center` == "50803-063" ~ "DAC E",
-      `Profit Center` %in% c("50802-018", "50803-034") ~ "MES",
-    ),
-    .before = `sold to`
-  ) %>%
-  mutate(
-    BU = case_when(
-      outlet == "ENC" ~ "CT",
-      outlet == "MTC" ~ "CT",
-      outlet == "DTC" ~ "CT",
-      outlet == "HYD" ~ "HT",
-      outlet == "EAC" ~ "AC",
-      outlet == "DAC E" ~ "AC",
-      outlet == "MES" ~ "SC",
-    ),
-    .before = outlet
-  ) %>%
-  arrange(BU, outlet)
+add_blank_columns <- function(df) {
+  # Add blank columns to fit to the Excel template ----
+  df <- df |>
+    mutate(a = "", .after = outlet) |>
+    mutate(b = "", .after = `출고Q`) |>
+    mutate(c = "", .after = `SAP Price`) |>
+    mutate(d = "", e = "", f = "", .after = "조정금액") |>
+    mutate(g = "", .after = `단가소급`)
+  return(df)
+}
 
 
-# Add blank columns to fit to the Excel template ----
-df <- df %>%
-  mutate(a = "", .after = outlet) %>%
-  mutate(b = "", .after = `출고Q`) %>%
-  mutate(c = "", .after = `SAP Price`) %>%
-  mutate(d = "", e = "", f = "", .after = "조정금액") %>%
-  mutate(g = "", .after = `단가소급`)
+eliminate_sample <- function(df) {
+  df <- df[df$MLFB != "Sample", ]
+  return(df)
+}
 
 
-# Samples elimination ----
-df <- df[df$MLFB != "Sample", ]
+main <- function() {
+  # Variables
+  year <- "2024"
 
+  # Filenames
+  input_file <- here(path, "output", "입출고비교 to Price diff.csv")
 
-df <- df %>%
-  left_join(df1, by = c("MLFB" = "Material"))
+  meta_1 <- here(path, "meta", glue("Material master_0180_{year}.xls"))
+  meta_2 <- here(path, "meta", glue("Material master_2182_{year}.xls"))
+  meta_3 <- here(path, "meta", glue("{year}_ACT & BUD MLFB mapping data.xlsx"))
+  meta_4 <- here(path, "meta", glue("Project Info with budget PN.xlsx"))
 
+  output_file <- here(path, "output", "4. BU Price diff.csv")
 
-df <- df %>%
-  left_join(df2, by = c(`BUD MLFB` = "Material(local)"))
+  # Read data
+  df <- read_csv(input_file, show_col_types = FALSE)
+  mm_0180 <- read_txt_file(meta_1)
+  mm_2182 <- read_txt_file(meta_2)
+  df1 <- read_excel_file(meta_3, sheet_number = 2)
+  df2 <- read_excel_file(meta_4, sheet_number = 1)
 
+  # Process data
+  mm <- bind_rows(mm_0180, mm_2182) |>
+    rename("Product Hierarchy" = "Product Hierachy...11") |>
+    select(c("Material", "Profit Center", "Description"))
 
-df <- df %>%
-  select(-`BUD MLFB`)
+  df <- df |>
+    add_material_master(mm) |>
+      relocate(Description, .after = MLFB) |>
+      select(!c("Customer PN rev")) |>
+      add_bu_outlet() |>
+      add_blank_columns() |>
+      eliminate_sample()
 
+  df <- df |>
+    left_join(df1, by = c("MLFB" = "Material")) |>
+    left_join(df2, by = c(`BUD MLFB` = "Material(local)")) |>
+    select(!c("BUD MLFB")) |>
+    relocate(`Project ID`, .after = 고객명) |>
+    relocate(`Project ID (pivot)`, .after = `Project ID`)
 
-df <- df %>%
-  relocate(`Project ID`, .after = 고객명)
+  # Write data
+  write_csv(df, output_file, na = "")
+  print("A file is created")
+}
 
-df <- df %>%
-  relocate(`Project ID (pivot)`, .after = `Project ID`)
-
-
-# Write a CSV file ----
-write_excel_csv(df, "C:/Users/uiv09452/Vitesco Technologies/Controlling VT Korea - Documents/120. Data automation/R workspace/Sales Recon/output/4. BU Price diff.csv", na = "")
-
+main()

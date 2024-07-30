@@ -64,24 +64,25 @@ main <- function() {
     change_data_type() |>
     filter_out_blank()
 
-  sub_1 <- df_meta |> distinct(c("Customer P/N", "Mat. Type", "Div.", "업체"))
-  sub_2 <- df_meta |> distinct(c("CASCO Part No.", "Mat. Type", "Div.", "업체"))
+  sub_1 <- df_meta |>
+    distinct(pick("Customer P/N", "Mat. Type", "Div.", "업체"))
+  sub_2 <- df_meta |>
+    distinct(pick("CASCO Part No.", "Mat. Type", "Div.", "업체"))
 
-  # Join two dataframes ----
+  ## Join two dataframes
   df_1 <- df |>
     left_join(sub_1, by = c("Part No" = "Customer P/N")) |>
     filter(!is.na(.data$`업체`)) |>
     arrange(.data$`업체`) |>
-    mutate(`구분` = "by Customer PN")
+    mutate(구분 = "by Customer PN")
 
   df_2 <- df |>
     left_join(sub_2, by = c("CAE" = "CASCO Part No.")) |>
     filter(!is.na(.data$`업체`)) |>
     arrange(.data$`업체`) |>
-    mutate(`구분` = "by Material")
+    mutate(구분 = "by Material")
 
-
-  # Join two dataframes ----
+  ## Join two dataframes
   df <- bind_rows(df_1, df_2)
 
   # Write data
