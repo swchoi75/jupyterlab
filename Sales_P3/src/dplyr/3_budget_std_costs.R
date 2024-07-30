@@ -37,7 +37,6 @@ budget_std_costs <- function(df) {
 
 
 main <- function() {
-  
   # Filenames
   input_file <- here(path, "output", "2_budget_sales.csv")
   meta_1 <- here(path, "meta", "Material master_0180.xlsx")
@@ -64,7 +63,7 @@ main <- function() {
 
   df_sub <- df_meta |> select(!c("product_hierarchy"))
 
-  df <- df |> 
+  df <- df |>
     left_join(df_sub, by = c("profit_ctr", "product")) |>
     budget_std_costs()
 

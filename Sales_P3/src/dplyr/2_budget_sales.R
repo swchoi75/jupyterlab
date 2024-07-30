@@ -182,7 +182,7 @@ main <- function() {
     process_volume_and_amount() |>
     process_miscellaneous() |>
     split_period()
-    
+
   df <- df |>
     arrange_by_month() |>
     add_account_class() |>

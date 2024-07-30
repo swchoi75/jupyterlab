@@ -84,7 +84,7 @@ add_delta_margin_mix <- function(df) {
   df <- df |>
     mutate(
       delta_margin_mix = .data$delta_margin -
-      .data$delta_margin_price - .data$delta_margin_volume
+        .data$delta_margin_price - .data$delta_margin_volume
     )
   return(df)
 }
