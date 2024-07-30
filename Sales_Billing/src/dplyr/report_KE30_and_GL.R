@@ -93,7 +93,7 @@ main <- function() {
     arrange(desc(source))
 
   # Write data
-  write_csv(df, output_file, na = "")
+  write_csv(df, output_file)
   print("A file is created")
 }
 
