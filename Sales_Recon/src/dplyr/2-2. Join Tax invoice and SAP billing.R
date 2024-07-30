@@ -79,7 +79,7 @@ main <- function() {
     left_join(df_2, by = c("고객명", "Sold-to Party", "Customer PN rev"))
 
   # Write data
-  write_excel_csv(df, output_file)
+  write_excel_csv(df, output_file, na = "0")
   print("A file is created")
 }
 

@@ -86,7 +86,7 @@ main <- function() {
   df <- bind_rows(df_1, df_2)
 
   # Write data
-  write_csv(df, output_file, na = "")
+  write_excel_csv(df, output_file)
   print("A file is created")
 }
 

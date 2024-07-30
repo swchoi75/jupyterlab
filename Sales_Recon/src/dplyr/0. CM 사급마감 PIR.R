@@ -66,8 +66,8 @@ main <- function() {
     filter(.data$Vendor == "9082855")
 
   # Write data
-  write_xlsx(df_ls, output_1, na = "")
-  write_xlsx(df_mo, output_2, na = "")
+  write_xlsx(df_ls, output_1)
+  write_xlsx(df_mo, output_2)
   print("Files are created")
 }
 

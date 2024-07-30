@@ -16,8 +16,8 @@ change_data_type <- function(df) {
   # Change types from text to double
   df <- df |>
     mutate(
-      `Current Price` = str_remove_all(`Current Price`, ","),
-      `Current Price` = as.double(`Current Price`),
+      `Current Price` = str_remove_all(.data$`Current Price`, ","),
+      `Current Price` = as.double(.data$`Current Price`),
     )
   return(df)
 }
@@ -26,7 +26,9 @@ change_data_type <- function(df) {
 get_latest_price <- function(df) {
   # Remove duplicates in Price list to get latest prices
   df <- df |>
-    tidyr::unite("Customer_Material", Customer:Material, remove = FALSE) |>
+    tidyr::unite("Customer_Material", c("Customer":"Material"),
+      remove = FALSE
+    ) |>
     filter(!duplicated(.data$`Customer_Material`))
   return(df)
 }
@@ -36,13 +38,13 @@ process_mobis <- function(df) {
   # Special dealing for CUstomer MOBIS
   df <- df |>
     mutate(
-      `고객명` = case_when(
-        `고객명` == "MOBIS" & `Ship-to Party` == "10003814" ~ "MOBIS module",
-        `고객명` == "MOBIS" & `Ship-to Party` == "10046779" ~ "MOBIS module",
-        `고객명` == "MOBIS" & `Ship-to Party` == "40053559" ~ "MOBIS module",
-        `고객명` == "MOBIS" & `Ship-to Party` == "40043038" ~ "MOBIS module",
-        `고객명` == "MOBIS" ~ "MOBIS AS",
-        TRUE ~ `고객명`
+      고객명 = case_when(
+        고객명 == "MOBIS" & `Ship-to Party` == "10003814" ~ "MOBIS module",
+        고객명 == "MOBIS" & `Ship-to Party` == "10046779" ~ "MOBIS module",
+        고객명 == "MOBIS" & `Ship-to Party` == "40053559" ~ "MOBIS module",
+        고객명 == "MOBIS" & `Ship-to Party` == "40043038" ~ "MOBIS module",
+        고객명 == "MOBIS" ~ "MOBIS AS",
+        TRUE ~ 고객명
       )
     )
   return(df)
@@ -53,12 +55,12 @@ process_customer_pn <- function(df) {
   # Remove hyphen(-) and blank in Customer Part Number
   df <- df |>
     mutate(
-      `Customer PN` = str_remove(`Customer Part Number`, "-"),
-      `Customer PN` = str_remove(`Customer PN`, " "),
-      .before = `Customer Part Number`
+      `Customer PN` = str_remove(.data$`Customer Part Number`, "-"),
+      `Customer PN` = str_remove(.data$`Customer PN`, " "),
+      .before = "Customer Part Number"
     ) |>
     mutate(
-      `Customer PN` = str_remove(`Customer PN`, "_")
+      `Customer PN` = str_remove(.data$`Customer PN`, "_")
     )
   return(df)
 }
@@ -67,8 +69,10 @@ process_customer_pn <- function(df) {
 extract_final_customer_pn <- function(df) {
   # Extract final customer PN as temp from Material Description
   df <- df |>
-    mutate(temp = str_extract(`Material Description`, "[a-zA-Z0-9-]*$")) |>
-    mutate(temp = str_remove(temp, "-"))
+    mutate(temp = str_extract(
+      .data$`Material Description`, "[a-zA-Z0-9-]*$"
+    )) |>
+    mutate(temp = str_remove(.data$temp, "-"))
   return(df)
 }
 
@@ -78,12 +82,12 @@ process_gm_mobis <- function(df) {
   df <- df |>
     mutate(
       `Customer PN rev1` = case_when(
-        `고객명` == "한국지엠" ~ str_remove(`Customer PN`, "P"),
-        `고객명` == "MOBIS module" ~ temp,
+        고객명 == "한국지엠" ~ str_remove(`Customer PN`, "P"),
+        고객명 == "MOBIS module" ~ temp,
         `Customer PN` == "392502" ~ "392502E000",
         TRUE ~ `Customer PN`
       ),
-      .before = `Customer PN`
+      .before = "Customer PN"
     )
   return(df)
 }
@@ -106,7 +110,7 @@ process_inverter <- function(df) {
         `Customer PN rev1` == "366B02B" ~ `Customer PN`,
         TRUE ~ `Customer PN rev1`
       ),
-      .before = `Customer PN rev1`
+      .before = "Customer PN rev1"
     )
 
   df <- df[, -which(names(df) == "Customer PN rev1")]
@@ -128,7 +132,7 @@ summary_data <- function(df) {
       Qty = sum(.data$`Billing Quantity`),
       Amt = sum(.data$`Sales Amount(KRW)`)
     ) |>
-    mutate(`Avg billing price` = round(Amt / Qty, 2))
+    mutate(`Avg billing price` = round(.data$Amt / .data$Qty, 2))
   return(df)
 }
 
@@ -172,7 +176,7 @@ main <- function() {
       "Current Price" = "Amount"
     )
 
-  customer <- read_csv(meta_1) |>
+  customer <- read_csv(meta_1, show_col_types = FALSE) |>
     select(c("Sold-to Party", "고객명"))
 
   customer_plant <- read_csv(meta_2,
@@ -184,7 +188,7 @@ main <- function() {
   df_0180 <- df_0180 |> mutate(Plant = "0180")
   df_2182 <- df_2182 |> mutate(Plant = "2182")
   df <- bind_rows(df_0180, df_2182) |>
-    relocate(Plant, .after = `Sales Organization`)
+    relocate("Plant", .after = "Sales Organization")
 
   price <- price |> change_data_type()
   price_latest <- price |> get_latest_price()
@@ -199,10 +203,10 @@ main <- function() {
     ##
     left_join(customer, by = "Sold-to Party") |>
     #  filter(!is.na(`고객명`)) |>
-    relocate(`고객명`, .after = `Plant`) |>
+    relocate("고객명", .after = "Plant") |>
     ##
     left_join(customer_plant, by = "Ship-to Party") |>
-    relocate(`공장명`, .after = `Sold-to Party`)
+    relocate("공장명", .after = "Sold-to Party")
 
   df <- df |>
     process_mobis() |>
@@ -217,7 +221,7 @@ main <- function() {
   write_excel_csv(df_summary, output_1)
   write_excel_csv(price_latest, output_2)
   write_excel_csv(df, output_3)
-  print("A file is created")
+  print("Files are created")
 }
 
 main()
