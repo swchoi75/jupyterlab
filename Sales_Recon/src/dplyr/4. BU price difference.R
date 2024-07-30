@@ -24,7 +24,11 @@ read_txt_file <- function(file_path) {
 
 
 read_excel_file <- function(file_path, sheet_number) {
-  df <- read_xlsx(path = file_path, sheet = wb_sheets[[sheet_number]])
+  # select Excel sheet
+  wb_sheets <- excel_sheets(file_path)
+  wb_sheets <- wb_sheets[sheet_number]
+  # read excel sheet
+  df <- read_xlsx(path = file_path, sheet = wb_sheets)
   return(df)
 }
 
@@ -53,7 +57,7 @@ add_bu_outlet <- function(df) {
         `Profit Center` == "50803-063" ~ "DAC E",
         `Profit Center` %in% c("50802-018", "50803-034") ~ "MES",
       ),
-      .before = `sold to`
+      .before = "sold to"
     ) |>
     mutate(
       BU = case_when(
@@ -65,9 +69,9 @@ add_bu_outlet <- function(df) {
         outlet == "DAC E" ~ "AC",
         outlet == "MES" ~ "SC",
       ),
-      .before = outlet
+      .before = "outlet"
     ) |>
-    arrange(c("BU", "outlet"))
+    arrange("BU", "outlet")
   return(df)
 }
 
@@ -75,11 +79,11 @@ add_bu_outlet <- function(df) {
 add_blank_columns <- function(df) {
   # Add blank columns to fit to the Excel template ----
   df <- df |>
-    mutate(a = "", .after = outlet) |>
-    mutate(b = "", .after = `출고Q`) |>
-    mutate(c = "", .after = `SAP Price`) |>
+    mutate(a = "", .after = "outlet") |>
+    mutate(b = "", .after = "출고Q") |>
+    mutate(c = "", .after = "SAP Price") |>
     mutate(d = "", e = "", f = "", .after = "조정금액") |>
-    mutate(g = "", .after = `단가소급`)
+    mutate(g = "", .after = "단가소급")
   return(df)
 }
 
@@ -96,10 +100,15 @@ main <- function() {
 
   # Filenames
   input_file <- here(path, "output", "입출고비교 to Price diff.csv")
-
+  ## originally from project "Sales_Report"
   meta_1 <- here(path, "meta", glue("Material master_0180_{year}.xls"))
   meta_2 <- here(path, "meta", glue("Material master_2182_{year}.xls"))
-  meta_3 <- here(path, "meta", glue("{year}_ACT & BUD MLFB mapping data.xlsx"))
+  ## from project "Sales P3"
+  meta_3 <- here(
+    path, "../", "Sales_P3", "meta",
+    glue("{year}_ACT & BUD MLFB mapping data.xlsx")
+  )
+  ## from current project
   meta_4 <- here(path, "meta", glue("Project Info with budget PN.xlsx"))
 
   output_file <- here(path, "output", "4. BU Price diff.csv")
@@ -118,21 +127,21 @@ main <- function() {
 
   df <- df |>
     add_material_master(mm) |>
-      relocate(Description, .after = MLFB) |>
-      select(!c("Customer PN rev")) |>
-      add_bu_outlet() |>
-      add_blank_columns() |>
-      eliminate_sample()
+    relocate("Description", .after = "MLFB") |>
+    select(!c("Customer PN rev")) |>
+    add_bu_outlet() |>
+    add_blank_columns() |>
+    eliminate_sample()
 
   df <- df |>
     left_join(df1, by = c("MLFB" = "Material")) |>
     left_join(df2, by = c(`BUD MLFB` = "Material(local)")) |>
     select(!c("BUD MLFB")) |>
-    relocate(`Project ID`, .after = 고객명) |>
-    relocate(`Project ID (pivot)`, .after = `Project ID`)
+    relocate("Project ID", .after = "고객명") |>
+    relocate("Project ID (pivot)", .after = "Project ID")
 
   # Write data
-  write_csv(df, output_file, na = "")
+  write_excel_csv(df, output_file, na = "")
   print("A file is created")
 }
 
