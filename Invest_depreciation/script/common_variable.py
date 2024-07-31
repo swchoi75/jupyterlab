@@ -4,8 +4,8 @@ import pandas as pd
 # Variables
 
 # Monthly update
-version = "Plan"  # choose between "FC" or "Plan"
-actual_month_end = "2024-05-31"  # 완료된 월 마감
+version = "FC"  # choose between "FC" or "Plan"
+actual_month_end = "2024-06-30"  # 완료된 월 마감
 GPA_version_1 = "v001"
 GPA_version_2 = "v388"  # optional version for Next Year Budget (frozen)
 
@@ -20,6 +20,8 @@ if version == "FC":
     # Filenames
     asset_filename = "2024_Asset History Ledger_FC.XLS"
     GPA_filename = "2024_GPA_WMS - All data report_FC.xlsx"
+    manual_GPA_filename = "fc_GPA_master_FC.xlsx"
+    manual_AUC_filename = "fc_AUC_list_FC.xlsx"
     result_filename = "fc_depreciation_this_year.csv"
 
     # Reclassify to AuC
@@ -34,6 +36,8 @@ elif version == "Plan":
     asset_filename = "2024_Asset History Ledger_Plan.XLS"
     GPA_filename = "2024_GPA_WMS - All data report_Plan.xlsx"
     # GPA_filename = "2024_GPA_WMS - All data report_Plan_frozen.xlsx"
+    manual_GPA_filename = "fc_GPA_master_Plan.xlsx"
+    manual_AUC_filename = "fc_AUC_list_Plan.xlsx"
     result_filename = "fc_depreciation_next_year.csv"
     # Reclassify to AuC
     current_year = "2025"

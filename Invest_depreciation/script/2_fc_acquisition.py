@@ -78,8 +78,8 @@ def col_acquisition(df):
 def str_to_month_ends(series):
     """Helper function"""
     # Convert year_month to datetime with day set to 1st
-    s1 = pd.to_datetime(series, format="%Y_%m", errors='coerce')
-    s2 = pd.to_datetime(series, format="%m_%Y", errors='coerce')
+    s1 = pd.to_datetime(series, format="%Y_%m", errors="coerce")
+    s2 = pd.to_datetime(series, format="%m_%Y", errors="coerce")
     series = s1.fillna(s2)
     # Add one month and subtract one day to get the month end
     series = series + pd.DateOffset(months=1, days=-1)
@@ -156,6 +156,7 @@ def main():
 
     # Variables
     from common_variable import (
+        manual_GPA_filename,
         spending_total_col,
         text_to_remove_1,
         text_to_remove_2,
@@ -165,7 +166,7 @@ def main():
 
     # Filenames
     input_file = path / "output" / "1_fc_monthly_spending.csv"
-    master_file = path / "data" / "fc_GPA_master.xlsx"
+    master_file = path / "data" / manual_GPA_filename
     output_file = path / "output" / "2_fc_acquisition_future_assets.csv"
 
     # Read data

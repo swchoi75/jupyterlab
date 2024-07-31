@@ -199,10 +199,12 @@ def reclassify_auc(df):
 
 
 def main():
+    # Variables
+    from common_variable import manual_AUC_filename
 
     # Filenames
     input_file = path / "output" / "2_fc_acquisition_existing_assets.csv"
-    master_file = path / "data" / "fc_AUC_list.xlsx"
+    master_file = path / "data" / manual_AUC_filename
     output_file = path / "output" / "4_fc_depreciation_asset_under_construction.csv"
 
     # Read data
