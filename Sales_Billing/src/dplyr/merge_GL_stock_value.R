@@ -23,6 +23,14 @@ read_txt_file <- function(file_path) {
     ),
     show_col_types = FALSE,
   )
+  # Correct the occasional column name in the data source
+  if ("Amount in DC" %in% names(df)) {
+    df <- df |>
+      rename(c(
+        "Amount in doc. curr." = "Amount in DC",
+        "Amount in local cur." = "Amt in loc.cur."
+      ))
+  }
   return(df)
 }
 
@@ -40,7 +48,7 @@ main <- function() {
 
   # Path
   # data_path <- here(path, "data", "GL", "Archive", glue("{year}"))
-  data_path <- here(path, "data", "GL")  # for current year
+  data_path <- here(path, "data", "GL") # for current year
 
   # Filenames
   input_files <- dir_ls(data_path, regexp = "\\.XLS|\\.xls")
