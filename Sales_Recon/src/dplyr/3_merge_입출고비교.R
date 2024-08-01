@@ -3,6 +3,7 @@ library(readxl)
 library(purrr)
 library(stringr)
 library(readr)
+library(janitor)
 library(here)
 library(glue)
 
@@ -35,7 +36,7 @@ read_excel_multiple_sheets <- function(file_path) {
 remove_unnecessary_row <- function(df) {
   df <- df |>
     filter(!.data$고객명 == 0) |>
-    filter(!str_starts(.data$`Customer PN`, "A2C")) # Remove Kappa HEV ADJ
+    filter(!str_starts(.data$customer_pn, "A2C")) # Remove Kappa HEV ADJ
   return(df)
 }
 
@@ -57,10 +58,10 @@ format_price_list <- function(df) {
     select(c(2:5, 7:8, 12:20)) |>
     # Remove MOBIS A/S for too much price change
     filter(!.data$고객명 == "MOBIS AS") |>
-    filter(.data$Plant != 0) |>
-    filter(.data$`Profit Center` != 0) |>
+    filter(.data$plant != 0) |>
+    filter(.data$profit_center != 0) |>
     select(!c(11:12)) |>
-    arrange(.data$`Profit Center`, .data$`Customer PN rev`)
+    arrange(.data$profit_center, .data$customer_pn_rev)
   return(df)
 }
 
@@ -79,12 +80,12 @@ format_uninvoiced_qty <- function(df) {
     select(c(2:4, 6, 12, 7:8, 13:14, 23, 19, 36)) |>
     filter(.data$조정Q != 0) |>
     mutate(
-      `Order type` = case_when(
+      order_type = case_when(
         조정Q > 0 ~ "ZOR",
         조정Q < 0 ~ "ZRE"
       ),
-      `Order reason` = "C02",
-      Adj_Qty = abs(.data$조정Q),
+      order_reason = "C02",
+      adj_qty = abs(.data$조정Q),
       이월체크 = "X",
     )
   return(df)
@@ -137,8 +138,8 @@ main <- function() {
   output_4 <- here(path, "output", "입출고비교 to Adj_Amt.csv")
 
   # Read data
-  df <- read_excel_multiple_sheets(input_file)
-
+  df <- read_excel_multiple_sheets(input_file) |>
+    clean_names(ascii = FALSE)
 
   # Process data
   df <- df |>

@@ -1,6 +1,7 @@
 library(dplyr)
 library(readr)
 library(stringr)
+library(janitor)
 library(here)
 library(glue)
 
@@ -25,8 +26,8 @@ read_txt_file <- function(file_path) {
 two_billing_dates <- function(df) {
   df <- df |>
     mutate(
-      `Billing Day` = str_sub(.data$`Billing Date`, 9, 10),
-      .after = "Plant"
+      billing_day = str_sub(.data$billing_date, 9, 10),
+      .after = "plant"
     )
   return(df)
 }
@@ -35,8 +36,8 @@ two_billing_dates <- function(df) {
 remove_unnecessary_row <- function(df) {
   # Filter out unneccessary rows on 2nd day ----
   df <- df |>
-    filter(!(.data$`Billing Day` == "02" &
-               !str_detect(.data$`Purchase Order`, "매출조정")
+    filter(!(.data$billing_day == "02" &
+               !str_detect(.data$purchase_order, "매출조정")
            ))
   return(df)
 }
@@ -59,12 +60,17 @@ main <- function() {
 
 
   # Read data
-  df_0180 <- read_txt_file(input_1) |> mutate(Plant = "0180")
-  df_2182 <- read_txt_file(input_2) |> mutate(Plant = "2182")
+  df_0180 <- read_txt_file(input_1) |>
+    clean_names() |>
+    mutate(plant = "0180")
+  
+  df_2182 <- read_txt_file(input_2) |>
+    clean_names() |>
+    mutate(plant = "2182")
 
   # Process data
   df <- bind_rows(df_0180, df_2182) |>
-    relocate("Plant", .after = "Sales Organization")
+    relocate("plant", .after = "sales_organization")
 
   df <- df |>
     two_billing_dates() |>

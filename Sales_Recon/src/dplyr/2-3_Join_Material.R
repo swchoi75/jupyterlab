@@ -24,15 +24,15 @@ main <- function() {
   # Process data
   # Select columns and Remove duplicate rows ----
   df_1 <- df_1 |>
-    select(c("고객명":"Customer PN rev")) |>
-    tidyr::unite("temp", c("고객명", "Sold-to Party", "Customer PN rev"),
+    select(c("고객명":"customer_pn_rev")) |>
+    tidyr::unite("temp", c("고객명", "sold_to_party", "customer_pn_rev"),
       sep = "_", remove = FALSE
     )
 
   df_2 <- df_2 |>
     filter(!is.na(.data$고객명)) |>
-    select(c("Plant":"Curr")) |>
-    tidyr::unite("temp", c("고객명", "Sold-to Party", "Customer PN rev"),
+    select(c("plant":"curr")) |>
+    tidyr::unite("temp", c("고객명", "sold_to_party", "customer_pn_rev"),
       sep = "_", remove = FALSE
     )
 
@@ -52,10 +52,10 @@ main <- function() {
 
   # Join two dataframes ----
   df <- df |>
-    left_join(df_2a, by = c("고객명", "Sold-to Party", "Customer PN rev"))
+    left_join(df_2a, by = c("고객명", "sold_to_party", "customer_pn_rev"))
 
   df <- df |>
-    left_join(df_1a, by = c("고객명", "Sold-to Party", "Customer PN rev"))
+    left_join(df_1a, by = c("고객명", "sold_to_party", "customer_pn_rev"))
 
 
   # bind_rows ----
@@ -67,11 +67,11 @@ main <- function() {
   df <- df |>
     arrange(
       .data$고객명,
-      .data$`Sold-to Party`,
-      .data$`Customer PN rev`,
-      .data$Plant,
-      .data$`Profit Center`,
-      .data$`Material Number`
+      .data$sold_to_party,
+      .data$customer_pn_rev,
+      .data$plant,
+      .data$profit_center,
+      .data$material_number
     )
 
   # Write data

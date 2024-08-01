@@ -26,15 +26,20 @@ main <- function() {
   output_file <- here(path, "output", "1-2-1. list of price download.xls")
 
   # Read data
-  df_0180 <- read_excel(input_1) |> filter(!is.na(.data$`Sales Organization`))
-  df_2182 <- read_excel(input_2) |> filter(!is.na(.data$`Sales Organization`))
+  df_0180 <- read_excel(input_1) |>
+    clean_names(ascii = FALSE) |>
+    filter(!is.na(.data$sales_organization))
+
+  df_2182 <- read_excel(input_2) |>
+    clean_names(ascii = FALSE) |>
+    filter(!is.na(.data$sales_organization))
 
   # Process data
   df <- bind_rows(df_0180, df_2182)
 
   df <- df |>
-    select(c("Material Number")) |>
-    distinct(pick("Material Number"))
+    select(c("material_number")) |>
+    distinct(pick("material_number"))
 
   # Write data
   write_tsv(df, output_file, na = "")

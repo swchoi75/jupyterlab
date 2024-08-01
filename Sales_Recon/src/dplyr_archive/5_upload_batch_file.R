@@ -31,9 +31,9 @@ change_zero_to_blank <- function(df) {
   # Change 0 back to blank in 이월체크 ----
   df <- df |>
     mutate(
-      `이월체크` = case_when(
-        `이월체크` == "0" ~ "",
-        TRUE ~ `이월체크`
+      이월체크 = case_when(
+        이월체크 == "0" ~ "",
+        TRUE ~ 이월체크
       )
     )
   return(df)

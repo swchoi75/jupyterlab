@@ -3,6 +3,7 @@ library(readxl)
 library(stringr)
 library(writexl)
 library(readr)
+library(janitor)
 library(here)
 library(glue)
 
@@ -22,7 +23,7 @@ remove_unnecessary_row <- function(df) {
 
 change_data_type <- function(df) {
   df <- df |>
-    mutate(across(c("Quantity", "Price"), as.double))
+    mutate(across(c("quantity", "price"), as.double))
   return(df)
 }
 
@@ -31,9 +32,9 @@ change_zero_to_blank <- function(df) {
   # Change 0 back to blank in 이월체크 ----
   df <- df |>
     mutate(
-      `이월체크` = case_when(
-        `이월체크` == "0" ~ "",
-        TRUE ~ `이월체크`
+      이월체크 = case_when(
+        이월체크 == "0" ~ "",
+        TRUE ~ 이월체크
       )
     )
   return(df)
@@ -70,12 +71,12 @@ main <- function() {
 
   ## Data to be deleted
   result <- df |>
-    filter(!((.data$`Order reason` == "C02" & .data$Price == 0) |
-               .data$Material == "0"))
+    filter(!((.data$order_reason == "C02" & .data$price == 0) |
+               .data$material == "0"))
 
   skip <- df |>
-    filter((.data$`Order reason` == "C02" & .data$Price == 0) |
-             .data$Material == "0")
+    filter((.data$order_reason == "C02" & .data$price == 0) |
+             .data$material == "0")
 
   # Write data
   write_excel_csv(result, output_1, na = "")

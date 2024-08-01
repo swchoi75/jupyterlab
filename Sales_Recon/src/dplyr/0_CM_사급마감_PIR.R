@@ -11,26 +11,31 @@ path <- here("Sales_Recon")
 
 
 # Functions
-select_change_col_names <- function(df) {
+rename_columns <- function(df) {
   df <- df |>
     rename(
-      "PIR Net Price" = "...15",
-      "S/A Net Price" = "...23",
-      "Unit" = "...26",
-      "S/A valid from" = "...36",
-      "PIR valid from" = "Info Record...40",
-    ) |>
+      "pir_net_price" = "x15",
+      "sa_net_price" = "x23",
+      "unit" = "x26",
+      "sa_valid_from" = "x36",
+      "pir_valid_from" = "info_record_40",
+    )
+  return(df)
+}
+
+
+select_columns <- function(df) {
+  df <- df |>
     select(c(
-      "Vendor",
-      "Vendor Name",
-      "Material No",
-      "Mtye",
-      "S/A Net Price",
-      "Unit",
-      "S/A valid from",
-      "SA #"
-    )) |>
-    tidyr::separate(.data$`SA #`, into = c("S/A"), sep = "\\t")
+      "vendor",
+      "vendor_name",
+      "material_no",
+      "mtye",
+      "sa_net_price",
+      "unit",
+      "sa_valid_from",
+      "sa_number"
+    ))
   return(df)
 }
 
@@ -49,20 +54,22 @@ main <- function() {
     skip = 9,
     locale = locale(encoding = "UTF-16LE"),
     show_col_types = FALSE,
-  )
+  ) |> clean_names(ascii = FALSE)
 
   # Process data
-  df <- df |> select_change_col_names()
+  df <- df |> 
+    rename_columns() |>
+    select_columns()
 
   ## Filter dataframe
   df <- df |>
-    filter(.data$`S/A Net Price` != 0)
+    filter(.data$sa_net_price != 0)
 
   df_ls <- df |>
-    filter(.data$Vendor == "9139976")
+    filter(.data$vendor == "9139976")
 
   df_mo <- df |>
-    filter(.data$Vendor == "9082855")
+    filter(.data$vendor == "9082855")
 
   # Write data
   write_xlsx(df_ls, output_1)

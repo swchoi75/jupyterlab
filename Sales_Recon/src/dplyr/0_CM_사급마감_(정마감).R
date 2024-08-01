@@ -37,7 +37,7 @@ change_data_type <- function(df) {
 
 filter_out_blank <- function(df) {
   df <- df |>
-    filter(.data$`Part No` != 0)
+    filter(.data$`part_no` != 0)
   return(df)
 }
 
@@ -54,8 +54,9 @@ main <- function() {
   output_file <- here(path, "data", "VAN CM", "result.csv")
 
   # Read data
-  df <- read_excel_multiple_sheets(input_file)
+  df <- read_excel_multiple_sheets(input_file) |> clean_names(ascii = FALSE)
   df_meta <- read_xlsx(meta_file, range = "A2:J1000") |>
+    clean_names(ascii = FALSE) |>
     filter(!is.na(.data$업체))
 
   # Process data
@@ -64,19 +65,19 @@ main <- function() {
     filter_out_blank()
 
   sub_1 <- df_meta |>
-    distinct(pick("Customer P/N", "Mat. Type", "Div.", "업체"))
+    distinct(pick("customer_p_n", "mat_type", "div", "업체"))
   sub_2 <- df_meta |>
-    distinct(pick("CASCO Part No.", "Mat. Type", "Div.", "업체"))
+    distinct(pick("casco_part_no", "mat_type", "div", "업체"))
 
   ## Join two dataframes
   df_1 <- df |>
-    left_join(sub_1, by = c("Part No" = "Customer P/N")) |>
+    left_join(sub_1, by = c("part_no" = "customer_p_n")) |>
     filter(!is.na(.data$업체)) |>
     arrange(.data$업체) |>
     mutate(구분 = "by Customer PN")
 
   df_2 <- df |>
-    left_join(sub_2, by = c("CAE" = "CASCO Part No.")) |>
+    left_join(sub_2, by = c("cae" = "casco_part_no")) |>
     filter(!is.na(.data$업체)) |>
     arrange(.data$업체) |>
     mutate(구분 = "by Material")

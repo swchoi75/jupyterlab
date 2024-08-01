@@ -4,6 +4,7 @@ library(writexl)
 library(readr)
 library(purrr)
 library(stringr)
+library(janitor)
 library(here)
 library(glue)
 
@@ -37,8 +38,8 @@ add_material_master <- function(df, df_meta) {
   # Join main data with meta data ----
   df <- df |>
     left_join(df_meta, by = c(
-      "MLFB" = "Material",
-      "Profit Center" = "Profit Center"
+      "MLFB" = "material",
+      "profit_center" = "profit_center"
     ))
   return(df)
 }
@@ -49,15 +50,15 @@ add_bu_outlet <- function(df) {
   df <- df |>
     mutate(
       outlet = case_when(
-        `Profit Center` == "50803-049" ~ "ENC",
-        `Profit Center` == "50803-051" ~ "MTC",
-        `Profit Center` == "50803-010" ~ "DTC",
-        `Profit Center` == "50803-026" ~ "HYD",
-        `Profit Center` == "50803-009" ~ "EAC",
-        `Profit Center` == "50803-063" ~ "DAC E",
-        `Profit Center` %in% c("50802-018", "50803-034") ~ "MES",
+        profit_center == "50803-049" ~ "ENC",
+        profit_center == "50803-051" ~ "MTC",
+        profit_center == "50803-010" ~ "DTC",
+        profit_center == "50803-026" ~ "HYD",
+        profit_center == "50803-009" ~ "EAC",
+        profit_center == "50803-063" ~ "DAC E",
+        profit_center %in% c("50802-018", "50803-034") ~ "MES",
       ),
-      .before = "sold to"
+      .before = "sold_to"
     ) |>
     mutate(
       BU = case_when(
@@ -71,7 +72,7 @@ add_bu_outlet <- function(df) {
       ),
       .before = "outlet"
     ) |>
-    arrange(.data$BU, .data$outlet)
+    arrange(.data$bu, .data$outlet)
   return(df)
 }
 
@@ -81,7 +82,7 @@ add_blank_columns <- function(df) {
   df <- df |>
     mutate(a = "", .after = "outlet") |>
     mutate(b = "", .after = "출고Q") |>
-    mutate(c = "", .after = "SAP Price") |>
+    mutate(c = "", .after = "sap_price") |>
     mutate(d = "", e = "", f = "", .after = "조정금액") |>
     mutate(g = "", .after = "단가소급")
   return(df)
@@ -89,7 +90,7 @@ add_blank_columns <- function(df) {
 
 
 eliminate_sample <- function(df) {
-  df <- df[df$MLFB != "Sample", ]
+  df <- df[df$MLFB != "sample", ]
   return(df)
 }
 
@@ -115,30 +116,30 @@ main <- function() {
 
   # Read data
   df <- read_csv(input_file, show_col_types = FALSE)
-  mm_0180 <- read_txt_file(meta_1)
-  mm_2182 <- read_txt_file(meta_2)
-  df1 <- read_excel_file(meta_3, sheet_number = 2)
-  df2 <- read_excel_file(meta_4, sheet_number = 1)
+  mm_0180 <- read_txt_file(meta_1) |> clean_names(ascii = FALSE)
+  mm_2182 <- read_txt_file(meta_2) |> clean_names(ascii = FALSE)
+  df1 <- read_excel_file(meta_3, sheet_number = 2) |> clean_names(ascii = FALSE)
+  df2 <- read_excel_file(meta_4, sheet_number = 1) |> clean_names(ascii = FALSE)
 
   # Process data
   mm <- bind_rows(mm_0180, mm_2182) |>
-    rename("Product Hierarchy" = "Product Hierachy...11") |>
-    select(c("Material", "Profit Center", "Description"))
+    rename("product_hierarchy" = "product_hierachy_11") |>
+    select(c("material", "profit_center", "description"))
 
   df <- df |>
     add_material_master(mm) |>
-    relocate("Description", .after = "MLFB") |>
-    select(!c("Customer PN rev")) |>
+    relocate("description", .after = "MLFB") |>
+    select(!c("customer_pn_rev")) |>
     add_bu_outlet() |>
     add_blank_columns() |>
     eliminate_sample()
 
   df <- df |>
-    left_join(df1, by = c("MLFB" = "Material")) |>
-    left_join(df2, by = c(`BUD MLFB` = "Material(local)")) |>
+    left_join(df1, by = c("MLFB" = "material")) |>
+    left_join(df2, by = c(`BUD MLFB` = "Material_local")) |>
     select(!c("BUD MLFB")) |>
-    relocate("Project ID", .after = "고객명") |>
-    relocate("Project ID (pivot)", .after = "Project ID")
+    relocate("project_id", .after = "고객명") |>
+    relocate("project_id_pivot", .after = "project_id")
 
   # Write data
   write_excel_csv(df, output_file, na = "")

@@ -21,16 +21,16 @@ main <- function() {
 
   # Process data
   df_1 <- df_1 |>
-    select(c("고객명", "Sold-to Party", "Customer PN rev"))
+    select(c("고객명", "sold_to_party", "customer_pn_rev"))
 
   df_2 <- df_2 |>
-    select(c("고객명", "Sold-to Party", "Customer PN rev"))
+    select(c("고객명", "sold_to_party", "customer_pn_rev"))
 
   df <- full_join(df_1, df_2,
     # Join two dataframes
-    by = c("고객명", "Sold-to Party", "Customer PN rev")
+    by = c("고객명", "sold_to_party", "customer_pn_rev")
   ) |>
-    distinct(pick("고객명", "Sold-to Party", "Customer PN rev")) |> # Unique values
+    distinct(pick("고객명", "sold_to_party", "customer_pn_rev")) |> # Unique values
     filter(!is.na(.data$고객명)) # Remove missing values
 
   # Write data

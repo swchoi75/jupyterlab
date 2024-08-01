@@ -35,8 +35,8 @@ read_excel_multiple_sheets <- function(file_path) {
 
 remove_unnecessary_rows <- function(df) {
   df <- df |>
-    filter(.data$`Customer PN` != 0) |>
-    filter(str_detect(.data$`Customer PN`, "^[a-zA-Z0-9-_\\s]*$"))
+    filter(.data$customer_pn != 0) |>
+    filter(str_detect(.data$customer_pn, "^[a-zA-Z0-9-_\\s]*$"))
   return(df)
 }
 
@@ -64,7 +64,8 @@ main <- function() {
   output_file <- here(path, "output", "1-1. Tax invoice all.csv")
 
   # Read data
-  df <- read_excel_multiple_sheets(input_file)
+  df <- read_excel_multiple_sheets(input_file) |>
+    clean_names(ascii = FALSE)
 
   # Process data
   df <- df |>

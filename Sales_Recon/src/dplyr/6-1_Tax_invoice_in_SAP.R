@@ -1,6 +1,7 @@
 library(dplyr)
 library(readr)
 library(stringr)
+library(janitor)
 library(here)
 
 
@@ -21,24 +22,24 @@ main <- function() {
     col_names = FALSE,
     locale = locale(encoding = "UTF-16LE"),
     col_types = cols(.default = col_character()),
-  )
+  ) |> clean_names(ascii = FALSE)
 
   # Process data
   df <- df |>
-    select(c("X2", "X6", "X15")) |>
+    select(c("x2", "x6", "x15")) |>
     rename(
-      "Sold-to Party" = "X2",
-      "Customer Name" = "X6",
-      "Amount" = "X15",
+      "sold_to_party" = "x2",
+      "customer_name" = "x6",
+      "amount" = "x15",
     ) |>
-    filter(!is.na(.data$`Sold-to Party`))
+    filter(!is.na(.data$sold_to_party))
 
   df <- df |>
     mutate(
-      across("Amount", ~ str_remove_all(.x, ",")),
-      across("Amount", as.double)
+      across("amount", ~ str_remove_all(.x, ",")),
+      across("amount", as.double)
     ) |>
-    arrange(.data$`Sold-to Party`)
+    arrange(.data$sold_to_party)
 
   # Write data
   write_excel_csv(df, output_file, na = "0")
