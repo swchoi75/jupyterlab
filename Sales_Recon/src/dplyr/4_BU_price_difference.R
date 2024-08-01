@@ -96,7 +96,7 @@ eliminate_sample <- function(df) {
 
 main <- function() {
   # Variables
-  year <- "2024"
+  source(here(path, "src", "dplyr", "common_variable.R"))
 
   # Filenames
   input_file <- here(path, "output", "입출고비교 to Price diff.csv")

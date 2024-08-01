@@ -44,8 +44,7 @@ filter_out_blank <- function(df) {
 
 main <- function() {
   # Variables
-  year <- "2024"
-  month <- "06"
+  source(here(path, "src", "dplyr", "common_variable.R"))
 
   # Filenames
   input_file <- here(

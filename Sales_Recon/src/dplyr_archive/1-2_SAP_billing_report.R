@@ -139,9 +139,7 @@ summary_data <- function(df) {
 
 main <- function() {
   # Variables
-  year <- "2024"
-  month <- "06"
-  day <- "30"
+  source(here(path, "src", "dplyr", "common_variable.R"))
 
   # Filenames
   input_1 <- here(

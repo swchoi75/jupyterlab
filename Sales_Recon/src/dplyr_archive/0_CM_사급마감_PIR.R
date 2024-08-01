@@ -37,8 +37,7 @@ select_change_col_names <- function(df) {
 
 main <- function() {
   # Variables
-  year <- "2024"
-  month <- "06"
+  source(here(path, "src", "dplyr", "common_variable.R"))
 
   # Filenames
   input_file <- here(path, "data", "VAN CM", glue("SA_{year}{month}.xls"))
