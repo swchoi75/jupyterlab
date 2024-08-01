@@ -15,8 +15,8 @@ path <- here("Sales_Recon")
 # Functions
 remove_unnecessary_row <- function(df) {
   df <- df |>
-    filter(.data$Plant != "0") |>
-    filter(.data$`Order reason` != "NA")
+    filter(.data$plant != "0") |>
+    filter(.data$order_reason != "NA")
   return(df)
 }
 
@@ -59,8 +59,10 @@ main <- function() {
   output_2 <- here(path, "output", "5. Upload to be skipped.csv")
 
   # Read data
-  df_qty <- read_xlsx(input_1, sheet = "Format", col_types = "text")
-  df_amt <- read_xlsx(input_2, sheet = "Format", col_types = "text")
+  df_qty <- read_xlsx(input_1, sheet = "Format", col_types = "text") |>
+    clean_names(ascii = FALSE)
+  df_amt <- read_xlsx(input_2, sheet = "Format", col_types = "text") |>
+    clean_names(ascii = FALSE)
 
   # Process data
   df <- bind_rows(df_qty, df_amt)

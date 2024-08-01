@@ -78,14 +78,14 @@ format_uninvoiced_qty <- function(df) {
   # Format for Uninvoiced
   df <- df |>
     select(c(2:4, 6, 12, 7:8, 13:14, 23, 19, 36)) |>
-    filter(.data$조정Q != 0) |>
+    filter(.data$조정_q != 0) |>
     mutate(
       order_type = case_when(
-        조정Q > 0 ~ "ZOR",
-        조정Q < 0 ~ "ZRE"
+        조정_q > 0 ~ "ZOR",
+        조정_q < 0 ~ "ZRE"
       ),
       order_reason = "C02",
-      adj_qty = abs(.data$조정Q),
+      adj_qty = abs(.data$조정_q),
       이월체크 = "X",
     )
   return(df)

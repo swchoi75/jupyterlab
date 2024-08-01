@@ -38,7 +38,7 @@ add_material_master <- function(df, df_meta) {
   # Join main data with meta data ----
   df <- df |>
     left_join(df_meta, by = c(
-      "MLFB" = "material",
+      "mlfb" = "material",
       "profit_center" = "profit_center"
     ))
   return(df)
@@ -61,7 +61,7 @@ add_bu_outlet <- function(df) {
       .before = "sold_to"
     ) |>
     mutate(
-      BU = case_when(
+      bu = case_when(
         outlet == "ENC" ~ "CT",
         outlet == "MTC" ~ "CT",
         outlet == "DTC" ~ "CT",
@@ -81,7 +81,7 @@ add_blank_columns <- function(df) {
   # Add blank columns to fit to the Excel template ----
   df <- df |>
     mutate(a = "", .after = "outlet") |>
-    mutate(b = "", .after = "출고Q") |>
+    mutate(b = "", .after = "출고_q") |>
     mutate(c = "", .after = "sap_price") |>
     mutate(d = "", e = "", f = "", .after = "조정금액") |>
     mutate(g = "", .after = "단가소급")
@@ -90,7 +90,7 @@ add_blank_columns <- function(df) {
 
 
 eliminate_sample <- function(df) {
-  df <- df[df$MLFB != "sample", ]
+  df <- df[df$mlfb != "sample", ]
   return(df)
 }
 
@@ -128,16 +128,16 @@ main <- function() {
 
   df <- df |>
     add_material_master(mm) |>
-    relocate("description", .after = "MLFB") |>
+    relocate("description", .after = "mlfb") |>
     select(!c("customer_pn_rev")) |>
     add_bu_outlet() |>
     add_blank_columns() |>
     eliminate_sample()
 
   df <- df |>
-    left_join(df1, by = c("MLFB" = "material")) |>
-    left_join(df2, by = c(`BUD MLFB` = "Material_local")) |>
-    select(!c("BUD MLFB")) |>
+    left_join(df1, by = c("mlfb" = "material")) |>
+    left_join(df2, by = c(bud_mlfb = "Material_local")) |>
+    select(!c("bud_mlfb")) |>
     relocate("project_id", .after = "고객명") |>
     relocate("project_id_pivot", .after = "project_id")
 
