@@ -13,7 +13,7 @@ path <- here("Sales_P3")
 
 
 # Functions
-read_and_rename <- function(file_path) {
+read_txt_file <- function(file_path) {
   # Read tsv file
   df <- read_tsv(
     file_path,
@@ -45,7 +45,7 @@ read_and_rename <- function(file_path) {
 
 read_multiple_files <- function(list_of_files) {
   df <- list_of_files |>
-    map_dfr(read_and_rename)
+    map_dfr(read_txt_file)
   return(df)
 }
 
