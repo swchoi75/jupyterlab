@@ -60,7 +60,7 @@ format_price_list <- function(df) {
     filter(.data$Plant != 0) |>
     filter(.data$`Profit Center` != 0) |>
     select(!c(11:12)) |>
-    arrange("Profit Center", "Customer PN rev")
+    arrange(.data$`Profit Center`, .data$`Customer PN rev`)
   return(df)
 }
 

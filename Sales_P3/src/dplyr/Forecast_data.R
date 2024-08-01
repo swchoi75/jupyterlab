@@ -104,7 +104,7 @@ split_period <- function(df) {
 
 arrange_by_month <- function(df) {
   df <- df |>
-    arrange(df$Month)
+    arrange(.data$Month)
   return(df)
 }
 

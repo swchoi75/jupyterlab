@@ -38,7 +38,7 @@ main <- function() {
       across("Amount", ~ str_remove_all(.x, ",")),
       across("Amount", as.double)
     ) |>
-    arrange("Sold-to Party")
+    arrange(.data$`Sold-to Party`)
 
   # Write data
   write_excel_csv(df, output_file, na = "0")

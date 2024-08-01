@@ -71,7 +71,7 @@ add_bu_outlet <- function(df) {
       ),
       .before = "outlet"
     ) |>
-    arrange("BU", "outlet")
+    arrange(.data$BU, .data$outlet)
   return(df)
 }
 

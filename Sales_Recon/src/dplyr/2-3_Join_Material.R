@@ -66,12 +66,12 @@ main <- function() {
   # Arrange rows by column values ----
   df <- df |>
     arrange(
-      "고객명",
-      "Sold-to Party",
-      "Customer PN rev",
-      "Plant",
-      "Profit Center",
-      "Material Number"
+      .data$고객명,
+      .data$`Sold-to Party`,
+      .data$`Customer PN rev`,
+      .data$Plant,
+      .data$`Profit Center`,
+      .data$`Material Number`
     )
 
   # Write data

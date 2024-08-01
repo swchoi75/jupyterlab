@@ -73,13 +73,13 @@ main <- function() {
   df_1 <- df |>
     left_join(sub_1, by = c("Part No" = "Customer P/N")) |>
     filter(!is.na(.data$업체)) |>
-    arrange("업체") |>
+    arrange(.data$업체) |>
     mutate(구분 = "by Customer PN")
 
   df_2 <- df |>
     left_join(sub_2, by = c("CAE" = "CASCO Part No.")) |>
     filter(!is.na(.data$업체)) |>
-    arrange("업체") |>
+    arrange(.data$업체) |>
     mutate(구분 = "by Material")
 
   ## Join two dataframes
