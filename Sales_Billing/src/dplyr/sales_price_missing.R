@@ -71,7 +71,7 @@ main <- function() {
   df_sub <- filter_price_missing((df))
 
   # Write data
-  write_csv(df, output_1, na = "")
+  write_excel_csv(df, output_1, na = "")  # write_excel_csv for 한글 표시
   write_csv(df_sub, output_2, na = "")
   print("Files are created")
 }
