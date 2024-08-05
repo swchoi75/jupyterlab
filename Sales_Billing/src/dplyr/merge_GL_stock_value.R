@@ -42,6 +42,20 @@ read_multiple_files <- function(list_of_files) {
 }
 
 
+remove_columns <- function(df) {
+  df <- df |>
+    select(!c("x1", "x2", "x6"))
+  return(df)
+}
+
+
+remove_missing_values <- function(df) {
+  df <- df |>
+    filter(!is.na(df$g_l))
+  return(df)
+}
+
+
 main <- function() {
   # Variables
   year <- "2024"
@@ -60,8 +74,8 @@ main <- function() {
 
   # Process data
   df <- df |>
-    select(!c(1:2, 6)) |>
-    filter(!is.na(df$g_l))
+    remove_columns() |>
+    remove_missing_values()
 
   # Write data
   write_csv(df, output_file, na = "")

@@ -36,6 +36,20 @@ read_multiple_files <- function(list_of_files) {
 }
 
 
+remove_columns <- function(df) {
+  df <- df |>
+    select(!c("x1", "x4"))
+  return(df)
+}
+
+
+remove_missing_values <- function(df) {
+  df <- df |>
+    filter(!is.na(df$record_type))
+  return(df)
+}
+
+
 extract_profit_center <- function(df) {
   df <- df |>
     mutate(
@@ -63,8 +77,8 @@ main <- function() {
 
   # Process data
   df <- df |>
-    select(!c(1, 4)) |>
-    filter(!is.na(df$record_type)) |>
+    remove_columns() |>
+    remove_missing_values() |>
     extract_profit_center()
 
   # Write data

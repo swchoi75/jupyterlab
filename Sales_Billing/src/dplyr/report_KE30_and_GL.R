@@ -60,6 +60,21 @@ process_gl <- function(df) {
 }
 
 
+summary_data <- function(df) {
+  df <- df |>
+    group_by(
+      across(c("source", "period", "profit_center", "product")),
+    ) |>
+    summarise(
+      quantity = sum(.data$quantity),
+      sales = sum(.data$revenues),
+      costs = sum(.data$stock_val),
+      .groups = "drop"
+    )
+  return(df)
+}
+
+
 main <- function() {
   # Variables
   year <- "2024"
@@ -70,10 +85,8 @@ main <- function() {
   output_file <- here(path, "output", glue("KE30 and GL Account_{year}.csv"))
 
   # Read data
-  df_ke30 <- read_csv(input_1, col_types = list(.default = col_character())) |>
-    clean_names()
-  df_gl <- read_csv(input_2, col_types = list(.default = col_character())) |>
-    clean_names()
+  df_ke30 <- read_csv(input_1, col_types = list(.default = col_character()))
+  df_gl <- read_csv(input_2, col_types = list(.default = col_character()))
 
   # Process data
   df_ke30 <- df_ke30 |> process_ke30()
@@ -81,15 +94,7 @@ main <- function() {
   df <- bind_rows(df_ke30, df_gl)
 
   df <- df |>
-    group_by(
-      across(c("source", "period", "profit_center", "product")),
-    ) |>
-    summarise(
-      quantity = sum(.data$quantity),
-      sales = sum(.data$revenues),
-      costs = sum(.data$stock_val),
-      .groups = "drop"
-    ) |>
+    summary_data() |>
     arrange(desc(source))
 
   # Write data

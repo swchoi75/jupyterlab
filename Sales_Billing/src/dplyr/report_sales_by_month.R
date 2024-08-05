@@ -22,6 +22,20 @@ rename_columns <- function(df) {
 }
 
 
+overwrite_with_blank_data <- function(df) {
+  df <- df |>
+    mutate(std_cost = "")  # Make std_cost into blank
+  return(df)
+}
+
+
+remove_missing_values <- function(df) {
+  df <- df |>
+    filter(!is.na(.data$prctr))
+  return(df)
+}
+
+
 main <- function() {
   # Filenames
   input_file <- here(path, "data", "Sales_20240702.xls")
@@ -33,8 +47,8 @@ main <- function() {
   # Process data
   df <- df |>
     rename_columns() |>
-    mutate(std_cost = "") |>  # Make Std.cost into blank
-    filter(.data$prctr != "50803-003")
+    overwrite_with_blank_data() |>
+    remove_missing_values()
 
   # Write data
   write_csv(df, output_file, na = "")
