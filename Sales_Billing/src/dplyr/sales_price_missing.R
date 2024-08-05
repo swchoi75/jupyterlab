@@ -16,16 +16,34 @@ read_txt_file <- function(file_path) {
     locale = locale(encoding = "UTF-16LE"),
     col_types = cols(.default = col_character()),
   ) |>
-    clean_names() |>
-    select(!c(1:2)) |>
-    filter(!is.na(.data$sales_org))
+    clean_names(ascii = FALSE)
+  return(df)
+}
+
+
+remove_columns <- function(df) {
+  df <- df |>
+    select(!c("x1", "x2"))
+  return(df)
+}
+
+
+remove_missing_values <- function(df) {
+  df <- df |>
+    filter(!is.na(df$sales_org))
   return(df)
 }
 
 
 filter_price_missing <- function(df) {
   df <- df |>
-    filter(.data$delivery_amount == 0) |>
+    filter(.data$delivery_amount == 0)
+  return(df)
+}
+
+
+select_columns <- function(df) {
+  df <- df |>
     select(c(
       "sold_to_party",
       "customer_material",
@@ -43,6 +61,7 @@ filter_price_missing <- function(df) {
     ))
   return(df)
 }
+
 
 
 main <- function() {
@@ -67,11 +86,16 @@ main <- function() {
   df_2182 <- read_txt_file(input_2)
 
   # Process data
-  df <- bind_rows(df_0180, df_2182)
-  df_sub <- filter_price_missing((df))
+  df <- bind_rows(df_0180, df_2182) |>
+    remove_columns() |>
+    remove_missing_values()
+
+  df_sub <- df |>
+    filter_price_missing() |>
+    select_columns()
 
   # Write data
-  write_excel_csv(df, output_1, na = "")  # write_excel_csv for 한글 표시
+  write_excel_csv(df, output_1, na = "") # write_excel_csv for 한글 표시
   write_csv(df_sub, output_2, na = "")
   print("Files are created")
 }
