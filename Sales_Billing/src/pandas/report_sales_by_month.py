@@ -72,7 +72,7 @@ def main():
 
     # Filenames
     input_file = path / "data" / "Sales_20240702.xls"
-    output_file = path / "output" / "Sales by month_test.csv"
+    output_file = path / "output" / "Sales by month.csv"
 
     # Read data
     df = pd.read_csv(input_file, delimiter="\t", encoding="latin1")

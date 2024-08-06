@@ -86,9 +86,9 @@ def main():
     year = "2024"
 
     # Filenames
-    input_1 = path / "db" / f"KE30_{year}_test.csv"
-    input_2 = path / "db" / f"GL_{year}_test.csv"
-    output_file = path / "output" / f"KE30 and GL Account_{year}_test.csv"
+    input_1 = path / "db" / f"KE30_{year}.csv"
+    input_2 = path / "db" / f"GL_{year}.csv"
+    output_file = path / "output" / f"KE30 and GL Account_{year}.csv"
 
     # Read data
     df_ke30 = pd.read_csv(

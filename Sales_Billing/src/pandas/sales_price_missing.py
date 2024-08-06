@@ -11,8 +11,8 @@ path = Path(__file__).parent.parent.parent
 def read_txt_file(file_path):
     df = pd.read_csv(
         file_path,
-        sep="\t",
         skiprows=3,
+        sep="\t",
         encoding="UTF-16LE",
         skipinitialspace=True,
         thousands=",",
@@ -77,8 +77,8 @@ def main():
         / "Sales Delivery Report"
         / f"Delivery report_2182_{year}_{month}.xls"
     )
-    output_1 = path / "output" / "Sales delivery report_test.csv"
-    output_2 = path / "output" / "Sales price missing_test.csv"
+    output_1 = path / "output" / "Sales delivery report.csv"
+    output_2 = path / "output" / "Sales price missing.csv"
 
     # Read data
     df_0180 = read_txt_file(input_1)

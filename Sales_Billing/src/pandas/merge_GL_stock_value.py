@@ -12,8 +12,8 @@ def read_multiple_files(list_of_files):
     dataframes = [
         pd.read_csv(
             file,
-            sep="\t",
             skiprows=5,
+            sep="\t",
             encoding="UTF-16LE",
             skipinitialspace=True,
             thousands=",",
@@ -79,7 +79,7 @@ def main():
         for file in data_path.iterdir()
         if file.is_file() and (file.suffix.lower() == ".xls")
     ]
-    output_file = path / "db" / f"GL_{year}_test.csv"
+    output_file = path / "db" / f"GL_{year}.csv"
 
     # Read data
     df = read_multiple_files(input_files).clean_names(
