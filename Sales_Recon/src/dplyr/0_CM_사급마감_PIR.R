@@ -24,22 +24,6 @@ rename_columns <- function(df) {
 }
 
 
-select_columns <- function(df) {
-  df <- df |>
-    select(c(
-      "vendor",
-      "vendor_name",
-      "material_no",
-      "mtye",
-      "sa_net_price",
-      "unit",
-      "sa_valid_from",
-      "sa_number"
-    ))
-  return(df)
-}
-
-
 main <- function() {
   # Variables
   source(here(path, "src", "dplyr", "common_variable.R"))
@@ -59,7 +43,17 @@ main <- function() {
   # Process data
   df <- df |> 
     rename_columns() |>
-    select_columns()
+    # select columns
+    select(c(
+      "vendor",
+      "vendor_name",
+      "material_no",
+      "mtye",
+      "sa_net_price",
+      "unit",
+      "sa_valid_from",
+      "sa_number"
+    ))
 
   ## Filter dataframe
   df <- df |>

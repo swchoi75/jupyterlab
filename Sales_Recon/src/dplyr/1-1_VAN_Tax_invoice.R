@@ -43,10 +43,20 @@ remove_unnecessary_rows <- function(df) {
 
 change_data_type <- function(df) {
   # Convert types from text to double ----
+  columns_to_change <- c(
+    "입고수량",
+    "입고금액",
+    "포장비",
+    "단가소급",
+    "관세정산",
+    "sample",
+    "glovis_price",
+    "서열비"
+  )
   df <- df |>
     mutate(
-      across(c("입고수량":"서열비"), as.double),
-      across(c("입고수량":"서열비"), ~ tidyr::replace_na(.x, 0)),
+      across(all_of(columns_to_change), as.double),
+      across(all_of(columns_to_change), ~ tidyr::replace_na(.x, 0)),
     )
   return(df)
 }

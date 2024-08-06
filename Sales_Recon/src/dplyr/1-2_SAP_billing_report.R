@@ -168,7 +168,7 @@ main <- function() {
     clean_names(ascii = FALSE) |>
     filter(!is.na(.data$sales_organization))
 
-  price <- read_tsv(input_3,
+  df_price <- read_tsv(input_3,
     skip = 3,
     locale = locale(encoding = "UTF-16LE"),
     col_types = cols(.default = col_character()),
@@ -181,11 +181,11 @@ main <- function() {
       "current_price" = "amount"
     )
 
-  customer <- read_csv(meta_1, show_col_types = FALSE) |>
+  df_customer <- read_csv(meta_1, show_col_types = FALSE) |>
     clean_names(ascii = FALSE) |>
     select(c("sold_to_party", "고객명"))
 
-  customer_plant <- read_csv(meta_2,
+  df_customer_plant <- read_csv(meta_2,
     col_types = cols(.default = col_character()),
   ) |>
     clean_names(ascii = FALSE) |>
@@ -197,22 +197,22 @@ main <- function() {
   df <- bind_rows(df_0180, df_2182) |>
     relocate("plant", .after = "sales_organization")
 
-  price <- price |> change_data_type()
-  price_latest <- price |> get_latest_price()
+  df_price <- df_price |> change_data_type()
+  df_price_latest <- df_price |> get_latest_price()
 
   ## Join dataframes
   df <- df |>
     ##
-    left_join(price_latest, by = c(
+    left_join(df_price_latest, by = c(
       "sold_to_party" = "customer",
       "material_number" = "material"
     )) |>
     ##
-    left_join(customer, by = "sold_to_party") |>
+    left_join(df_customer, by = "sold_to_party") |>
     #  filter(!is.na(`고객명`)) |>
     relocate("고객명", .after = "plant") |>
     ##
-    left_join(customer_plant, by = "ship_to_party") |>
+    left_join(df_customer_plant, by = "ship_to_party") |>
     relocate("공장명", .after = "sold_to_party")
 
   df <- df |>
@@ -226,7 +226,7 @@ main <- function() {
 
   # Write data
   write_excel_csv(df_summary, output_1)
-  write_excel_csv(price_latest, output_2)
+  write_excel_csv(df_price_latest, output_2)
   write_excel_csv(df, output_3)
   print("Files are created")
 }
