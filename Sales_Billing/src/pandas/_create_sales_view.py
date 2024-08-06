@@ -66,17 +66,8 @@ def change_format(df):
     return df
 
 
-def select_columns(df):
-    selected_columns = [
-        "plant",
-        "sales_org",
-        "material_number",
-        "acc_assig_grp",
-        "material_group1",
-        "material_group2",
-        "material_group3",
-    ]
-    df = df[df[selected_columns]]
+def select_columns(df, selected_columns):
+    df = df[selected_columns]
     return df
 
 
@@ -91,7 +82,22 @@ def main():
     df = pd.read_csv(input_file).clean_names()
 
     # Process data
-    df = df.pipe(filter_last_date).pipe(change_format).pipe(select_columns)
+    df = (
+        df.pipe(filter_last_date)
+        .pipe(change_format)
+        .pipe(
+            select_columns,
+            [
+                "plant",
+                "sales_org",
+                "material_number",
+                "acc_assig_grp",
+                "material_group1",
+                "material_group2",
+                "material_group3",
+            ],
+        )
+    )
 
     # Write data
     df.to_csv(output_1, index=False)

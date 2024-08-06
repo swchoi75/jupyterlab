@@ -52,21 +52,6 @@ change_format <- function(df) {
 }
 
 
-select_columns <- function(df) {
-  df <- df |>
-    select(c(
-      "plant",
-      "sales_org",
-      "material_number",
-      "acc_assig_grp",
-      "material_group1",
-      "material_group2",
-      "material_group3"
-    ))
-  return(df)
-}
-
-
 main <- function() {
   # Filenames
   input_file <- here(path, "data", "Sales View Creation Request.csv")
@@ -83,7 +68,16 @@ main <- function() {
   df <- df |>
     filter_last_date() |>
     change_format() |>
-    select_columns()
+    # select columns
+    select(c(
+      "plant",
+      "sales_org",
+      "material_number",
+      "acc_assig_grp",
+      "material_group1",
+      "material_group2",
+      "material_group3"
+    ))
 
   # Write data
   write_csv(df, output_1, na = "")

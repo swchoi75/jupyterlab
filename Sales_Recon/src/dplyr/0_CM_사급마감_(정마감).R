@@ -55,7 +55,7 @@ main <- function() {
 
   # Read data
   df <- read_excel_multiple_sheets(input_file) |> clean_names(ascii = FALSE)
-  df_meta <- read_xlsx(meta_file, range = "A2:J1000") |>
+  df_meta <- read_xlsx(meta_file, sheet = "Master", range = "A2:J1000") |>
     clean_names(ascii = FALSE) |>
     filter(!is.na(.data$업체))
 
@@ -69,7 +69,7 @@ main <- function() {
   sub_2 <- df_meta |>
     distinct(pick("casco_part_no", "mat_type", "div", "업체"))
 
-  ## Join two dataframes
+  ## Add master data
   df_1 <- df |>
     left_join(sub_1, by = c("part_no" = "customer_p_n")) |>
     filter(!is.na(.data$업체)) |>

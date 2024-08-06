@@ -58,7 +58,7 @@ def remove_missing_values(df):
     return df
 
 
-def conver_data_type(df):
+def change_data_type(df):
     # change from float to integer
     columns_to_change = ["quantity", "amount_in_doc_curr", "amount_in_local_cur"]
     df[columns_to_change] = df[columns_to_change].astype(int)
@@ -87,7 +87,7 @@ def main():
     )
 
     # Process data
-    df = df.pipe(remove_columns).pipe(remove_missing_values).pipe(conver_data_type)
+    df = df.pipe(remove_columns).pipe(remove_missing_values).pipe(change_data_type)
 
     # Write data
     df.to_csv(output_file, index=False)

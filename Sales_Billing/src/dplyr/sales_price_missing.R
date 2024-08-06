@@ -42,28 +42,6 @@ filter_price_missing <- function(df) {
 }
 
 
-select_columns <- function(df) {
-  df <- df |>
-    select(c(
-      "sold_to_party",
-      "customer_material",
-      "material_number",
-      "material_description",
-      "profit_center",
-      "delivery_date",
-      "mvt_type",
-      "quantity",
-      "delivery_amount",
-      "delivery_number",
-      "billing_number",
-      "billing_amount",
-      "item"
-    ))
-  return(df)
-}
-
-
-
 main <- function() {
   # Variables
   year <- "2024"
@@ -92,7 +70,22 @@ main <- function() {
 
   df_sub <- df |>
     filter_price_missing() |>
-    select_columns()
+    # select columns
+    select(c(
+      "sold_to_party",
+      "customer_material",
+      "material_number",
+      "material_description",
+      "profit_center",
+      "delivery_date",
+      "mvt_type",
+      "quantity",
+      "delivery_amount",
+      "delivery_number",
+      "billing_number",
+      "billing_amount",
+      "item"
+    ))
 
   # Write data
   write_excel_csv(df, output_1, na = "") # write_excel_csv for 한글 표시

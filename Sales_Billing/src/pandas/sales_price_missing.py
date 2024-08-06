@@ -38,24 +38,8 @@ def filter_price_missing(df):
     return df
 
 
-def select_columns(df):
-    selected_columns = [
-        "sold_to_party",
-        "customer_material",
-        "material_number",
-        "material_description",
-        "profit_center",
-        "delivery_date",
-        "mvt_type",
-        "quantity",
-        "delivery_amount",
-        "delivery_number",
-        "billing_number",
-        "billing_amount",
-        "item",
-    ]
+def select_columns(df, selected_columns):
     df = df[selected_columns]
-
     return df
 
 
@@ -87,7 +71,24 @@ def main():
     # Process data
     df = pd.concat([df_0180, df_2182])
     df = df.pipe(remove_columns).pipe(remove_missing_values)
-    df_sub = df.pipe(filter_price_missing).pipe(select_columns)
+    df_sub = df.pipe(filter_price_missing).pipe(
+        select_columns,
+        [
+            "sold_to_party",
+            "customer_material",
+            "material_number",
+            "material_description",
+            "profit_center",
+            "delivery_date",
+            "mvt_type",
+            "quantity",
+            "delivery_amount",
+            "delivery_number",
+            "billing_number",
+            "billing_amount",
+            "item",
+        ],
+    )
 
     # Write data
     df.to_csv(output_1, index=False, encoding="utf-8-sig")  # for 한글 표시
