@@ -170,7 +170,6 @@ main <- function() {
     skip = 3,
     locale = locale(encoding = "UTF-16LE"),
     show_col_types = FALSE,
-    # col_types = cols(.default = col_character()),
   ) |>
     clean_names(ascii = FALSE) |>
     select(!c("x1", "re_st")) |>
