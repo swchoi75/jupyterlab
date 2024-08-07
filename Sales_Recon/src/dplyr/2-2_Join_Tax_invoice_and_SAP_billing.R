@@ -9,11 +9,24 @@ path <- here("Sales_Recon")
 
 
 # Functions
-summary_data <- function(df) {
+summary_df2 <- function(df, key_columns) {
+  df <- df |>
+    group_by(
+      pick(key_columns)
+    ) |>
+    summarise(
+      출고Q = sum(.data$qty),
+      출고금액 = sum(.data$amt),
+    )
+  return(df)
+}
+
+
+summary_data <- function(df, key_columns) {
   # Summary of data ----
   df <- df |>
     group_by(
-      pick("고객명", "sold_to_party", "customer_pn_rev")
+      pick(key_columns)
     ) |>
     summarise(
       입고Q = sum(.data$입고수량),
@@ -32,19 +45,6 @@ summary_data <- function(df) {
 }
 
 
-summary_df2 <- function(df) {
-  df <- df |>
-    group_by(
-      pick("고객명", "sold_to_party", "customer_pn_rev")
-    ) |>
-    summarise(
-      출고Q = sum(.data$qty),
-      출고금액 = sum(.data$amt),
-    )
-  return(df)
-}
-
-
 main <- function() {
   # Filenames
   input_0 <- here(path, "output", "2-1. Join Customer PN.csv")
@@ -56,27 +56,34 @@ main <- function() {
   )
 
   # Read data
-  df <- read_csv(input_0, col_types = cols(.default = col_character()))
-  df_1 <- read_csv(input_1, col_types = cols(.default = col_character()))
-  df_2 <- read_csv(input_2, col_types = cols(.default = col_character()))
+  df <- read_csv(input_0, col_types = cols(sold_to_party = col_character()))
+  df_1 <- read_csv(input_1, col_types = cols(sold_to_party = col_character()))
+  df_2 <- read_csv(input_2, col_types = cols(sold_to_party = col_character()))
 
   # Process data
-  df_1 <- df_1 |>
-    mutate(across(c("입고수량":"서열비"), as.double)) |>
-    select(c("고객명", "sold_to_party", "customer_pn_rev", "입고수량":"서열비"))
+  key_columns <- c("고객명", "sold_to_party", "customer_pn_rev")
+  value_columns <- c(
+    "입고수량",
+    "입고금액",
+    "포장비",
+    "단가소급",
+    "관세정산",
+    "sample",
+    "glovis_price",
+    "서열비"
+  )
+
+  df_1 <- df_1 |> select(c(key_columns, value_columns))
 
   df_2 <- df_2 |>
-    mutate(
-      across(c("current_price", "qty":"avg_billing_price"), as.double),
-    ) |>
-    select(c("고객명", "sold_to_party", "customer_pn_rev", "qty", "amt")) |>
-    filter(!is.na(.data$고객명)) |>
-    summary_df2()
+    select(c(key_columns, "qty", "amt")) |>
+    tidyr::drop_na() |>
+    summary_df2(key_columns)
 
   df <- df |>
-    left_join(df_1, by = c("고객명", "sold_to_party", "customer_pn_rev")) |>
-    summary_data() |>
-    left_join(df_2, by = c("고객명", "sold_to_party", "customer_pn_rev"))
+    left_join(df_1, by = key_columns) |>
+    summary_data(key_columns) |>
+    left_join(df_2, by = key_columns)
 
   # Write data
   write_excel_csv(df, output_file, na = "0")

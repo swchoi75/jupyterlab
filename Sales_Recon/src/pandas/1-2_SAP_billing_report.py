@@ -97,38 +97,37 @@ def process_inverter(df):
 
 
 def summary_data(df):
-    # Group by specified columns and calculate sum of billing_quantity and sales_amount_krw
-    grouped_df = (
-        df.groupby(
-            [
-                "plant",
-                "고객명",
-                "sold_to_party",
-                "customer_name",
-                "customer_pn_rev",
-                "customer_pn",
-                "material_number",
-                "division",
-                "profit_center",
-                "material_description",
-                "customer_material",
-                "current_price",
-                "cn_ty",
-                "curr",
-            ],
-            dropna=False,
-        )
-        .agg(
-            qty=pd.NamedAgg(column="billing_quantity", aggfunc="sum"),
-            amt=pd.NamedAgg(column="sales_amount_krw", aggfunc="sum"),
-        )
+    key_columns = [
+        "plant",
+        "고객명",
+        "sold_to_party",
+        "customer_name",
+        "customer_pn_rev",
+        "customer_pn",
+        "material_number",
+        "division",
+        "profit_center",
+        "material_description",
+        "customer_material",
+        "current_price",
+        "cn_ty",
+        "curr",
+    ]
+    agg_dict = {
+        "billing_quantity": "sum",
+        "sales_amount_krw": "sum",
+    }
+    df = (
+        df.groupby(key_columns, dropna=False)
+        .agg(agg_dict)
         .reset_index()
+        .rename(columns={"billing_quantity": "qty", "sales_amount_krw": "amt"})
     )
 
     # Calculate avg_billing_price
-    grouped_df["avg_billing_price"] = round(grouped_df["amt"] / grouped_df["qty"], 2)
+    df["avg_billing_price"] = round(df["amt"] / df["qty"], 2)
 
-    return grouped_df
+    return df
 
 
 def main():
