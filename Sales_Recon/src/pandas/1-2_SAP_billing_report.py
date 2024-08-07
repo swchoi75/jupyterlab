@@ -18,15 +18,6 @@ def remove_columns(df, cols_to_remove):
     return df
 
 
-def change_data_type(df):
-    """change from text or float to integer"""
-    # remove NA values
-    df["current_price"] = df["current_price"].fillna(0)
-    # change data type
-    df["current_price"] = df["current_price"].astype(int)
-    return df
-
-
 def get_latest_price(df):
     # Combine 'customer' and 'material' columns into a new column 'customer_material'
     df["customer_material"] = df["customer"] + "_" + df["material"]
@@ -124,7 +115,8 @@ def summary_data(df):
                 "current_price",
                 "cn_ty",
                 "curr",
-            ]
+            ],
+            dropna=False,
         )
         .agg(
             qty=pd.NamedAgg(column="billing_quantity", aggfunc="sum"),
@@ -152,20 +144,20 @@ def main():
     meta_1 = path / "meta" / "고객명.csv"
     meta_2 = path / "meta" / "공장명.csv"
 
-    output_1 = path / "output" / "1-2. SAP billing summary.csv"
-    output_2 = path / "output" / "1-2. price_latest.csv"
-    output_3 = path / "output" / "1-2. SAP billing details.csv"
+    output_1 = path / "output" / "1-2. SAP billing summary_test.csv"
+    output_2 = path / "output" / "1-2. price_latest_test.csv"
+    output_3 = path / "output" / "1-2. SAP billing details_test.csv"
 
     # Read data
     df_0180 = (
         pd.read_excel(input_1)
-        .clean_names(strip_accents=False)
+        .clean_names(strip_accents=False, strip_underscores=True, case_type="snake")
         .dropna(subset=["sales_organization"])
     )
 
     df_2182 = (
         pd.read_excel(input_2)
-        .clean_names(strip_accents=False)
+        .clean_names(strip_accents=False, strip_underscores=True, case_type="snake")
         .dropna(subset=["sales_organization"])
     )
 
@@ -179,12 +171,13 @@ def main():
             thousands=",",
             engine="python",
         )
-        .clean_names(strip_underscores=True)
-        .pipe(remove_columns, ["re_st"])
+        .clean_names(strip_accents=False, strip_underscores=True, case_type="snake")
+        .dropna(subset=["s_org"])
+        .pipe(remove_columns, ["unnamed_0", "re_st"])
         .rename(
             columns={
-                "unit_9": "curr",
-                "unit_10": "per_unit",
+                "unit": "curr",
+                "unit_1": "per_unit",
                 "amount": "current_price",
             }
         )
@@ -192,13 +185,13 @@ def main():
 
     df_customer = (
         pd.read_csv(meta_1)
-        .clean_names(strip_accents=False)
+        .clean_names(strip_accents=False, strip_underscores=True, case_type="snake")
         .pipe(select_columns, ["sold_to_party", "고객명"])
     )
 
     df_customer_plant = (
         pd.read_csv(meta_2, dtype=str)
-        .clean_names(strip_accents=False)
+        .clean_names(strip_accents=False, strip_underscores=True, case_type="snake")
         .pipe(select_columns, ["ship_to_party", "공장명"])
     )
 
@@ -207,7 +200,6 @@ def main():
     df_2182["plant"] = "2182"
     df = pd.concat([df_0180, df_2182])
 
-    df_price = change_data_type(df_price)
     df_price_latest = get_latest_price(df_price)
 
     ## Join dataframes
@@ -218,8 +210,9 @@ def main():
             right_on=["customer", "material"],
             how="left",
         )
+        .drop(columns=["customer", "material"])
         .merge(df_customer, on="sold_to_party", how="left")
-        .merge(df_customer_plant, on="sold_to_party", how="left")
+        .merge(df_customer_plant, on="ship_to_party", how="left")
     )
 
     df = (
@@ -234,7 +227,7 @@ def main():
 
     # Write data
     df_summary.to_csv(output_1, index=False, encoding="utf-8-sig")  # for 한글 표시
-    df_price_latest.to_csv(output_2, index=False, encoding="utf-8-sig")  # for 한글 표시
+    df_price_latest.to_csv(output_2, index=False)
     df.to_csv(output_3, index=False, encoding="utf-8-sig")  # for 한글 표시
     print("Files are created")
 

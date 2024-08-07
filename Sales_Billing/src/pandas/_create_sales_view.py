@@ -15,47 +15,35 @@ def filter_last_date(df):
 
 
 def add_acc_assig_grp(row):
-    if row["Type"] == "FERT":
-        return "01"
-    elif row["Type"] == "HAWA":
-        return "02"
-    elif row["Type"] == "HALB":
-        return "03"
-    elif row["Type"] == "ROH":
-        return "04"
+    type_mapping = {
+        "FERT": "01",
+        "HAWA": "02",
+        "HALB": "03",
+        "ROH": "04",
+    }
+    return type_mapping.get(row["Type"], None)
 
 
 def add_material_group(row):
-    if row["Customer"] == "HMC":
-        return "183"
-    elif row["Customer"] == "KMC":
-        return "191"
-    elif row["Customer"] == "KIA":
-        return "191"
-    elif row["Customer"] == "GM":
-        return "105"
-    elif row["Customer"] == "RSM":
-        return "193"
-    elif row["Customer"] == "Ssangyong":
-        return "180"
-    elif row["Customer"] == "SYM":
-        return "180"
-    elif row["Customer"] == "Others":
-        return "199"
-    elif row["Customer"] == "MOBIS":
-        return "317"
-    elif row["Customer"] == "Mobis":
-        return "317"
-    elif row["Customer"] == "MANDO":
-        return "384"
-    elif row["Customer"] == "Mando":
-        return "384"
-    elif row["Customer"] == "Webasto":
-        return "376"
-    elif row["Customer"] == "VT":
-        return "360"
-    elif row["Customer"] == "Conti":
-        return "394"
+    customer_mapping = {
+        "HMC": "183",
+        "KMC": "191",
+        "KIA": "191",
+        "GM": "105",
+        "RSM": "193",
+        "Ssangyong": "180",
+        "SYM": "180",
+        "Others": "199",
+        "MOBIS": "317",
+        "Mobis": "317",
+        "MANDO": "384",
+        "Mando": "384",
+        "Webasto": "376",
+        "VT": "360",
+        "Conti": "394",
+    }
+
+    return customer_mapping.get(row["Customer"], "Unknown")
 
 
 def change_format(df):

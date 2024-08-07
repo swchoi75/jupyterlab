@@ -29,6 +29,7 @@ get_latest_price <- function(df) {
     tidyr::unite("customer_material", c("customer":"material"),
       remove = FALSE
     ) |>
+    relocate(c("customer_material"), .after = last_col()) |>
     filter(!duplicated(.data$customer_material))
   return(df)
 }
@@ -57,7 +58,6 @@ process_customer_pn <- function(df) {
     mutate(
       customer_pn = str_remove(.data$customer_part_number, "-"),
       customer_pn = str_remove(.data$customer_pn, " "),
-      .before = "customer_part_number"
     ) |>
     mutate(
       customer_pn = str_remove(.data$customer_pn, "_")
@@ -86,8 +86,7 @@ process_gm_mobis <- function(df) {
         고객명 == "MOBIS module" ~ temp,
         customer_pn == "392502" ~ "392502E000",
         TRUE ~ customer_pn
-      ),
-      .before = "customer_pn"
+      )
     )
   return(df)
 }
@@ -109,8 +108,7 @@ process_inverter <- function(df) {
         customer_pn_rev1 == "V03" ~ customer_pn,
         customer_pn_rev1 == "366B02B" ~ customer_pn,
         TRUE ~ customer_pn_rev1
-      ),
-      .before = "customer_pn_rev1"
+      )
     )
 
   df <- df[, -which(names(df) == "customer_pn_rev1")]
@@ -171,10 +169,11 @@ main <- function() {
   df_price <- read_tsv(input_3,
     skip = 3,
     locale = locale(encoding = "UTF-16LE"),
-    col_types = cols(.default = col_character()),
+    show_col_types = FALSE,
+    # col_types = cols(.default = col_character()),
   ) |>
     clean_names(ascii = FALSE) |>
-    select(!c(1, "re_st")) |>
+    select(!c("x1", "re_st")) |>
     rename(
       "curr" = "unit_9",
       "per_unit" = "unit_10",
@@ -194,26 +193,19 @@ main <- function() {
   # Process data
   df_0180 <- df_0180 |> mutate(plant = "0180")
   df_2182 <- df_2182 |> mutate(plant = "2182")
-  df <- bind_rows(df_0180, df_2182) |>
-    relocate("plant", .after = "sales_organization")
+  df <- bind_rows(df_0180, df_2182)
 
   df_price <- df_price |> change_data_type()
   df_price_latest <- df_price |> get_latest_price()
 
   ## Join dataframes
   df <- df |>
-    ##
     left_join(df_price_latest, by = c(
       "sold_to_party" = "customer",
       "material_number" = "material"
     )) |>
-    ##
     left_join(df_customer, by = "sold_to_party") |>
-    #  filter(!is.na(`고객명`)) |>
-    relocate("고객명", .after = "plant") |>
-    ##
-    left_join(df_customer_plant, by = "ship_to_party") |>
-    relocate("공장명", .after = "sold_to_party")
+    left_join(df_customer_plant, by = "ship_to_party")
 
   df <- df |>
     process_mobis() |>
@@ -226,7 +218,7 @@ main <- function() {
 
   # Write data
   write_excel_csv(df_summary, output_1)
-  write_excel_csv(df_price_latest, output_2)
+  write_csv(df_price_latest, output_2)
   write_excel_csv(df, output_3)
   print("Files are created")
 }
