@@ -29,23 +29,23 @@ costctr_and_accounts <- function(df, year, month) {
       fy = year,
       period = month,
       costctr = str_extract(
-        df$text_col,
+        .data$text_col,
         "\\s[0-9]{4,5}|IC-.{4,5}|CY-.{4,5}|ICH-.{4,5}|DUMMY_.{3}"
       ) |> str_trim(),
       gl_accounts = str_extract(
-        df$text_col,
+        .data$text_col,
         "^K[0-9]+|^S[0-9]+"
       )
     ) |>
-    tidyr::fill(df$costctr, .direction = "up")
+    tidyr::fill("costctr", .direction = "up")
 
   return(df)
 }
 
 filter_and_select <- function(df) {
   df <- df |>
-    filter(!(df$actual == 0 & df$plan == 0 &
-               df$target == 0)) |>
+    filter(!(.data$actual == 0 & .data$plan == 0 &
+               .data$target == 0)) |>
     select(c(
       "fy", "period", "costctr", "gl_accounts", "actual", "plan", "target"
     ))

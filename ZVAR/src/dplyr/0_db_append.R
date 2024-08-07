@@ -30,7 +30,7 @@ main <- function() {
   # Remove first two columns and sub-total rows
   df <- df |>
     select(-c(1, 2, 5)) |>
-    filter(!is.na(df$Order)) |>
+    filter(!is.na(.data$Order)) |>
     clean_names()
 
 

@@ -13,9 +13,9 @@ source(here(path, "src", "dplyr", "common_functions.R"))
 filter_fix_account <- function(df) {
   # Fix costs : Add account information
   df <- df |>
-    filter(df$coom == "Fix") |>
+    filter(.data$coom == "Fix") |>
     # Remove S90xxx accounts
-    filter(df$acc_lv6 != "Assessments to COPA") |>
+    filter(.data$acc_lv6 != "Assessments to COPA") |>
     mutate(
       ce_text = case_when(
         # PV Costs : special logic for Division P in 2023 (temporary)

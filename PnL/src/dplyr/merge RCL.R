@@ -33,22 +33,22 @@ rename_columns <- function(df) {
   df <- df |>
     select(!c("ACT Period GC":"FC GC fx impact")) |>
     rename(c(
-      `Period Plan`         = "Single Period BUD GC",
-      `Period Act`          = "Single Period ACT GC @ BUD fx",
-      `Delta Period`        = "Single Period ACT-BUD GC @ BUD fx",
-      `Comments Period`     = "Comment Single Period ACT-BUD Period",
-      `YTD Plan`            = "YTD BUD GC",
-      `YTD Act`             = "YTD ACT GC @ BUD fx",
-      `Delta YTD`           = "YTD ACT-BUD GC @ BUD fx",
-      `Comments YTD`        = "Comment YTD ACT-BUD",
-      `Plan`                = "FY BUD GC",
-      `FC`                  = "FC GC @ BUD fx...11",
-      `Delta to Plan`       = "FC - BUD GC @ BUD fx",
-      `Comments FC`         = "Comment FC - BUD GC",
-      `LFC`                 = "LFC GC @ BUD fx",
-      `FC_`                 = "FC GC @ BUD fx...15",
-      `Delta to LFC`        = "FC - LFC GC @ BUD fx",
-      `Comments FC changes` = "Comment FC - LFC"
+      "Period Plan"         = "Single Period BUD GC",
+      "Period Act"          = "Single Period ACT GC @ BUD fx",
+      "Delta Period"        = "Single Period ACT-BUD GC @ BUD fx",
+      "Comments Period"     = "Comment Single Period ACT-BUD Period",
+      "YTD Plan"            = "YTD BUD GC",
+      "YTD Act"             = "YTD ACT GC @ BUD fx",
+      "Delta YTD"           = "YTD ACT-BUD GC @ BUD fx",
+      "Comments YTD"        = "Comment YTD ACT-BUD",
+      "Plan"                = "FY BUD GC",
+      "FC"                  = "FC GC @ BUD fx...11",
+      "Delta to Plan"       = "FC - BUD GC @ BUD fx",
+      "Comments FC"         = "Comment FC - BUD GC",
+      "LFC"                 = "LFC GC @ BUD fx",
+      "FC_"                 = "FC GC @ BUD fx...15",
+      "Delta to LFC"        = "FC - LFC GC @ BUD fx",
+      "Comments FC changes" = "Comment FC - LFC"
     ))
   return(df)
 }
@@ -64,9 +64,9 @@ extract_poc <- function(df) {
   # Get Outlet, Plant infomration from file names using Regex
   df <- df |>
     mutate(
-      outlet_plant = str_extract(source, "[0-9\\_]{7,9}"),
-      outlet = str_extract(df$outlet_plant, "[0-9]{3,4}"),
-      plant = str_extract(df$outlet_plant, "[0-9]{3}$")
+      outlet_plant = str_extract(.data$source, "[0-9\\_]{7,9}"),
+      outlet = str_extract(.data$outlet_plant, "[0-9]{3,4}"),
+      plant = str_extract(.data$outlet_plant, "[0-9]{3}$")
     ) |>
     select(!c("source", "outlet_plant")) |>
     relocate(c("outlet", "plant"))
@@ -126,6 +126,7 @@ main <- function() {
 
   # Write data
   write_csv(df, output_file, na = "")
+  print("A file is created")
 }
 
 main()

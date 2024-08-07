@@ -14,11 +14,11 @@ path <- here("PnL")
 read_excel_file <- function(filename, version) {
   df <- read_excel(filename, sheet = "Query", skip = 11) |>
     rename(c(
-      `FS item description` = "...2",
-      `CU name` = "...4",
-      `Plant name` = "...6",
-      `Outlet name` = "...8",
-      `YTD PM` = "YTD - 1"
+      "FS item description" = "...2",
+      "CU name" = "...4",
+      "Plant name" = "...6",
+      "Outlet name" = "...8",
+      "YTD PM" = "YTD - 1"
     )) |>
     rename_with(~ gsub(version, "", .x)) |>
     clean_names()
@@ -52,14 +52,14 @@ join_with_outlet <- function(df, filename) {
 profit_and_loss <- function(df) {
   df <- df |>
     select(!c("period_0", "ytd_0":"ytd_12")) |>
-    filter(str_detect(df$financial_statement_item, "^3|^CO"))
+    filter(str_detect(.data$financial_statement_item, "^3|^CO"))
   return(df)
 }
 
 balance_sheet <- function(df) {
   df <- df |>
     select(!c("period_0":"period_12")) |>
-    filter(str_detect(df$financial_statement_item, "^1|^2"))
+    filter(str_detect(.data$financial_statement_item, "^1|^2"))
   return(df)
 }
 
@@ -93,6 +93,7 @@ main <- function() {
   # Output data
   write_csv(race_pnl, output_pnl, na = "0")
   write_csv(race_bs, output_bs, na = "0")
+  print("Files are created")
 }
 
 main()

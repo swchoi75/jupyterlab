@@ -28,16 +28,16 @@ process_columns <- function(df) {
   df <- df |>
     select(-c(4:6, 24:26)) |>
     rename(c(
-      Plant  = "...1",
-      Outlet = "...2",
-      Items  = "...6"
+      "Plant"  = "...1",
+      "Outlet" = "...2",
+      "Items"  = "...6"
     ))
   return(df)
 }
 
 filter_rows <- function(df) {
   df <- df |>
-    filter(!is.na(df$plant))
+    filter(!is.na(.data$plant))
   return(df)
 }
 
@@ -45,9 +45,9 @@ process_text <- function(df, path_name) {
   # Remove unnecessary text
   df <- df |>
     mutate(
-      source = str_remove(df$source, "_2023"),
-      source = str_remove(df$source, ".xlsx"),
-      source = str_remove(df$source, path_name)
+      source = str_remove(.data$source, "_2023"),
+      source = str_remove(.data$source, ".xlsx"),
+      source = str_remove(.data$source, path_name)
     )
   return(df)
 }

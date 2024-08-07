@@ -17,7 +17,7 @@ read_multiple_files <- function(list_of_files) {
   df <- list_of_files |>
     map_dfr(read_excel,
       sheet = "Total devaluation",
-      range = "B4:AM30000",
+      range = "B4:BD30000",
       .id = "source"
     )
   return(df)
@@ -25,7 +25,7 @@ read_multiple_files <- function(list_of_files) {
 
 remove_na_rows <- function(df) {
   df <- df |>
-    filter(!is.na(df$plant))
+    filter(!is.na(.data$plant))
   return(df)
 }
 
@@ -33,14 +33,14 @@ year_month <- function(df) {
   # Capture Year and Month
   df <- df |>
     mutate(
-      source = str_extract(source, "\\d{4}-\\d{2}"),
+      source = str_extract(.data$source, "\\d{4}-\\d{2}"),
     )
   return(df)
 }
 
 filter_data <- function(df) {
   df <- df |>
-    filter(df$monthly_impact > 10^7 | df$monthly_impact < -10^7)
+    filter(.data$monthly_impact > 10^7 | .data$monthly_impact < -10^7)
   return(df)
 }
 

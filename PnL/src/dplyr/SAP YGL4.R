@@ -30,9 +30,9 @@ select_columns <- function(df) {
 process_textual_columns <- function(df, path_name) {
   df <- df |>
     mutate(
-      source = str_remove(df$source, path_name),
-      source = str_remove(df$source, ".dat$"),
-      PrCr = str_extract(df["OneGL B/S + P/L"], "[0-9\\-]{8,9}")
+      source = str_remove(.data$source, path_name),
+      source = str_remove(.data$source, ".dat$"),
+      PrCr = str_extract(df[["OneGL B/S + P/L"]], "[0-9\\-]{8,9}")
     )
   return(df)
 }
@@ -63,9 +63,19 @@ change_sign_logic <- function(df) {
 
 change_column_names <- function(df) {
   lookup <- c(
-    Items = "source",
-    Jan = "01", Feb = "02", Mar = "03", Apr = "04", May = "05", Jun = "06",
-    Jul = "07", Aug = "08", Sep = "09", Oct = "10", Nov = "11", Dec = "12"
+    "Items" = "source",
+    "Jan" = "01",
+    "Feb" = "02",
+    "Mar" = "03",
+    "Apr" = "04",
+    "May" = "05",
+    "Jun" = "06",
+    "Jul" = "07",
+    "Aug" = "08",
+    "Sep" = "09",
+    "Oct" = "10",
+    "Nov" = "11",
+    "Dec" = "12"
   )
   df <- df |>
     rename(all_of(lookup))

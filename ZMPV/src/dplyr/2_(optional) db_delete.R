@@ -10,11 +10,11 @@ path <- here("ZMPV")
 # Functions
 delete_last_month <- function(df) {
   # Find the last month
-  last_month <- last(df$"m_y_from_")
+  last_month <- last(df$m_y_from)
 
   # Filter out last month
   df <- df |>
-    filter(df$m_y_from_ != last_month)
+    filter(.data$m_y_from != last_month)
 
   return(df)
 }

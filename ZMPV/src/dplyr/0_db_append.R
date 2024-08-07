@@ -22,7 +22,7 @@ remove_col_row <- function(df) {
   # Remove first two columns and sub-total rows
   df <- df |>
     select(-c(1, 2)) |>
-    filter(!is.na(df["Profit Cen"]))
+    filter(!is.na(.data[["Profit Cen"]]))
   return(df)
 }
 
@@ -41,10 +41,10 @@ convert_col_type <- function(df) {
 
 rename_cols <- function(df) {
   lookup <- c(
-    `Net PPV` = "Net PM_PPV...23",
-    `Net PPV ratio` = "Net PM_PPV...24",
-    `STD Other` = "STD Other...39",
-    `STD Other 2` = "STD Other...40"
+    "Net PPV" = "Net PM_PPV...23",
+    "Net PPV ratio" = "Net PM_PPV...24",
+    "STD Other" = "STD Other...39",
+    "STD Other 2" = "STD Other...40"
   )
   df <- df |>
     rename(all_of(lookup))

@@ -30,7 +30,7 @@ process_numeric_columns <- function(df) {
       ~ (.x / -10^3)
     )) |>
     mutate(
-      delta_to_plan = round(df$actual - df$plan, 3),
+      delta_to_plan = round(.data$actual - .data$plan, 3),
       .after = "target"
     )
   return(df)
@@ -55,7 +55,7 @@ master_coom <- function(filename) {
 add_vol_diff <- function(df) {
   df <- df |>
     mutate(
-      volume_difference = round(df$plan - df$target, 3),
+      volume_difference = round(.data$plan - .data$target, 3),
     )
   return(df)
 }
@@ -74,8 +74,8 @@ process_master_data <- function(df, df_cc, df_acc, df_coom, df_poc) {
     ) |>
     relocate("function_2", .after = last_col()) |>
     left_join(df_poc, c("pctr" = "profit_center")) |>
-    rename(c(profit_center = "pctr")) |>
-    return(df)
+    rename(c(profit_center = "pctr"))
+  return(df)
 }
 
 # Process COOM data for fix and variable costs
