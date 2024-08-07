@@ -20,21 +20,16 @@ main <- function() {
   df_2 <- read_csv(input_2, col_types = cols(.default = col_character()))
 
   # Process data
-  df_1 <- df_1 |>
-    select(c("고객명", "sold_to_party", "customer_pn_rev"))
+  selected_columns <- c("고객명", "sold_to_party", "customer_pn_rev")
+  df_1 <- df_1 |> select(selected_columns)
+  df_2 <- df_2 |> select(selected_columns)
 
-  df_2 <- df_2 |>
-    select(c("고객명", "sold_to_party", "customer_pn_rev"))
-
-  df <- full_join(df_1, df_2,
-    # Join two dataframes
-    by = c("고객명", "sold_to_party", "customer_pn_rev")
-  ) |>
-    distinct(pick("고객명", "sold_to_party", "customer_pn_rev")) |> # Unique values
-    filter(!is.na(.data$고객명)) # Remove missing values
+  df <- full_join(df_1, df_2, by = selected_columns) |>
+    distinct() |> # Unique values
+    tidyr::drop_na() # Remove missing values
 
   # Write data
-  write_excel_csv(df, output_file)
+  write_excel_csv(df, output_file) # for 한글 표시
   print("A file is created")
 }
 
