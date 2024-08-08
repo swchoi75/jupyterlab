@@ -143,9 +143,9 @@ def main():
     meta_1 = path / "meta" / "고객명.csv"
     meta_2 = path / "meta" / "공장명.csv"
 
-    output_1 = path / "output" / "1-2. SAP billing summary_test.csv"
-    output_2 = path / "output" / "1-2. price_latest_test.csv"
-    output_3 = path / "output" / "1-2. SAP billing details_test.csv"
+    output_1 = path / "output" / "1-2. SAP billing summary.csv"
+    output_2 = path / "output" / "1-2. price_latest.csv"
+    output_3 = path / "output" / "1-2. SAP billing details.csv"
 
     # Read data
     df_0180 = (

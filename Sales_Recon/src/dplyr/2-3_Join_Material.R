@@ -23,56 +23,47 @@ main <- function() {
 
   # Process data
   # Select columns and Remove duplicate rows ----
+  key_columns <- c("고객명", "sold_to_party", "customer_pn_rev")
   df_1 <- df_1 |>
-    select(c("고객명":"customer_pn_rev")) |>
-    tidyr::unite("temp", c("고객명", "sold_to_party", "customer_pn_rev"),
-      sep = "_", remove = FALSE
-    )
+    select(c(all_of(key_columns), "공장명", "ship_to_party")) |>
+    tidyr::unite("temp", key_columns, sep = "_", remove = FALSE)
 
   df_2 <- df_2 |>
     filter(!is.na(.data$고객명)) |>
-    select(c("plant":"curr")) |>
-    tidyr::unite("temp", c("고객명", "sold_to_party", "customer_pn_rev"),
-      sep = "_", remove = FALSE
-    )
+    select(!c("qty", "amt", "avg_billing_price")) |>
+    tidyr::unite("temp", key_columns, sep = "_", remove = FALSE)
 
   # Remove duplicate rows ----
   df_1a <- df_1 |>
-    filter(!duplicated(.data$temp)) |>
+    filter(!duplicated(pick("temp"))) |>
     select(!c("temp"))
 
   df_2a <- df_2 |>
-    filter(!duplicated(.data$temp)) |>
+    filter(!duplicated(pick("temp"))) |>
     select(!c("temp"))
 
   df_2b <- df_2 |>
-    filter(duplicated(.data$temp)) |>
+    filter(duplicated(pick("temp"))) |>
     select(!c("temp"))
-
 
   # Join two dataframes ----
   df <- df |>
-    left_join(df_2a, by = c("고객명", "sold_to_party", "customer_pn_rev"))
-
-  df <- df |>
-    left_join(df_1a, by = c("고객명", "sold_to_party", "customer_pn_rev"))
-
+    left_join(df_2a, by = key_columns) |>
+    left_join(df_1a, by = key_columns)
 
   # bind_rows ----
-  df <- df |>
-    bind_rows(df_2b)
-
+  df <- df |> bind_rows(df_2b)
 
   # Arrange rows by column values ----
   df <- df |>
-    arrange(
-      .data$고객명,
-      .data$sold_to_party,
-      .data$customer_pn_rev,
-      .data$plant,
-      .data$profit_center,
-      .data$material_number
-    )
+    arrange(pick(
+      "고객명",
+      "sold_to_party",
+      "customer_pn_rev",
+      "plant",
+      "profit_center",
+      "material_number"
+    ))
 
   # Write data
   write_excel_csv(df, output_file, na = "0")

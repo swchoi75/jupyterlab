@@ -29,7 +29,7 @@ def summary_data(df, key_columns):
         "단가소급": "sum",
         "관세정산": "sum",
         "sample": "sum",
-        "glovis_price": "sum",
+        "glovis_price": lambda x: x[x > 0].dropna().mean(),
         "서열비": "sum",
     }
     # Group by key_columns and aggregate using the dictionary
@@ -47,7 +47,7 @@ def main():
     input_0 = path / "output" / "2-1. Join Customer PN.csv"
     input_1 = path / "output" / "1-1. Tax invoice all.csv"
     input_2 = path / "output" / "1-2. SAP billing summary.csv"
-    output_file = path / "output" / "2-2. Join Tax invoice and SAP billing_test.csv"
+    output_file = path / "output" / "2-2. Join Tax invoice and SAP billing.csv"
 
     # Read data
     df = pd.read_csv(input_0, dtype={"sold_to_party": str})
