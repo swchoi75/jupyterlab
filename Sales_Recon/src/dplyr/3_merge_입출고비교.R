@@ -35,7 +35,7 @@ read_excel_multiple_sheets <- function(file_path) {
 
 remove_unnecessary_row <- function(df) {
   df <- df |>
-    filter(!.data$고객명 == 0) |>
+    filter(.data$고객명 != 0) |>
     filter(!str_starts(.data$customer_pn, "A2C")) # Remove Kappa HEV ADJ
   return(df)
 }
@@ -52,32 +52,30 @@ change_data_type <- function(df) {
 }
 
 
-format_price_list <- function(df) {
+format_price_list <- function(df, list_of_cols) {
   # Format for Price List
   df <- df |>
-    select(c(2:5, 7:8, 12:20)) |>
+    select(all_of(list_of_cols)) |>
     # Remove MOBIS A/S for too much price change
-    filter(!.data$고객명 == "MOBIS AS") |>
+    filter(.data$고객명 != "MOBIS AS") |>
     filter(.data$plant != 0) |>
     filter(.data$profit_center != 0) |>
-    select(!c(11:12)) |>
-    arrange(.data$profit_center, .data$customer_pn_rev)
+    arrange(pick("profit_center", "customer_pn_rev"))
   return(df)
 }
 
 
-format_price_diff <- function(df) {
+format_price_diff <- function(df, list_of_cols) {
   # Format for BU Price Difference
-  df <- df |>
-    select(c(4, 3, 7:8, 12, 14, 20:21, 23, 15:19, 26:27, 29, 31:34))
+  df <- df |> select(all_of(list_of_cols))
   return(df)
 }
 
 
-format_uninvoiced_qty <- function(df) {
+format_uninvoiced_qty <- function(df, list_of_cols) {
   # Format for Uninvoiced
   df <- df |>
-    select(c(2:4, 6, 12, 7:8, 13:14, 23, 19, 36)) |>
+    select(all_of(list_of_cols)) |>
     filter(.data$조정_q != 0) |>
     mutate(
       order_type = case_when(
@@ -92,9 +90,9 @@ format_uninvoiced_qty <- function(df) {
 }
 
 
-format_uninvoiced_amt <- function(df) {
+format_uninvoiced_amt <- function(df, list_of_cols) {
   df <- df |>
-    select(c(2:4, 6, 12, 7:8, 13:14, 29:36)) |>
+    select(all_of(list_of_cols)) |>
     tidyr::pivot_longer(
       cols = c("조정금액":"sample"),
       names_to = "key",
@@ -102,19 +100,19 @@ format_uninvoiced_amt <- function(df) {
     ) |>
     filter(.data$value != 0) |>
     mutate(
-      `Order type` = case_when(
+      order_type = case_when(
         value > 0 ~ "ZDR",
         value < 0 ~ "ZCR"
       ),
-      `Order reason` = case_when(
+      order_reason = case_when(
         key == "조정금액" ~ "A02",
         key == "단가소급" ~ "A03",
         key == "관세정산" ~ "A11",
         key == "환율차이" ~ "A04",
         key == "서열비" ~ "A12",
       ),
-      `Adj_Amt` = abs(.data$value),
-      `이월체크` = "",
+      adj_amt = abs(.data$value),
+      이월체크 = "",
     )
   return(df)
 }
@@ -146,10 +144,84 @@ main <- function() {
     remove_unnecessary_row() |>
     change_data_type()
 
-  price_list <- df |> format_price_list()
-  price_diff <- df |> format_price_diff()
-  adj_qty <- df |> format_uninvoiced_qty()
-  adj_amt <- df |> format_uninvoiced_amt()
+  columns_for_price_list <- c(
+    "plant",
+    "고객명",
+    "sold_to",
+    "공장명",
+    "customer_pn_rev",
+    "customer_pn",
+    "mlfb",
+    "div",
+    "profit_center",
+    "tax_invoice",
+    "price_type",
+    "sap_price",
+    "입고_q"
+  )
+  price_list <- df |> format_price_list(columns_for_price_list)
+
+  columns_for_price_diff <- c(
+    "sold_to",
+    "고객명",
+    "customer_pn_rev",
+    "customer_pn",
+    "mlfb",
+    "profit_center",
+    "입고_q",
+    "출고_q",
+    "조정_q",
+    "tax_invoice",
+    "price_type_before_adj",
+    "billing_price_before_adj",
+    "price_type",
+    "sap_price",
+    "입고금액_jj_수량_단가",
+    "출고금액",
+    "조정금액",
+    "단가소급",
+    "관세정산",
+    "환율차이",
+    "서열비"
+  )
+  price_diff <- df |> format_price_diff(columns_for_price_diff)
+
+  colummns_for_uninvoiced_qty <- c(
+    "plant",
+    "고객명",
+    "sold_to",
+    "ship_to",
+    "mlfb",
+    "customer_pn_rev",
+    "customer_pn",
+    "div",
+    "profit_center",
+    "조정_q",
+    "sap_price",
+    "comment"
+  )
+  adj_qty <- df |> format_uninvoiced_qty(colummns_for_uninvoiced_qty)
+
+  colummns_for_uninvoiced_amt <- c(
+    "plant",
+    "고객명",
+    "sold_to",
+    "ship_to",
+    "mlfb",
+    "customer_pn_rev",
+    "customer_pn",
+    "div",
+    "profit_center",
+    "조정금액",
+    "포장비",
+    "단가소급",
+    "관세정산",
+    "환율차이",
+    "서열비",
+    "sample",
+    "comment"
+  )
+  adj_amt <- df |> format_uninvoiced_amt(colummns_for_uninvoiced_amt)
 
   # Write data
   write_excel_csv(df, output_0)

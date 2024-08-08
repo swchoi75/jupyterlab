@@ -37,7 +37,7 @@ def process_mobis(df):
             and row["ship_to_party"] in ["10003814", "10046779", "40053559", "40043038"]
             else "MOBIS AS" if row["고객명"] == "MOBIS" else row["고객명"]
         ),
-        axis=1,
+        axis="columns",
     )
     return df
 
